@@ -29,7 +29,7 @@ instructions, Debug/UBSan builds, testing and installation.
 | Exact word arithmetic, actors, RNG and shared rules | `include/nuclear`, `src/game/game_rules.cpp` |
 | Turn coordinator and resolution | `src/game/turn_manager.cpp`, `src/game/combat` |
 | Four-attack, airborne-first revenge | `src/game/revenge/revenge_system.hpp` |
-| Production and AI decisions | `src/game/game_rules.cpp` |
+| Production and AI decisions | `src/game/game_rules.cpp`, `src/game/ai/ai_controller.cpp` |
 | Human commands and committed display state | `src/ui/player_controller.*` |
 | Console, speech, selection and playback | `src/ui` |
 | Original-art rendering and animation definitions | `src/rendering` |

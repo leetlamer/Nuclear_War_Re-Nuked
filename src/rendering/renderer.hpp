@@ -156,20 +156,19 @@ class Renderer {
         owned_renderer_.reset(renderer);
         SDL_RenderSetLogicalSize(renderer, 320, 200);
         SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
-        winner_art_ = sheet("endchar", 112, "mask_endchar_mask", true);
-        space_ = sheet("spacemap", 200, "", true, true);
-        ending_ = sheet("desolate_map", 200, "", true);
-        large_ = sheet("bigtiles", 432, "mask_bigmask");
-        large_opaque_ = sheet("bigtiles", 432);
-        controls_ = sheet("smalltiles", 272);
-        missiles_ = sheet("big512", 288, "mask_big512mask");
-        start_ = sheet("start", 200);
-        dip_ = sheet("dip", 200);
-        heads_ = sheet("leaders", 160);
-        world_ = sheet("world_map", 200);
-        tiles_ = sheet("smalltiles", 272, "mask_smallmask_z_m");
-        auto bitmap = nuclear::assets::image("font");
-        font_ = texture(bitmap.rgba, int(bitmap.width), int(bitmap.height));
+        winner_art_ = image_texture("victory_body", "masked");
+        space_ = image_texture("space_ending");
+        ending_ = image_texture("desolate_ending");
+        large_ = image_texture("large_sprites", "masked");
+        large_opaque_ = image_texture("large_sprites");
+        controls_ = image_texture("sprite_tiles");
+        missiles_ = image_texture("flight_effects", "masked");
+        start_ = image_texture("character_selection");
+        dip_ = image_texture("main_window");
+        heads_ = image_texture("leader_portraits");
+        world_ = image_texture("world_map");
+        tiles_ = image_texture("sprite_tiles", "masked");
+        font_ = image_texture("bitmap_font");
     }
     ~Renderer() = default;
     Renderer(const Renderer &) = delete;
@@ -184,14 +183,9 @@ class Renderer {
         SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
         return t;
     }
-    SDL_Texture *sheet(std::string name, int h, std::string mask = "", bool ending = false,
-                       bool all_dead = false) {
-        (void)ending;
-        (void)all_dead;
-        auto image = nuclear::assets::image(name, mask);
-        if (int(image.height) != h)
-            throw std::runtime_error("image height disagrees with atlas");
-        return texture(image.rgba, int(image.width), int(image.height));
+    SDL_Texture *image_texture(std::string_view key, std::string_view variant = {}) {
+        auto bitmap = nuclear::assets::image(key, variant);
+        return texture(bitmap.rgba, int(bitmap.width), int(bitmap.height));
     }
     void copy(SDL_Texture *t, SDL_Rect s, SDL_Rect d) { SDL_RenderCopy(renderer, t, &s, &d); }
     void text(std::string s, int x, int y, SDL_Color color = {0, 0, 0, 255}) {

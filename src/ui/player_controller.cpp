@@ -127,7 +127,7 @@ bool Player::complete_selection_screen() {
     data.human.selection.selected_class = 0;
     data.human.selection.selected_capacity = 0;
     auto c = std::make_unique<session::Coordinator>(data);
-    session::Adapters adapters{setup_, schedule_};
+    session::Adapters adapters{resolver_, schedule_};
     if (!c->advance(adapters) || !c->advance(adapters)) {
         diagnostic_ = c->diagnostic()->message;
         return false;
@@ -163,7 +163,7 @@ bool Player::command(HumanCommand cmd) {
     accepted_action_ = false;
     if (!coordinator_ || coordinator_->phase() != session::Phase::human_selection)
         return false;
-    session::Adapters a{setup_, schedule_};
+    session::Adapters a{resolver_, schedule_};
     bool delivery_accepted = false;
     Word delivery_action = cmd.kind == HumanCommandKind::missile   ? 2
                            : cmd.kind == HumanCommandKind::bomber  ? 4
@@ -218,7 +218,7 @@ bool Player::confirm_banner() {
     accepted_action_ = false;
     if (!coordinator_ || coordinator_->phase() != session::Phase::human_selection)
         return false;
-    session::Adapters a{setup_, schedule_};
+    session::Adapters a{resolver_, schedule_};
     if (!coordinator_->request_banner_confirmation() || !coordinator_->advance(a)) {
         diagnostic_ = coordinator_->diagnostic()->message;
         return false;
@@ -241,7 +241,7 @@ bool Player::advance_turn(Word time) {
     auto from = coordinator_->phase();
     auto before = coordinator_->data().state;
     auto seed_before = coordinator_->data().rng.seed();
-    session::Adapters adapters{setup_, schedule_};
+    session::Adapters adapters{resolver_, schedule_};
     if (!coordinator_->advance(adapters, from == session::Phase::resolver_handoff
                                              ? std::optional<Word>(time)
                                              : std::nullopt)) {

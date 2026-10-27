@@ -1,0 +1,309 @@
+[
+  {
+    "case": "four_rounds",
+    "compared_frames": 158,
+    "exact_frames_outside_wall_clock_console": 122,
+    "transient_differences": [
+      "banner.bmp",
+      "door_5_1_1.bmp",
+      "door_5_1_2.bmp",
+      "door_5_1_3.bmp",
+      "door_5_1_4.bmp",
+      "door_5_2_0.bmp",
+      "door_5_2_1.bmp",
+      "door_5_2_2.bmp",
+      "production.bmp",
+      "round_4_event_1_phase_0.bmp",
+      "round_4_event_1_phase_1.bmp",
+      "round_4_event_1_phase_2.bmp",
+      "round_4_event_3_message_23.bmp",
+      "round_4_event_3_phase_0.bmp",
+      "round_4_event_3_phase_1.bmp",
+      "round_4_event_3_phase_2.bmp",
+      "round_4_event_3_phase_3.bmp",
+      "round_4_event_4_message_24.bmp",
+      "round_4_event_4_phase_0.bmp",
+      "round_4_event_4_phase_1.bmp",
+      "round_4_event_5_message_25.bmp",
+      "round_4_event_5_phase_0.bmp",
+      "round_4_event_5_phase_1.bmp",
+      "round_4_event_5_phase_2.bmp",
+      "round_4_main.bmp",
+      "selection_1.bmp",
+      "selection_2.bmp",
+      "selection_3.bmp",
+      "selection_4.bmp",
+      "selection_empty.bmp",
+      "target_door_0_3_1.bmp",
+      "target_door_0_3_4.bmp",
+      "target_door_0_3_7.bmp",
+      "target_selected.bmp",
+      "target_view.bmp",
+      "title.bmp"
+    ]
+  },
+  {
+    "case": "missile",
+    "compared_frames": 6,
+    "exact_frames_outside_wall_clock_console": 6,
+    "transient_differences": []
+  },
+  {
+    "case": "bomber-attack",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "interception",
+    "compared_frames": 6,
+    "exact_frames_outside_wall_clock_console": 6,
+    "transient_differences": []
+  },
+  {
+    "case": "defense",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "production",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "100mt-production",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "100mt-missile",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "selector",
+    "compared_frames": 9,
+    "exact_frames_outside_wall_clock_console": 9,
+    "transient_differences": []
+  },
+  {
+    "case": "action-shutters",
+    "compared_frames": 13,
+    "exact_frames_outside_wall_clock_console": 13,
+    "transient_differences": []
+  },
+  {
+    "case": "reverse-shutters",
+    "compared_frames": 13,
+    "exact_frames_outside_wall_clock_console": 13,
+    "transient_differences": []
+  },
+  {
+    "case": "rapid-shutters",
+    "compared_frames": 7,
+    "exact_frames_outside_wall_clock_console": 7,
+    "transient_differences": []
+  },
+  {
+    "case": "round-shutters",
+    "compared_frames": 41,
+    "exact_frames_outside_wall_clock_console": 41,
+    "transient_differences": []
+  },
+  {
+    "case": "round-shutters-eliminated",
+    "compared_frames": 34,
+    "exact_frames_outside_wall_clock_console": 34,
+    "transient_differences": []
+  },
+  {
+    "case": "mood-controls",
+    "compared_frames": 7,
+    "exact_frames_outside_wall_clock_console": 7,
+    "transient_differences": []
+  },
+  {
+    "case": "mood-profile4",
+    "compared_frames": 9,
+    "exact_frames_outside_wall_clock_console": 9,
+    "transient_differences": []
+  },
+  {
+    "case": "speech",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "alien-departure",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "alien-delivery",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "earthquake",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "stork",
+    "compared_frames": 8,
+    "exact_frames_outside_wall_clock_console": 8,
+    "transient_differences": []
+  },
+  {
+    "case": "weight",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "meltdown",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "defector-right",
+    "compared_frames": 3,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-ai",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 37,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-human",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 37,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-bomber",
+    "compared_frames": 16,
+    "exact_frames_outside_wall_clock_console": 16,
+    "transient_differences": []
+  },
+  {
+    "case": "missile_click",
+    "compared_frames": 7,
+    "exact_frames_outside_wall_clock_console": 7,
+    "transient_differences": []
+  },
+  {
+    "case": "missile_hold",
+    "compared_frames": 6,
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": [
+      "round_1_event_0_phase_0.bmp",
+      "round_1_event_0_phase_1.bmp",
+      "round_1_event_0_phase_2.bmp"
+    ]
+  },
+  {
+    "case": "bomber-attack_click",
+    "compared_frames": 6,
+    "exact_frames_outside_wall_clock_console": 6,
+    "transient_differences": []
+  },
+  {
+    "case": "bomber-attack_hold",
+    "compared_frames": 5,
+    "exact_frames_outside_wall_clock_console": 5,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-ai_click",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 37,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-ai_hold",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 23,
+    "transient_differences": [
+      "round_1_event_2_phase_0.bmp",
+      "round_1_event_2_phase_1.bmp",
+      "round_1_event_2_phase_2.bmp",
+      "round_1_event_2_phase_3.bmp",
+      "round_1_event_3_phase_0.bmp",
+      "round_1_event_3_phase_1.bmp",
+      "round_1_event_3_phase_2.bmp",
+      "round_1_event_4_phase_1.bmp",
+      "round_1_event_4_phase_2.bmp",
+      "round_1_event_5_phase_0.bmp",
+      "round_1_event_5_phase_1.bmp",
+      "round_1_event_5_phase_2.bmp",
+      "round_1_event_5_phase_3.bmp",
+      "round_1_event_5_phase_4.bmp"
+    ]
+  },
+  {
+    "case": "revenge-human_click",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 37,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-human_hold",
+    "compared_frames": 37,
+    "exact_frames_outside_wall_clock_console": 25,
+    "transient_differences": [
+      "round_1_event_2_phase_0.bmp",
+      "round_1_event_2_phase_1.bmp",
+      "round_1_event_2_phase_4.bmp",
+      "round_1_event_3_phase_0.bmp",
+      "round_1_event_3_phase_1.bmp",
+      "round_1_event_3_phase_2.bmp",
+      "round_1_event_4_phase_0.bmp",
+      "round_1_event_4_phase_2.bmp",
+      "round_1_event_4_phase_4.bmp",
+      "round_1_event_5_phase_0.bmp",
+      "round_1_event_5_phase_1.bmp",
+      "round_1_event_5_phase_2.bmp"
+    ]
+  },
+  {
+    "case": "revenge-bomber_click",
+    "compared_frames": 16,
+    "exact_frames_outside_wall_clock_console": 16,
+    "transient_differences": []
+  },
+  {
+    "case": "revenge-bomber_hold",
+    "compared_frames": 16,
+    "exact_frames_outside_wall_clock_console": 13,
+    "transient_differences": [
+      "round_1_event_2_phase_0.bmp",
+      "round_1_event_2_phase_2.bmp",
+      "round_1_event_2_phase_3.bmp"
+    ]
+  },
+  {
+    "case": "human-victoryrestart",
+    "compared_frames": 21,
+    "exact_frames_outside_wall_clock_console": 21,
+    "transient_differences": []
+  },
+  {
+    "case": "ai-onlyrestart",
+    "compared_frames": 57,
+    "exact_frames_outside_wall_clock_console": 57,
+    "transient_differences": []
+  }
+]

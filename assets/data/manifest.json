@@ -2,7 +2,7 @@
   "schema": 1,
   "images": [
     {
-      "key": "start",
+      "key": "character_selection",
       "mask": "",
       "file": "images/backgrounds/character_selection.png",
       "width": 320,
@@ -10,10 +10,13 @@
       "rgba_sha256": "bd392e9bbb6e9c4ab1bbcf46183a43c2a3ec205b7693abfb14e32cbe256b39b9",
       "transparency": "opaque",
       "source_mapping": "start: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 1,
+      "source_key": "start",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
-      "key": "dip",
+      "key": "main_window",
       "mask": "",
       "file": "images/interface/main_window.png",
       "width": 320,
@@ -21,10 +24,13 @@
       "rgba_sha256": "eb700cd4695ceb4488c9f4f4ec196234c68ce45143b83db96c8871e063c5eb7c",
       "transparency": "opaque",
       "source_mapping": "dip: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 1,
+      "source_key": "dip",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
-      "key": "leaders",
+      "key": "leader_portraits",
       "mask": "",
       "file": "images/characters/leader_portraits.png",
       "width": 320,
@@ -32,7 +38,10 @@
       "rgba_sha256": "121b6af158c9e7ca49928f59f533c34245b6ea9278f7e5840fe00a29cc56340a",
       "transparency": "opaque",
       "source_mapping": "leaders: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 50,
+      "source_key": "leaders",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
       "key": "world_map",
@@ -43,10 +52,13 @@
       "rgba_sha256": "b45b585ba70197a7e7dcab5e8724017e2f460981251bed01c7fcebca7d41f453",
       "transparency": "opaque",
       "source_mapping": "world_map: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 1,
+      "source_key": "world_map",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
-      "key": "smalltiles",
+      "key": "sprite_tiles",
       "mask": "",
       "file": "images/interface/control_tiles.png",
       "width": 320,
@@ -54,43 +66,59 @@
       "rgba_sha256": "971ea5a046e80d40b24d5a05b58bd9c47d4ccd5cac5d159aaed7796837658e0a",
       "transparency": "opaque",
       "source_mapping": "smalltiles: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "smalltiles",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "smalltiles",
-      "mask": "mask_smallmask_z_m",
+      "key": "sprite_tiles",
+      "mask": "masked",
       "file": "images/effects/small_sprites.png",
       "width": 320,
       "height": 272,
       "rgba_sha256": "2a1751a467b8f1c233fd555ae4e5e6cdb26c05dd4544e07d721b32d39c1b0e84",
       "transparency": "original 1-bit mask",
       "source_mapping": "smalltiles: indexed pixels + original palette + mask_smallmask_z_m",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "smalltiles",
+      "source_mask": "mask_smallmask_z_m",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "big512",
-      "mask": "mask_big512mask",
+      "key": "flight_effects",
+      "mask": "masked",
       "file": "images/missiles/flight_and_effects.png",
       "width": 320,
       "height": 288,
       "rgba_sha256": "357aaecf36229c1604513691c655f9fbf93c7d5748f98401c9c5bd7cd74a7d35",
       "transparency": "original 1-bit mask",
       "source_mapping": "big512: indexed pixels + original palette + mask_big512mask",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "big512",
+      "source_mask": "mask_big512mask",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "bigtiles",
-      "mask": "mask_bigmask",
+      "key": "large_sprites",
+      "mask": "masked",
       "file": "images/effects/large_sprites.png",
       "width": 320,
       "height": 432,
       "rgba_sha256": "fe960cd7f1aa2304dc183c9d8d78b1048353c8b182ecf861703ddcf52999bcfe",
       "transparency": "original 1-bit mask",
       "source_mapping": "bigtiles: indexed pixels + original palette + mask_bigmask",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "bigtiles",
+      "source_mask": "mask_bigmask",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "bigtiles",
+      "key": "large_sprites",
       "mask": "",
       "file": "images/interface/selection_backdrops.png",
       "width": 320,
@@ -98,21 +126,29 @@
       "rgba_sha256": "0d36c86835e5368f26d69f57abfde4fedc090a0ab00bb1a5fa03720ca926ee2c",
       "transparency": "opaque",
       "source_mapping": "bigtiles: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "bigtiles",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "endchar",
-      "mask": "mask_endchar_mask",
+      "key": "victory_body",
+      "mask": "masked",
       "file": "images/characters/victory_body.png",
       "width": 320,
       "height": 112,
       "rgba_sha256": "6dc08abc06a384c43dcc28e18db20b7a6b1c0fba916a78232057fc8b40fe0df4",
       "transparency": "original 1-bit mask",
       "source_mapping": "endchar: indexed pixels + original palette + mask_endchar_mask",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": null,
+      "source_key": "endchar",
+      "source_mask": "mask_endchar_mask",
+      "frame_catalog": "data/animations.json",
+      "frame_count_note": "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
     },
     {
-      "key": "spacemap",
+      "key": "space_ending",
       "mask": "",
       "file": "images/backgrounds/space_ending.png",
       "width": 320,
@@ -120,10 +156,13 @@
       "rgba_sha256": "2ba6d8361a0f94eddc0146bbc879eb7067c0f8c97e846e46ae182764b2fa5372",
       "transparency": "opaque",
       "source_mapping": "spacemap: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 1,
+      "source_key": "spacemap",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
-      "key": "desolate_map",
+      "key": "desolate_ending",
       "mask": "",
       "file": "images/backgrounds/desolate_ending.png",
       "width": 320,
@@ -131,17 +170,24 @@
       "rgba_sha256": "a054c395c88c34c6fe216b5eca72c04a303f3f0423db1a2693f0fd36cebcf8c0",
       "transparency": "opaque",
       "source_mapping": "desolate_map: indexed pixels + original palette",
-      "frame_count": "atlas; see animations.json"
+      "frame_count": 1,
+      "source_key": "desolate_map",
+      "source_mask": "",
+      "frame_catalog": "data/animations.json"
     },
     {
-      "key": "font",
+      "key": "bitmap_font",
       "file": "fonts/original_bitmap.png",
       "width": 576,
       "height": 8,
       "rgba_sha256": "dbbd54173b523345d4d8ab4177170c0344dec6898bc0b5e1b8a934f90459bc96",
       "transparency": "glyph bits",
       "source_mapping": "ld_8_strike.raw",
-      "frame_count": 97
+      "frame_count": 97,
+      "source_key": "font",
+      "source_mask": "",
+      "mask": "",
+      "frame_catalog": "data/animations.json"
     }
   ],
   "audio": [

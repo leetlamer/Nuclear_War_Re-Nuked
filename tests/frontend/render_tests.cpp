@@ -9,7 +9,7 @@ using namespace nuclear::player;
 int main() {
     SDL_SetMainReady();
     SDL_Init(0);
-    auto atlas = nuclear::assets::image("smalltiles", "mask_smallmask_z_m");
+    auto atlas = nuclear::assets::image("sprite_tiles", "masked");
     std::vector<unsigned char> rgba(16 * 16 * 4);
     unsigned opaque = 0;
     for (int y = 0; y < 16; ++y)
@@ -74,8 +74,8 @@ int main() {
         auto image = sprite.atlas == Atlas::small
                          ? atlas
                          : nuclear::assets::image(
-                               sprite.atlas == Atlas::large ? "bigtiles" : "big512",
-                               sprite.atlas == Atlas::large ? "mask_bigmask" : "mask_big512mask");
+                               sprite.atlas == Atlas::large ? "large_sprites" : "flight_effects",
+                               sprite.atlas == Atlas::large ? "masked" : "masked");
         int w = sprite.source.w, h = sprite.source.h;
         std::vector<unsigned char> rgba2(w * h * 4);
         for (int y = 0; y < h; ++y)

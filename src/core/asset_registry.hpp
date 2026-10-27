@@ -4,19 +4,19 @@
 namespace nuclear::assets {
 struct ImageSpec{std::string_view key,mask,file;unsigned width,height;};
 inline constexpr std::array<ImageSpec,13> images{{
-    {"start","","images/backgrounds/character_selection.png",320,200},
-    {"dip","","images/interface/main_window.png",320,200},
-    {"leaders","","images/characters/leader_portraits.png",320,160},
+    {"character_selection","","images/backgrounds/character_selection.png",320,200},
+    {"main_window","","images/interface/main_window.png",320,200},
+    {"leader_portraits","","images/characters/leader_portraits.png",320,160},
     {"world_map","","images/backgrounds/world_map.png",320,200},
-    {"smalltiles","","images/interface/control_tiles.png",320,272},
-    {"smalltiles","mask_smallmask_z_m","images/effects/small_sprites.png",320,272},
-    {"big512","mask_big512mask","images/missiles/flight_and_effects.png",320,288},
-    {"bigtiles","mask_bigmask","images/effects/large_sprites.png",320,432},
-    {"bigtiles","","images/interface/selection_backdrops.png",320,432},
-    {"endchar","mask_endchar_mask","images/characters/victory_body.png",320,112},
-    {"spacemap","","images/backgrounds/space_ending.png",320,200},
-    {"desolate_map","","images/backgrounds/desolate_ending.png",320,200},
-    {"font","","fonts/original_bitmap.png",576,8},
+    {"sprite_tiles","","images/interface/control_tiles.png",320,272},
+    {"sprite_tiles","masked","images/effects/small_sprites.png",320,272},
+    {"flight_effects","masked","images/missiles/flight_and_effects.png",320,288},
+    {"large_sprites","masked","images/effects/large_sprites.png",320,432},
+    {"large_sprites","","images/interface/selection_backdrops.png",320,432},
+    {"victory_body","masked","images/characters/victory_body.png",320,112},
+    {"space_ending","","images/backgrounds/space_ending.png",320,200},
+    {"desolate_ending","","images/backgrounds/desolate_ending.png",320,200},
+    {"bitmap_font","","fonts/original_bitmap.png",576,8},
 }};
 struct AudioSpec{std::string_view key,file;unsigned samples,rate;};
 inline constexpr std::array<AudioSpec,13> audio{{

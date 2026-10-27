@@ -1,0 +1,3 @@
+src/core/asset_registry.hpp
+src/core/game_text_data.hpp
+src/rendering/asset_layout.hpp

@@ -76,8 +76,22 @@ for key, h, mask, name, palette in specs:
     png(O / "assets" / name, 320, h, bytes(rgba))
     images.append(
         dict(
-            key=key,
-            mask=mask,
+            key={
+                "start": "character_selection",
+                "dip": "main_window",
+                "leaders": "leader_portraits",
+                "world_map": "world_map",
+                "smalltiles": "sprite_tiles",
+                "big512": "flight_effects",
+                "bigtiles": "large_sprites",
+                "endchar": "victory_body",
+                "spacemap": "space_ending",
+                "desolate_map": "desolate_ending",
+                "font": "bitmap_font",
+            }[key],
+            source_key=key,
+            source_mask=mask,
+            mask="masked" if mask else "",
             file=name,
             width=320,
             height=h,
@@ -97,7 +111,8 @@ name = "fonts/original_bitmap.png"
 png(O / "assets" / name, 576, 8, rgba)
 images.append(
     dict(
-        key="font",
+        key="bitmap_font",
+        source_key="font",
         file=name,
         width=576,
         height=8,
@@ -177,6 +192,29 @@ for key, signed in sorted(waves.items()):
             rate_policy="cue period and 3546895 clock still determine effective source rate; production ooo 1.08x",
         )
     )
+for image in images:
+    image.setdefault("mask", "")
+    image.setdefault("source_mask", "")
+    source_key = image["source_key"]
+    image["frame_catalog"] = "data/animations.json"
+    image["frame_count"] = (
+        50
+        if source_key == "leaders"
+        else (
+            97
+            if source_key == "font"
+            else (
+                1
+                if source_key in ["start", "dip", "world_map", "spacemap", "desolate_map"]
+                else None
+            )
+        )
+    )
+    if image["frame_count"] is None:
+        image["frame_count_note"] = (
+            "Packed variable-size atlas; independent total not assigned. Named used sequences are catalogued separately."
+        )
+
 data = (S / "analysis/unpacked/segment_1_original.bin").read_bytes()
 font = json.loads((S / "port/assets/extracted/fonts/ld_8_metrics.json").read_text())
 gadgets = json.loads(

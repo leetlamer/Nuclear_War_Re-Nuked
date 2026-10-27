@@ -12,7 +12,7 @@ void setup(Player &p) {
         auto r = portrait_rect(id);
         verify(p.click(r.x + 20, r.y + 15), "character pick");
     }
-    verify(p.click(110, 20), "start");
+    verify(p.click(110, 20), "character_selection");
 }
 void frame(Renderer &display, Player &p, ActionPresentation &scene,
            const std::string &capture = {}) {
@@ -23,7 +23,7 @@ void frame(Renderer &display, Player &p, ActionPresentation &scene,
     verify(SDL_RenderReadPixels(display.renderer, nullptr, SDL_PIXELFORMAT_RGBA32, pixels.data(),
                                 w * 4) == 0,
            "pre-present readback");
-    auto controls = nuclear::assets::image("smalltiles").rgba;
+    auto controls = nuclear::assets::image("sprite_tiles").rgba;
     int scale = std::min(w / 320, h / 200), ox = (w - 320 * scale) / 2, oy = (h - 200 * scale) / 2;
     for (std::size_t a = 0; a < 4; ++a) {
         auto indicator = mood_indicator(p.coordinator()->data().state, a);

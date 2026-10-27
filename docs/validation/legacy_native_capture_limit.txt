@@ -1,0 +1,9 @@
+missile 6 / 6
+mood-controls 5 / 7
+alien-departure 1 / 5
+revenge-bomber 11 / 16
+Traceback (most recent call last):
+  File "<project>/tools/check_parity.py", line 41, in <module>
+    if 'result.bmp' in differences:raise AssertionError((name,'final pixels differ',differences))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('human-victoryrestart', 'final pixels differ', ['restart_hall_0.bmp', 'result.bmp', 'round_2_event_0_phase_0.bmp', 'round_2_event_0_phase_1.bmp'])

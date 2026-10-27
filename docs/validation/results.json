@@ -1,0 +1,67 @@
+{
+  "source_preservation": {
+    "files": 133940,
+    "unchanged": true,
+    "differences": []
+  },
+  "release_ctest": "16/16 passed",
+  "ubsan_ctest": "16/16 passed",
+  "clean_debug_ctest": "16/16 passed in independently extracted source tree",
+  "deterministic_state_parity": {
+    "phase_records": 2173,
+    "byte_identical": true,
+    "sha256": "6e232a179c0668a255b89d857589a72c07ffd4d6eb8a003c89ac4cd563333198"
+  },
+  "decoded_audio_cues": {
+    "count": 20,
+    "byte_identical": true,
+    "ui_waveforms": "ticker and selection bleep independently byte-compared to original generators"
+  },
+  "headless_replay_pairs": 39,
+  "compared_frames": 731,
+  "matching_outside_wall_clock_console": 663,
+  "native_pre_present": {
+    "pre_present_matching_frames": [
+      "action_11_0_pre.bmp",
+      "action_11_1_pre.bmp",
+      "action_11_2_pre.bmp",
+      "action_11_3_pre.bmp",
+      "action_16_0_pre.bmp",
+      "action_16_1_pre.bmp",
+      "action_16_2_pre.bmp",
+      "action_16_3_pre.bmp",
+      "action_1_0_pre.bmp",
+      "action_1_1_pre.bmp",
+      "action_1_2_pre.bmp",
+      "action_1_3_pre.bmp",
+      "action_5_0_pre.bmp",
+      "action_5_1_pre.bmp",
+      "action_5_2_pre.bmp",
+      "action_5_3_pre.bmp",
+      "action_7_0_pre.bmp",
+      "action_7_1_pre.bmp",
+      "action_7_2_pre.bmp",
+      "action_7_3_pre.bmp",
+      "action_86_0_pre.bmp",
+      "action_86_1_pre.bmp",
+      "action_86_2_pre.bmp",
+      "action_86_3_pre.bmp",
+      "four_selected_pre.bmp",
+      "high_scores_pre.bmp",
+      "main_pre.bmp",
+      "restart_selection_pre.bmp",
+      "selection_pre.bmp"
+    ],
+    "reference_pre_post_present_differences": 27
+  },
+  "native_emoji_checks": 397424,
+  "native_emoji_clicks_and_bleeps": 104,
+  "converted_images": 13,
+  "converted_wavs": 13,
+  "text_entries": 743,
+  "pointer_references": 315,
+  "platform_tested": "macOS27 arm64,AppleClang17,SDL2 2.32.10",
+  "other_platforms": "CMake/CI configured; not executed locally",
+  "audio_listening": "not performed",
+  "published": false
+}

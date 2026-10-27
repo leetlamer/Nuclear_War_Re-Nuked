@@ -4,8 +4,8 @@ project(
   VERSION 1.0.0
   LANGUAGES CXX)
 include(CTest)
-find_package(SDL2 CONFIG REQUIRED)
-find_package(PNG REQUIRED)
+find_package(SDL2 2.0.22 CONFIG REQUIRED)
+find_package(PNG 1.6 REQUIRED)
 option(NWR_ENABLE_UBSAN "Enable undefined-behavior checks (Clang/GCC)" OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

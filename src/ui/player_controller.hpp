@@ -36,7 +36,7 @@ class StaticSchedule : public session::CallbackSchedule {
 class Player {
     Screen screen_{Screen::title};
     Selection selection_;
-    TurnResolverAdapter setup_;
+    TurnResolverAdapter resolver_;
     StaticSchedule schedule_;
     State committed_quantities_{};
     std::unique_ptr<session::Coordinator> coordinator_;

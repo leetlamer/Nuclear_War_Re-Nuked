@@ -82,6 +82,7 @@ attack and hold uses1.5× presentation time. Neither recomputes outcomes.
 
 ## AI, production and text
 
+`src/game/ai/ai_controller.cpp` is the original ordered AI entry pass.
 `src/game/game_rules.cpp` holds the proven initialization, AI choices, inventory
 pairing, production and population rules. Related planning/marker helpers retain
 separate files. Profile4 mood inversion and the five-state human declaration cycle

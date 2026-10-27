@@ -10,6 +10,21 @@ m = json.loads((R / "assets/data/manifest.json").read_text())
 d = json.loads((R / "assets/data/dialogue.json").read_text())
 
 
+# Validate inputs before replacing generated artifacts.
+assert len(set(r["id"] for r in d["entries"])) == len(d["entries"])
+ids = {int(r["id"], 16) for r in d["entries"]}
+assert all(
+    t["id"] == "0x0" or int(t["id"], 16) == 0 or int(t["id"], 16) in ids for t in d["tables"]
+)
+addresses = [int(row["id"], 16) for row in d["entries"]]
+assert addresses == sorted(addresses), "Text lookup requires address order"
+assert len({(p["name"], p["index"]) for p in d["tables"]}) == len(d["tables"])
+assert len(l["profiles"]) == len(l["names"]) == len(l["portraits"]) == 10
+assert len(l["glyphs"]) == 97 and len(l["gadgets"]) == 28
+assert len(l["origin_x"]) == len(l["origin_y"]) == 5
+assert all(g["offset"] + g["width"] <= 576 for g in l["glyphs"])
+
+
 def array(typ, name, values):
     return (
         f"inline constexpr std::array<{typ},{len(values)}> {name}{{{{"
@@ -91,11 +106,6 @@ s += (
     + "}\n"
 )
 (R / "src/core/asset_registry.hpp").write_text(s)
-assert len(set(r["id"] for r in d["entries"])) == len(d["entries"])
-ids = {int(r["id"], 16) for r in d["entries"]}
-assert all(
-    t["id"] == "0x0" or int(t["id"], 16) == 0 or int(t["id"], 16) in ids for t in d["tables"]
-)
 print("Generated layout, exact text tables and asset registry; references validated")
 
 # CMake validates generated data and assets without needing Python at build/runtime.

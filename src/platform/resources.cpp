@@ -8,7 +8,7 @@ namespace nuclear::assets {
 const std::filesystem::path &root() {
     static const auto value = []() {
         if (const char *override = std::getenv("NWR_ASSETS")) {
-            std::filesystem::path p(override);
+            auto p = std::filesystem::u8path(override);
             if (std::filesystem::is_regular_file(p / "data/manifest.json"))
                 return p;
             throw std::runtime_error("NWR_ASSETS has no data/manifest.json");
@@ -16,7 +16,7 @@ const std::filesystem::path &root() {
         std::unique_ptr<char, decltype(&SDL_free)> base(SDL_GetBasePath(), SDL_free);
         if (!base)
             throw std::runtime_error(SDL_GetError());
-        const std::filesystem::path exe(base.get());
+        const auto exe = std::filesystem::u8path(base.get());
         for (const auto &p :
              {exe / "assets", exe / "../share/nuclearwar/assets", exe / "../Resources/assets"})
             if (std::filesystem::is_regular_file(p / "data/manifest.json"))
@@ -27,14 +27,19 @@ const std::filesystem::path &root() {
     return value;
 }
 std::filesystem::path path(std::string_view relative) {
-    return root() / std::filesystem::path(relative);
+    return root() / std::filesystem::u8path(std::string(relative));
 }
 Image image(std::string_view key, std::string_view mask) {
     for (const auto &entry : images)
         if (entry.key == key && entry.mask == mask) {
             png_image png{};
             png.version = PNG_IMAGE_VERSION;
-            if (!png_image_begin_read_from_file(&png, path(entry.file).string().c_str()))
+            std::size_t file_size = 0;
+            std::unique_ptr<void, decltype(&SDL_free)> file(
+                SDL_LoadFile(path(entry.file).u8string().c_str(), &file_size), SDL_free);
+            if (!file)
+                throw std::runtime_error(SDL_GetError());
+            if (!png_image_begin_read_from_memory(&png, file.get(), file_size))
                 throw std::runtime_error(png.message);
             struct Guard {
                 png_image *value;
@@ -56,7 +61,7 @@ Wave wave(std::string_view key) {
             SDL_AudioSpec spec{};
             Uint8 *data = nullptr;
             Uint32 size = 0;
-            if (!SDL_LoadWAV(path(entry.file).string().c_str(), &spec, &data, &size))
+            if (!SDL_LoadWAV(path(entry.file).u8string().c_str(), &spec, &data, &size))
                 return {};
             std::unique_ptr<Uint8, decltype(&SDL_FreeWAV)> guard(data, SDL_FreeWAV);
             if (spec.channels != 1 || spec.format != AUDIO_U8 || size != entry.samples ||

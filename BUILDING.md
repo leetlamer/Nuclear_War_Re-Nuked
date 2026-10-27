@@ -4,7 +4,7 @@
 
 - C++17 compiler: Apple Clang, GCC/Clang, or Visual Studio2022 C++ tools.
 - CMake3.20 or later and a platform build tool.
-- SDL2 development package and libpng development package.
+- SDL2 2.0.22+ development package and libpng1.6+ development package.
 - Python3 only for optional asset/data regeneration, validation and parity tools.
 
 No Python interpreter or original Amiga file is needed by the built game.

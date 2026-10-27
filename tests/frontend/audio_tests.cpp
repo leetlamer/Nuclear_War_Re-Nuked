@@ -15,6 +15,23 @@ int main() {
     SDL_SetHint(SDL_HINT_AUDIODRIVER, "dummy");
     SDL_Init(0);
     {
+        auto stored = nuclear::assets::wave("ticker").samples;
+        auto original = ticker_wave();
+        check(stored.size() == original.size());
+        for (std::size_t i = 0; i < stored.size(); ++i)
+            check(stored[i] == static_cast<unsigned char>(original[i]));
+        std::vector<unsigned char> expected;
+        for (int v = 1; v < 127; ++v) {
+            expected.push_back(static_cast<unsigned char>(v));
+            expected.push_back(static_cast<unsigned char>(-v));
+        }
+        for (int v = 127; v > 0; --v) {
+            expected.push_back(static_cast<unsigned char>(v));
+            expected.push_back(static_cast<unsigned char>(-v));
+        }
+        check(nuclear::assets::wave("selection_bleep").samples == expected);
+    }
+    {
         SoundManager defaulted;
         check(defaulted.available());
         check(defaulted.effective_clock() == 3546895);
