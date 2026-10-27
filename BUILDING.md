@@ -108,3 +108,6 @@ WAVs reversibly re-bias signed8 source samples into standard RIFF PCM8.
 The CI matrix covers Linux, Windows and both macOS architectures. Runner labels
 were checked against [GitHub's runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
 These jobs are configured but have not been published or run remotely.
+
+Application icon exports, macOS bundle launching and Linux AppImage staging are
+documented in [APPLICATION_ICONS.md](docs/APPLICATION_ICONS.md).

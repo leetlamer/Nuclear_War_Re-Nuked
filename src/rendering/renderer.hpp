@@ -141,11 +141,13 @@ class Renderer {
     }
     Renderer() {
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-        window = SDL_CreateWindow("Nuclear War", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                  960, 600, SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        window = SDL_CreateWindow("Nuclear War: Re-Nuked", SDL_WINDOWPOS_CENTERED,
+                                  SDL_WINDOWPOS_CENTERED, 960, 600,
+                                  SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
         if (!window)
             throw std::runtime_error(SDL_GetError());
         owned_window_.reset(window);
+        nuclear::assets::set_window_icon(window);
         SDL_SetWindowMinimumSize(window, 320, 200);
         renderer =
             SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);

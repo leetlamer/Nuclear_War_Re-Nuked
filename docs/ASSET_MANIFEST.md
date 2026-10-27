@@ -76,3 +76,10 @@ because no active cue/rate is established; this avoids inventing playback rules.
 Regenerate from an explicitly supplied source with `tools/convert_assets.py`,
 then run `tools/generate_data.py` and `tools/validate_assets.py`. Generated C++
 tables are checked in; configure-time SHA256 checks prevent stale data.
+
+## Application branding
+
+The unchanged master PNG and derived Windows ICO, macOS ICNS and seven Linux PNG
+sizes are listed in [APPLICATION_ICONS.md](APPLICATION_ICONS.md) and
+`assets/branding/manifest.json`. These are platform/window branding, independent
+of the game's original graphics atlases.

@@ -1,0 +1,20 @@
+{
+  "master_sha256": "3ca062ccaa824e4702f8942f6effac9aa1d931ced6bf902b98f111c8e6a5bb15",
+  "master_dimensions": [
+    1254,
+    1254
+  ],
+  "resampling": "Pillow LANCZOS; centered transparent square padding; no crop",
+  "files": [
+    "assets/branding/linux/128x128/nuclear-war-renuked.png",
+    "assets/branding/linux/16x16/nuclear-war-renuked.png",
+    "assets/branding/linux/256x256/nuclear-war-renuked.png",
+    "assets/branding/linux/32x32/nuclear-war-renuked.png",
+    "assets/branding/linux/48x48/nuclear-war-renuked.png",
+    "assets/branding/linux/512x512/nuclear-war-renuked.png",
+    "assets/branding/linux/64x64/nuclear-war-renuked.png",
+    "assets/branding/nuclear-war-renuked-icon.png",
+    "assets/branding/nuclear-war-renuked.icns",
+    "assets/branding/nuclear-war-renuked.ico"
+  ]
+}

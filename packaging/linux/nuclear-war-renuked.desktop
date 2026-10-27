@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Nuclear War: Re-Nuked
+Comment=Turn-based nuclear strategy game
+Exec=nuclearwar
+Icon=nuclear-war-renuked
+Terminal=false
+Categories=Game;StrategyGame;
+StartupWMClass=nuclearwar

@@ -29,6 +29,33 @@ const std::filesystem::path &root() {
 std::filesystem::path path(std::string_view relative) {
     return root() / std::filesystem::u8path(std::string(relative));
 }
+void set_window_icon(SDL_Window *window) {
+    const auto filename = path("branding/linux/256x256/nuclear-war-renuked.png");
+    std::size_t size = 0;
+    std::unique_ptr<void, decltype(&SDL_free)> file(
+        SDL_LoadFile(filename.u8string().c_str(), &size), SDL_free);
+    if (!file)
+        throw std::runtime_error(SDL_GetError());
+    png_image png{};
+    png.version = PNG_IMAGE_VERSION;
+    if (!png_image_begin_read_from_memory(&png, file.get(), size))
+        throw std::runtime_error(png.message);
+    struct Guard {
+        png_image *value;
+        ~Guard() { png_image_free(value); }
+    } guard{&png};
+    png.format = PNG_FORMAT_RGBA;
+    std::vector<unsigned char> pixels(PNG_IMAGE_SIZE(png));
+    if (!png_image_finish_read(&png, nullptr, pixels.data(), 0, nullptr))
+        throw std::runtime_error(png.message);
+    std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface(
+        SDL_CreateRGBSurfaceWithFormatFrom(pixels.data(), int(png.width), int(png.height), 32,
+                                           int(png.width) * 4, SDL_PIXELFORMAT_RGBA32),
+        SDL_FreeSurface);
+    if (!surface)
+        throw std::runtime_error(SDL_GetError());
+    SDL_SetWindowIcon(window, surface.get());
+}
 Image image(std::string_view key, std::string_view mask) {
     for (const auto &entry : images)
         if (entry.key == key && entry.mask == mask) {

@@ -6,6 +6,8 @@
 namespace nuclear::assets {
 const std::filesystem::path &root();
 std::filesystem::path path(std::string_view relative);
+// Set platform window branding without changing game rendering.
+void set_window_icon(SDL_Window *window);
 struct Image {
     unsigned width{}, height{};
     std::vector<unsigned char> rgba;

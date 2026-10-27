@@ -45,6 +45,7 @@ file(
   DESTINATION "${CMAKE_BINARY_DIR}"
   PATTERN ".DS_Store" EXCLUDE)
 add_executable(nuclearwar src/platform/application.cpp)
+include(cmake/ApplicationIcons.cmake)
 target_link_libraries(nuclearwar PRIVATE nuclear_game nuclear_resources
                                          SDL2::SDL2 PNG::PNG)
 if(TARGET SDL2::SDL2main)
@@ -117,6 +118,12 @@ foreach(target nuclearwar nuclearwar_replay)
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyAssets.cmake")
   endif()
 endforeach()
+if(APPLE)
+  add_custom_command(TARGET nuclearwar POST_BUILD COMMAND ${CMAKE_COMMAND}
+    "-DNWR_ASSET_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/assets"
+    "-DNWR_ASSET_DEST=$<TARGET_BUNDLE_CONTENT_DIR:nuclearwar>/Resources/assets"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyAssets.cmake")
+endif()
 if(MSVC)
   target_compile_options(nuclear_game PRIVATE /W4 /utf-8)
   target_compile_options(nuclear_resources PRIVATE /W4 /utf-8)
@@ -140,7 +147,8 @@ if(Python3_FOUND)
   endif()
 endif()
 include(GNUInstallDirs)
-install(TARGETS nuclearwar RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS nuclearwar RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                          BUNDLE DESTINATION .)
 install(
   DIRECTORY assets/
   DESTINATION ${CMAKE_INSTALL_DATADIR}/nuclearwar/assets
