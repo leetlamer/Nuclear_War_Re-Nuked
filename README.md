@@ -1,5 +1,5 @@
 # Nuclear War: Re-Nuked
-<img width="1983" height="793" alt="Nuclear War_ Re-Nuked Beach Apocalypse" src="https://github.com/user-attachments/assets/497d0ad0-03fc-4240-8017-0d79850ee13d" />
+<img width="1983" height="793" alt="Nuclear War_ Re-Nuked Beach Chaos" src="https://github.com/user-attachments/assets/faf30b79-3e3f-4a30-8f83-cf4beb8cf7ba" />
 
 A C++17/SDL2 recreation of the Amiga Nuclear War, organized as a standalone source
 project. This is a source modernization of the completed GameReverse game, not a
