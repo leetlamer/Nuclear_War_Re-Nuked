@@ -148,14 +148,14 @@ Independent probes captured **before presentation** using each actual renderer.
 All **29 paired native frames matched** outside the live console where applicable;
 the high-score frame matched fully. They cover selection, UI, missile/bomber/
 defence, city launch, alien/earthquake, high scores and reset-to-selection.
-The native emoji renderer test also passed397424 checks /104 accepted clicks and
-verified continued speech and12 subsequent rounds. This demonstrates actual SDL
+The native emoji renderer test also passed 397,424 checks / 104 accepted clicks and
+verified continued speech and 12 subsequent rounds. This demonstrates actual SDL
 pixel behavior rather than claiming unit tests alone establish visual parity.
 Native speaker listening and a complete manual playthrough were not performed.
 
 ## Build, installation and platform status
 
-Tested host: **macOS27 arm64, Apple Clang17, SDL2 2.32.10**. Release and Debug/UBSan
+Tested host: **macOS 27 arm64, Apple Clang 17, SDL2 2.32.10**. Release and Debug/UBSan
 builds passed. The installed native executable started from a foreign working
 directory without an asset override and remained running; the test terminated its
 own process after startup. Resources resolve beside the executable or in the
@@ -164,9 +164,9 @@ Python and Amiga tools do not.
 
 CMake and CI configurations cover Apple Silicon, Intel macOS, Linux x86_64 and
 Windows x64. Other operating systems/architectures were **not executed locally**.
-The host libpng bottle was built for macOS27 while the compiler's default target
-was26, producing a linker deployment warning; do not claim that this host-built
-binary supports macOS26 without matching dependency builds. Source builds are
+The host libpng bottle was built for macOS 27 while the compiler's default target
+was 26, producing a linker deployment warning; do not claim that this host-built
+binary supports macOS 26 without matching dependency builds. Source builds are
 not hardwired to that bottle or machine path.
 
 Installation and source ZIP preparation are local only. No GitHub repository,
@@ -176,7 +176,7 @@ work beyond this source project's tested host.
 
 ## Preservation and remaining debt
 
-- GameReverse content/inventory:133940 files unchanged. Its historical canonical
+- GameReverse content/inventory: 133,940 files unchanged. Its historical canonical
   `.DS_Store` evidence mismatch was neither altered nor called a passing check.
 - No original files moved/deleted; no original handoff edits; no shutdown.
 - No changed game rules, RNG ordering, production boundary, revenge policy,
