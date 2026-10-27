@@ -1,0 +1,4553 @@
+{
+  "entries": [
+    {
+      "id": "0x00100006",
+      "text": "Nuclear War Program"
+    },
+    {
+      "id": "0x0010001a",
+      "text": "Nuclear Key Disk:"
+    },
+    {
+      "id": "0x001008aa",
+      "text": "No Signal\n"
+    },
+    {
+      "id": "0x001008b6",
+      "text": "ld.font"
+    },
+    {
+      "id": "0x001008be",
+      "text": "---------------------------"
+    },
+    {
+      "id": "0x001008da",
+      "text": "        NUCLEAR WAR        "
+    },
+    {
+      "id": "0x001008f6",
+      "text": "---------------------------"
+    },
+    {
+      "id": "0x00100912",
+      "text": "Design  : Eric Hyman       "
+    },
+    {
+      "id": "0x0010092e",
+      "text": "          Jon Van Caneghem "
+    },
+    {
+      "id": "0x0010094a",
+      "text": "Program : Eric Hyman       "
+    },
+    {
+      "id": "0x00100966",
+      "text": "Graphics: Avril Harrison   "
+    },
+    {
+      "id": "0x00100982",
+      "text": "---------------------------"
+    },
+    {
+      "id": "0x0010099e",
+      "text": "Release 1.0  Copyright 1989"
+    },
+    {
+      "id": "0x001009ba",
+      "text": " New World Computing Inc.  "
+    },
+    {
+      "id": "0x001009d6",
+      "text": "    All Rights Reserved    "
+    },
+    {
+      "id": "0x001009f2",
+      "text": " Restart Game"
+    },
+    {
+      "id": "0x00100a00",
+      "text": " Quit        "
+    },
+    {
+      "id": "0x00100a0e",
+      "text": "About"
+    },
+    {
+      "id": "0x00100a14",
+      "text": "Game"
+    },
+    {
+      "id": "0x00100a1a",
+      "text": "topaz.font"
+    },
+    {
+      "id": "0x00100a26",
+      "text": "Nuclear War"
+    },
+    {
+      "id": "0x00102868",
+      "text": "Nuke War Vblank-1"
+    },
+    {
+      "id": "0x001028ba",
+      "text": "Your Country"
+    },
+    {
+      "id": "0x0010538e",
+      "text": "%d Million leave %s for %s."
+    },
+    {
+      "id": "0x001053aa",
+      "text": "No one leaves %s for %s."
+    },
+    {
+      "id": "0x001053c3",
+      "text": "%s gains %d Million."
+    },
+    {
+      "id": "0x001053d8",
+      "text": "%s gains %d Million."
+    },
+    {
+      "id": "0x001053ed",
+      "text": "%d million people are lost to the stars!"
+    },
+    {
+      "id": "0x00105416",
+      "text": "%d million people enter orbit."
+    },
+    {
+      "id": "0x00105435",
+      "text": "%d million space cadets fly away."
+    },
+    {
+      "id": "0x00105457",
+      "text": "%d million people squashed: CITY OBLITERATED!"
+    },
+    {
+      "id": "0x00105485",
+      "text": "%d million sucked into the ground: CITY PULVERIZED!"
+    },
+    {
+      "id": "0x001054b9",
+      "text": "%d million people crushed: CITY DESTROYED!"
+    },
+    {
+      "id": "0x001054e4",
+      "text": "%d million people squashed: CITY OBLITERATED!"
+    },
+    {
+      "id": "0x00105512",
+      "text": "%d million people flattened: CITY PULVERIZED!"
+    },
+    {
+      "id": "0x00105540",
+      "text": "%d million people crushed: CITY DESTROYED!"
+    },
+    {
+      "id": "0x0010556b",
+      "text": "%d million people killed by crazed cows."
+    },
+    {
+      "id": "0x00105594",
+      "text": "STAMPEDE! %d crushed by cows."
+    },
+    {
+      "id": "0x001055b2",
+      "text": "Cruising cows kill %d million people."
+    },
+    {
+      "id": "0x001055d8",
+      "text": "The Heinous Heifer kills %d million people."
+    },
+    {
+      "id": "0x00105604",
+      "text": "CattleTech claims another %d million lives."
+    },
+    {
+      "id": "0x00105630",
+      "text": "%s receives %d million immigrants."
+    },
+    {
+      "id": "0x00105653",
+      "text": "%d million killed by radiation."
+    },
+    {
+      "id": "0x00105673",
+      "text": "Population increases by %d million!"
+    },
+    {
+      "id": "0x00105697",
+      "text": "Bomber crashes enroute. City is safe!"
+    },
+    {
+      "id": "0x001056bd",
+      "text": "Missile Explodes off target. City is safe!"
+    },
+    {
+      "id": "0x001056e8",
+      "text": "Dud warhead saves the city!"
+    },
+    {
+      "id": "0x00105704",
+      "text": "Bomb shelters in use. only %d million killed."
+    },
+    {
+      "id": "0x00105732",
+      "text": "Bomb shelters prove fruitless. CITY DESTROYED!"
+    },
+    {
+      "id": "0x00105761",
+      "text": "Bomb shelters save everyone!"
+    },
+    {
+      "id": "0x0010577e",
+      "text": "Fireball engulfs city: %d million killed."
+    },
+    {
+      "id": "0x001057a8",
+      "text": "Fireball engulfs city: CITY DESTROYED"
+    },
+    {
+      "id": "0x001057ce",
+      "text": "Nuclear explosion kills %d million."
+    },
+    {
+      "id": "0x001057f2",
+      "text": "Nuclear explosion destroys city"
+    },
+    {
+      "id": "0x00105812",
+      "text": "Radioactive fallout kills %d million."
+    },
+    {
+      "id": "0x00105838",
+      "text": "Radioactive fallout destroys city"
+    },
+    {
+      "id": "0x0010585a",
+      "text": "Radioactive Beta-Rays kills %d million."
+    },
+    {
+      "id": "0x00105882",
+      "text": "Radioactive Beta-Rays destroy city"
+    },
+    {
+      "id": "0x001058a5",
+      "text": "Lethal Gamma-Rays kills %d million."
+    },
+    {
+      "id": "0x001058c9",
+      "text": "Lethal Gamma-Rays destroys city"
+    },
+    {
+      "id": "0x001058e9",
+      "text": "Dirty bomb kills %d million."
+    },
+    {
+      "id": "0x00105906",
+      "text": "Dirty bomb destroys city"
+    },
+    {
+      "id": "0x0010591f",
+      "text": "Stockpile Explodes! %d million killed."
+    },
+    {
+      "id": "0x00105946",
+      "text": "STOCKPILE EXPLODES! CITY DESTROYED!"
+    },
+    {
+      "id": "0x0010596a",
+      "text": "Bomber Shot down. City is safe!"
+    },
+    {
+      "id": "0x0010598a",
+      "text": "Missile Destroyed by ABM. City is safe!"
+    },
+    {
+      "id": "0x001059b2",
+      "text": "%s does nothing."
+    },
+    {
+      "id": "0x001059c3",
+      "text": "%s gains %d Million people."
+    },
+    {
+      "id": "0x001066b8",
+      "text": "L.N.D.S"
+    },
+    {
+      "id": "0x001066c0",
+      "text": "MegaCannon"
+    },
+    {
+      "id": "0x001066cc",
+      "text": "Nuclear Postman"
+    },
+    {
+      "id": "0x001066dc",
+      "text": "Grim Reaper"
+    },
+    {
+      "id": "0x001066e8",
+      "text": "Carnage"
+    },
+    {
+      "id": "0x001066f0",
+      "text": "Gravedigger"
+    },
+    {
+      "id": "0x001066fc",
+      "text": "Deathbringer"
+    },
+    {
+      "id": "0x00106709",
+      "text": "Pacifier"
+    },
+    {
+      "id": "0x00108f16",
+      "text": ""
+    },
+    {
+      "id": "0x00108f17",
+      "text": "%d"
+    },
+    {
+      "id": "0x00108f1a",
+      "text": "The %s missile"
+    },
+    {
+      "id": "0x00108f29",
+      "text": "exploded on %s"
+    },
+    {
+      "id": "0x00108f38",
+      "text": "%d million dead."
+    },
+    {
+      "id": "0x00108f49",
+      "text": "No casualties."
+    },
+    {
+      "id": "0x00108f58",
+      "text": "%d million Alien"
+    },
+    {
+      "id": "0x00108f69",
+      "text": "Immigrants Landed"
+    },
+    {
+      "id": "0x00108f7b",
+      "text": "In your Fine Nation."
+    },
+    {
+      "id": "0x00108f90",
+      "text": "%d million killed by"
+    },
+    {
+      "id": "0x00108fa5",
+      "text": "radiation from a"
+    },
+    {
+      "id": "0x00108fb6",
+      "text": "nuclear meltdown."
+    },
+    {
+      "id": "0x00108fc8",
+      "text": "%d million gained"
+    },
+    {
+      "id": "0x00108fda",
+      "text": "when Mr. Stork flew"
+    },
+    {
+      "id": "0x00108fee",
+      "text": "over your city."
+    },
+    {
+      "id": "0x00108ffe",
+      "text": "%d million killed by"
+    },
+    {
+      "id": "0x00109013",
+      "text": "a savage earthquake"
+    },
+    {
+      "id": "0x00109027",
+      "text": "striking your nation"
+    },
+    {
+      "id": "0x0010903c",
+      "text": "You deployed a defense"
+    },
+    {
+      "id": "0x00109053",
+      "text": "system to protect"
+    },
+    {
+      "id": "0x00109065",
+      "text": "your population."
+    },
+    {
+      "id": "0x00109076",
+      "text": "Your bomber crashed"
+    },
+    {
+      "id": "0x0010908a",
+      "text": "enroute to its target."
+    },
+    {
+      "id": "0x001090a1",
+      "text": ""
+    },
+    {
+      "id": "0x001090a2",
+      "text": "ejected %d million"
+    },
+    {
+      "id": "0x001090b5",
+      "text": "libelous liberals."
+    },
+    {
+      "id": "0x001090c8",
+      "text": "Your Human Catapult"
+    },
+    {
+      "id": "0x001090dc",
+      "text": "ejected %d million"
+    },
+    {
+      "id": "0x001090ef",
+      "text": "libelous liberals."
+    },
+    {
+      "id": "0x00109102",
+      "text": "The flying cows of"
+    },
+    {
+      "id": "0x00109115",
+      "text": "CattleTech killed"
+    },
+    {
+      "id": "0x00109127",
+      "text": "%d million carnivores."
+    },
+    {
+      "id": "0x0010913e",
+      "text": "absolutely no one."
+    },
+    {
+      "id": "0x00109151",
+      "text": "A 16 ton weight from"
+    },
+    {
+      "id": "0x00109166",
+      "text": "Hell splattered"
+    },
+    {
+      "id": "0x00109176",
+      "text": "%d million people."
+    },
+    {
+      "id": "0x00109189",
+      "text": "%d million space cadets"
+    },
+    {
+      "id": "0x001091a1",
+      "text": "joined the L-5 space"
+    },
+    {
+      "id": "0x001091b6",
+      "text": "colony."
+    },
+    {
+      "id": "0x001091be",
+      "text": "Your propaganda strike"
+    },
+    {
+      "id": "0x001091d5",
+      "text": "failed %d million"
+    },
+    {
+      "id": "0x001091e7",
+      "text": "defected to %s."
+    },
+    {
+      "id": "0x001091f7",
+      "text": "After a propaganda"
+    },
+    {
+      "id": "0x0010920a",
+      "text": "strike, %d million left"
+    },
+    {
+      "id": "0x00109222",
+      "text": "strike, No one left"
+    },
+    {
+      "id": "0x00109236",
+      "text": "%s for you."
+    },
+    {
+      "id": "0x00109242",
+      "text": "You bombed %s"
+    },
+    {
+      "id": "0x00109250",
+      "text": "for %d million:"
+    },
+    {
+      "id": "0x00109260",
+      "text": "for no casualties."
+    },
+    {
+      "id": "0x00109273",
+      "text": "%d megatons remain."
+    },
+    {
+      "id": "0x00109287",
+      "text": "%s missile"
+    },
+    {
+      "id": "0x00109292",
+      "text": "%d Megatons capacity"
+    },
+    {
+      "id": "0x001092a7",
+      "text": "awaits orders."
+    },
+    {
+      "id": "0x001092b6",
+      "text": "Bomber standing by,"
+    },
+    {
+      "id": "0x001092ca",
+      "text": "%d megatons remain."
+    },
+    {
+      "id": "0x001092de",
+      "text": "Welcome to Nuclear War."
+    },
+    {
+      "id": "0x001092f6",
+      "text": ""
+    },
+    {
+      "id": "0x001092f7",
+      "text": "Select an action"
+    },
+    {
+      "id": "0x00109308",
+      "text": "before ending turn."
+    },
+    {
+      "id": "0x0010931c",
+      "text": ""
+    },
+    {
+      "id": "0x0010931d",
+      "text": "Choose a target city"
+    },
+    {
+      "id": "0x00109332",
+      "text": "Before ending turn."
+    },
+    {
+      "id": "0x00109346",
+      "text": ""
+    },
+    {
+      "id": "0x00109347",
+      "text": "Select a target city"
+    },
+    {
+      "id": "0x0010935c",
+      "text": "for your propaganda."
+    },
+    {
+      "id": "0x00109371",
+      "text": ""
+    },
+    {
+      "id": "0x00109372",
+      "text": "%s targeted"
+    },
+    {
+      "id": "0x0010937e",
+      "text": "for propoganada."
+    },
+    {
+      "id": "0x0010938f",
+      "text": ""
+    },
+    {
+      "id": "0x00109390",
+      "text": "This will junk a bomber"
+    },
+    {
+      "id": "0x001093a8",
+      "text": "This will junk a missile"
+    },
+    {
+      "id": "0x001093c1",
+      "text": "You have no warheads"
+    },
+    {
+      "id": "0x001093d6",
+      "text": "of that size."
+    },
+    {
+      "id": "0x001093e4",
+      "text": ""
+    },
+    {
+      "id": "0x001093e5",
+      "text": "You have no warheads."
+    },
+    {
+      "id": "0x001093fb",
+      "text": "Try to build some."
+    },
+    {
+      "id": "0x0010940e",
+      "text": ""
+    },
+    {
+      "id": "0x0010940f",
+      "text": "Your bomber has"
+    },
+    {
+      "id": "0x0010941f",
+      "text": "used all its bombs,"
+    },
+    {
+      "id": "0x00109433",
+      "text": "deploy a new weapon."
+    },
+    {
+      "id": "0x00109448",
+      "text": "Warhead is too large."
+    },
+    {
+      "id": "0x0010945e",
+      "text": "The bomber can only"
+    },
+    {
+      "id": "0x00109472",
+      "text": "drop %d megatons."
+    },
+    {
+      "id": "0x00109484",
+      "text": "Warhead is too large."
+    },
+    {
+      "id": "0x0010949a",
+      "text": "The missile can only"
+    },
+    {
+      "id": "0x001094af",
+      "text": "carry %d megatons."
+    },
+    {
+      "id": "0x001094c2",
+      "text": "You must first deploy"
+    },
+    {
+      "id": "0x001094d8",
+      "text": "A delivery system."
+    },
+    {
+      "id": "0x001094eb",
+      "text": "Select a target first!"
+    },
+    {
+      "id": "0x00109502",
+      "text": ""
+    },
+    {
+      "id": "0x00109503",
+      "text": "%s targeted"
+    },
+    {
+      "id": "0x0010950f",
+      "text": "by your bomber:"
+    },
+    {
+      "id": "0x0010951f",
+      "text": "%d megaton payload."
+    },
+    {
+      "id": "0x00109533",
+      "text": ""
+    },
+    {
+      "id": "0x00109534",
+      "text": "%s targeted"
+    },
+    {
+      "id": "0x00109540",
+      "text": "by your missile."
+    },
+    {
+      "id": "0x00109551",
+      "text": "%d megaton payload."
+    },
+    {
+      "id": "0x00109565",
+      "text": "You decided to build."
+    },
+    {
+      "id": "0x0010957c",
+      "text": ""
+    },
+    {
+      "id": "0x0010957d",
+      "text": ""
+    },
+    {
+      "id": "0x0010957e",
+      "text": "Weapons will be built."
+    },
+    {
+      "id": "0x00109595",
+      "text": "Click on Nuclear war."
+    },
+    {
+      "id": "0x001095ab",
+      "text": "This will junk a bomber"
+    },
+    {
+      "id": "0x001095c3",
+      "text": "This will junk a missile"
+    },
+    {
+      "id": "0x001095dc",
+      "text": "NOTE: You're stockpiling"
+    },
+    {
+      "id": "0x001095f5",
+      "text": ""
+    },
+    {
+      "id": "0x001095f6",
+      "text": "Your arsenal contains"
+    },
+    {
+      "id": "0x0010960c",
+      "text": "no missiles at this time."
+    },
+    {
+      "id": "0x00109626",
+      "text": ""
+    },
+    {
+      "id": "0x00109627",
+      "text": "You have no missiles"
+    },
+    {
+      "id": "0x0010963c",
+      "text": "of that size."
+    },
+    {
+      "id": "0x0010964a",
+      "text": ""
+    },
+    {
+      "id": "0x0010964b",
+      "text": "%s missile"
+    },
+    {
+      "id": "0x00109656",
+      "text": "%d megaton capacity."
+    },
+    {
+      "id": "0x0010966b",
+      "text": ""
+    },
+    {
+      "id": "0x0010966c",
+      "text": "This will junk a bomber"
+    },
+    {
+      "id": "0x00109684",
+      "text": "This will junk a missile"
+    },
+    {
+      "id": "0x0010969d",
+      "text": "Your arseneal contains"
+    },
+    {
+      "id": "0x001096b4",
+      "text": "no bombers at this time."
+    },
+    {
+      "id": "0x001096cd",
+      "text": ""
+    },
+    {
+      "id": "0x001096ce",
+      "text": "Your have no bombers"
+    },
+    {
+      "id": "0x001096e3",
+      "text": "of that class."
+    },
+    {
+      "id": "0x001096f2",
+      "text": ""
+    },
+    {
+      "id": "0x001096f3",
+      "text": "%s bomber"
+    },
+    {
+      "id": "0x001096fd",
+      "text": "%d megaton capacity."
+    },
+    {
+      "id": "0x00109712",
+      "text": ""
+    },
+    {
+      "id": "0x00109713",
+      "text": "This will junk a bomber"
+    },
+    {
+      "id": "0x0010972b",
+      "text": "This will junk a missile"
+    },
+    {
+      "id": "0x00109744",
+      "text": "Your arsenal contains"
+    },
+    {
+      "id": "0x0010975a",
+      "text": "no defensive weaponry"
+    },
+    {
+      "id": "0x00109770",
+      "text": "at this time."
+    },
+    {
+      "id": "0x0010977e",
+      "text": "Your stockpile contains"
+    },
+    {
+      "id": "0x00109796",
+      "text": "no defensive weaponry."
+    },
+    {
+      "id": "0x001097ad",
+      "text": "of that type."
+    },
+    {
+      "id": "0x001097bb",
+      "text": "%s system"
+    },
+    {
+      "id": "0x001097c5",
+      "text": "ready for action."
+    },
+    {
+      "id": "0x001097d7",
+      "text": ""
+    },
+    {
+      "id": "0x001097d8",
+      "text": "You may not target"
+    },
+    {
+      "id": "0x001097eb",
+      "text": "your own country!"
+    },
+    {
+      "id": "0x001097fd",
+      "text": ""
+    },
+    {
+      "id": "0x001097fe",
+      "text": ""
+    },
+    {
+      "id": "0x001097ff",
+      "text": "%s targeted"
+    },
+    {
+      "id": "0x0010980b",
+      "text": "for propaganada."
+    },
+    {
+      "id": "0x0010981c",
+      "text": ""
+    },
+    {
+      "id": "0x0010981d",
+      "text": "This will junk a bomber"
+    },
+    {
+      "id": "0x00109835",
+      "text": "This will junk a missile"
+    },
+    {
+      "id": "0x0010984e",
+      "text": "%d"
+    },
+    {
+      "id": "0x0010a5ac",
+      "text": "r"
+    },
+    {
+      "id": "0x0010a6c8",
+      "text": "    "
+    },
+    {
+      "id": "0x0010a6cd",
+      "text": "r"
+    },
+    {
+      "id": "0x0010a6cf",
+      "text": "FORM"
+    },
+    {
+      "id": "0x0010a6d4",
+      "text": "8SVX"
+    },
+    {
+      "id": "0x0010a6d9",
+      "text": "VHDR"
+    },
+    {
+      "id": "0x0010a83e",
+      "text": "    "
+    },
+    {
+      "id": "0x0010a843",
+      "text": "r"
+    },
+    {
+      "id": "0x0010a845",
+      "text": "FORM"
+    },
+    {
+      "id": "0x0010a84a",
+      "text": "8SVX"
+    },
+    {
+      "id": "0x0010a84f",
+      "text": "VHDR"
+    },
+    {
+      "id": "0x0010a854",
+      "text": "BODY"
+    },
+    {
+      "id": "0x0010a8f6",
+      "text": "    "
+    },
+    {
+      "id": "0x0010aa2c",
+      "text": "Sound Channel"
+    },
+    {
+      "id": "0x0010aa3a",
+      "text": "audio.device"
+    },
+    {
+      "id": "0x0010d39e",
+      "text": "Your factories produced:"
+    },
+    {
+      "id": "0x0010d3b7",
+      "text": "Your factories produced:"
+    },
+    {
+      "id": "0x0010d3d0",
+      "text": "Your citizens made:"
+    },
+    {
+      "id": "0x0010d3e4",
+      "text": "%2.2d %3dMT Missile%c"
+    },
+    {
+      "id": "0x0010d3fa",
+      "text": "%2.2d %3dMT Warhead%c"
+    },
+    {
+      "id": "0x0010d410",
+      "text": "%2.2d  %s-%d Bomber%c"
+    },
+    {
+      "id": "0x0010d426",
+      "text": "NP"
+    },
+    {
+      "id": "0x0010d429",
+      "text": "GR"
+    },
+    {
+      "id": "0x0010d42c",
+      "text": "%2.2d  %s%s"
+    },
+    {
+      "id": "0x0010d438",
+      "text": "MegaCannon"
+    },
+    {
+      "id": "0x0010d443",
+      "text": "L.N.D.S."
+    },
+    {
+      "id": "0x0010d44c",
+      "text": "'s"
+    },
+    {
+      "id": "0x0010d44f",
+      "text": "  "
+    },
+    {
+      "id": "0x0010d452",
+      "text": "Nothing!"
+    },
+    {
+      "id": "0x0010dfae",
+      "text": "%2.2ld "
+    },
+    {
+      "id": "0x0010dfb7",
+      "text": "%2.2ld "
+    },
+    {
+      "id": "0x0010f224",
+      "text": "I consulted my astrologer."
+    },
+    {
+      "id": "0x0010f23f",
+      "text": "Nancy! Oh Nancy!"
+    },
+    {
+      "id": "0x0010f250",
+      "text": "I want to press the button."
+    },
+    {
+      "id": "0x0010f26c",
+      "text": "I need a nap."
+    },
+    {
+      "id": "0x0010f27a",
+      "text": "Hug me with nuclear arms."
+    },
+    {
+      "id": "0x0010f294",
+      "text": "I use awesome firepower."
+    },
+    {
+      "id": "0x0010f2ad",
+      "text": "Who says I'm moody?"
+    },
+    {
+      "id": "0x0010f2c1",
+      "text": "I will reclaim our islands!"
+    },
+    {
+      "id": "0x0010f2dd",
+      "text": "My nation will prevail."
+    },
+    {
+      "id": "0x0010f2f5",
+      "text": "I hate two-bit nations."
+    },
+    {
+      "id": "0x0010f30d",
+      "text": "What? Me an Iron Maiden?"
+    },
+    {
+      "id": "0x0010f326",
+      "text": "Would you like a cigar?"
+    },
+    {
+      "id": "0x0010f33e",
+      "text": "Nukes stink!"
+    },
+    {
+      "id": "0x0010f34b",
+      "text": "What missile crisis?"
+    },
+    {
+      "id": "0x0010f360",
+      "text": "Join me! Have a cigar."
+    },
+    {
+      "id": "0x0010f377",
+      "text": "We are like neighbors."
+    },
+    {
+      "id": "0x0010f38e",
+      "text": "Would you like some refugees?"
+    },
+    {
+      "id": "0x0010f3ac",
+      "text": "Who's the infidel?"
+    },
+    {
+      "id": "0x0010f3bf",
+      "text": "Have a cookie my friend."
+    },
+    {
+      "id": "0x0010f3d8",
+      "text": "My friends are my enemies."
+    },
+    {
+      "id": "0x0010f3f3",
+      "text": "Now, Did I like you or not?"
+    },
+    {
+      "id": "0x0010f40f",
+      "text": "I just want to help."
+    },
+    {
+      "id": "0x0010f424",
+      "text": "Who says I'm crazed?!"
+    },
+    {
+      "id": "0x0010f43a",
+      "text": "Just call me 'The Colonel'."
+    },
+    {
+      "id": "0x0010f456",
+      "text": "Fitted sheets for everyone."
+    },
+    {
+      "id": "0x0010f472",
+      "text": "Persecute dry cleaners!"
+    },
+    {
+      "id": "0x0010f48a",
+      "text": "Fanatic! Me. HAHAHAHAHA!"
+    },
+    {
+      "id": "0x0010f4a3",
+      "text": "You'd look good in towels."
+    },
+    {
+      "id": "0x0010f4be",
+      "text": "Toga! Toga! Toga!"
+    },
+    {
+      "id": "0x0010f4d0",
+      "text": "Join me or die!"
+    },
+    {
+      "id": "0x0010f4e0",
+      "text": "I propogate better!"
+    },
+    {
+      "id": "0x0010f4f4",
+      "text": "This is pun!"
+    },
+    {
+      "id": "0x0010f501",
+      "text": "Be nice to me."
+    },
+    {
+      "id": "0x0010f510",
+      "text": "Who me care?"
+    },
+    {
+      "id": "0x0010f51d",
+      "text": "Care for a fortune cookie."
+    },
+    {
+      "id": "0x0010f538",
+      "text": "Bide your time."
+    },
+    {
+      "id": "0x0010f548",
+      "text": "It's all peanuts to me."
+    },
+    {
+      "id": "0x0010f560",
+      "text": "Let's sign an accord."
+    },
+    {
+      "id": "0x0010f576",
+      "text": "I'm everyones friend."
+    },
+    {
+      "id": "0x0010f58c",
+      "text": "Be nice to everyone!"
+    },
+    {
+      "id": "0x0010f5a1",
+      "text": "Propaganda has its limits."
+    },
+    {
+      "id": "0x0010f5bc",
+      "text": "Help me!"
+    },
+    {
+      "id": "0x0010f5c5",
+      "text": "Lies..What Lies?"
+    },
+    {
+      "id": "0x0010f5d6",
+      "text": "Tapes..What Tapes?"
+    },
+    {
+      "id": "0x0010f5e9",
+      "text": "I am not a crook!"
+    },
+    {
+      "id": "0x0010f5fb",
+      "text": "I've been .. Never mind."
+    },
+    {
+      "id": "0x0010f614",
+      "text": "Trust me!"
+    },
+    {
+      "id": "0x0010f61e",
+      "text": "I'd never lie to You!"
+    },
+    {
+      "id": "0x0010f634",
+      "text": "Lies..Lies..Sweet little Lies."
+    },
+    {
+      "id": "0x0010f653",
+      "text": "Love me or leave me!"
+    },
+    {
+      "id": "0x0010f668",
+      "text": "Glasnost or Bust!"
+    },
+    {
+      "id": "0x0010f67a",
+      "text": "I'll reform, I promise!"
+    },
+    {
+      "id": "0x0010f692",
+      "text": "Die a horrible death!"
+    },
+    {
+      "id": "0x0010f6a8",
+      "text": "Your system is doomed!"
+    },
+    {
+      "id": "0x0010f6bf",
+      "text": "There is no need for struggle."
+    },
+    {
+      "id": "0x0010f6de",
+      "text": "Prosper through non-violence."
+    },
+    {
+      "id": "0x0010f6fc",
+      "text": "Don't mess with 'The Ghanj'!"
+    },
+    {
+      "id": "0x0010f719",
+      "text": "No body props better!"
+    },
+    {
+      "id": "0x0010f72f",
+      "text": "My prop never fails!"
+    },
+    {
+      "id": "0x0010f744",
+      "text": "Don't even think of nuking me"
+    },
+    {
+      "id": "0x0010f762",
+      "text": "I forgot."
+    },
+    {
+      "id": "0x0010f76c",
+      "text": "There can be only one!"
+    },
+    {
+      "id": "0x0010f783",
+      "text": "Blessed are the meek!"
+    },
+    {
+      "id": "0x0010f799",
+      "text": "Worse, how could it be worse."
+    },
+    {
+      "id": "0x0010f7b7",
+      "text": "I am in control."
+    },
+    {
+      "id": "0x0010f7c8",
+      "text": "Danger! Danger!"
+    },
+    {
+      "id": "0x0010f7d8",
+      "text": "We can rebuild it."
+    },
+    {
+      "id": "0x0010f7eb",
+      "text": "Does my city glow at night?"
+    },
+    {
+      "id": "0x0010f807",
+      "text": "Foul!!!! He fouled me!!!"
+    },
+    {
+      "id": "0x0010f820",
+      "text": "Who's your buddy? I am!"
+    },
+    {
+      "id": "0x0010f838",
+      "text": "Ouch that hurt!"
+    },
+    {
+      "id": "0x0010f848",
+      "text": "Leave me alone."
+    },
+    {
+      "id": "0x0010f858",
+      "text": "I don't want to talk."
+    },
+    {
+      "id": "0x0010f86e",
+      "text": "Who turned out the lights."
+    },
+    {
+      "id": "0x0010f889",
+      "text": "Change your happy face!"
+    },
+    {
+      "id": "0x0010f8a1",
+      "text": "Smile at me!"
+    },
+    {
+      "id": "0x0010f8ae",
+      "text": "Frown at him!"
+    },
+    {
+      "id": "0x0010f8bc",
+      "text": "I'm flailing!"
+    },
+    {
+      "id": "0x0010f8ca",
+      "text": "Help! I need your help!"
+    },
+    {
+      "id": "0x0010f8e2",
+      "text": "Without you I will be killed!"
+    },
+    {
+      "id": "0x0010f900",
+      "text": "They want me to attack you."
+    },
+    {
+      "id": "0x0010f91c",
+      "text": "I'm so happy!"
+    },
+    {
+      "id": "0x0010f92a",
+      "text": "I'm in over my head."
+    },
+    {
+      "id": "0x0010f93f",
+      "text": "You are truly feeble."
+    },
+    {
+      "id": "0x0010f955",
+      "text": "You are a lucky lucky man."
+    },
+    {
+      "id": "0x0010f970",
+      "text": "Propaganda usually fails."
+    },
+    {
+      "id": "0x0010f98a",
+      "text": "Its the only way to be sure."
+    },
+    {
+      "id": "0x0010f9a7",
+      "text": "Nukes yield more."
+    },
+    {
+      "id": "0x0010f9b9",
+      "text": "Nukes are risky business."
+    },
+    {
+      "id": "0x0010f9d3",
+      "text": "I want the stork!"
+    },
+    {
+      "id": "0x0010f9e5",
+      "text": "Anything is better then an L5."
+    },
+    {
+      "id": "0x0010fa04",
+      "text": "Sky 'Scrapers are invincible."
+    },
+    {
+      "id": "0x0010fa22",
+      "text": "100 Megs or nothing!"
+    },
+    {
+      "id": "0x0010fa37",
+      "text": "Can't take the Heat?"
+    },
+    {
+      "id": "0x0010fa4c",
+      "text": "Are you my friend?"
+    },
+    {
+      "id": "0x0010fa5f",
+      "text": "Be my friend."
+    },
+    {
+      "id": "0x0010fa6d",
+      "text": "That was a poor move."
+    },
+    {
+      "id": "0x0010fa83",
+      "text": "Oh! Do it again! Please!"
+    },
+    {
+      "id": "0x0010fa9c",
+      "text": "Ah......No!"
+    },
+    {
+      "id": "0x0010faa8",
+      "text": "Stay On Target!"
+    },
+    {
+      "id": "0x0010fab8",
+      "text": "I'm Batman."
+    },
+    {
+      "id": "0x0010fac4",
+      "text": "Who is this Batman Fellow?"
+    },
+    {
+      "id": "0x0010fadf",
+      "text": "Savoir Faire is everywhere."
+    },
+    {
+      "id": "0x0010fafb",
+      "text": "Here I come to save the day!"
+    },
+    {
+      "id": "0x0010fb18",
+      "text": "I won't change my mind!"
+    },
+    {
+      "id": "0x0010fb30",
+      "text": "Always expect the Unexpected."
+    },
+    {
+      "id": "0x0010fb4e",
+      "text": "Lets work together."
+    },
+    {
+      "id": "0x0010fb62",
+      "text": "My dislike for you grows!"
+    },
+    {
+      "id": "0x0010fb7c",
+      "text": "Hey leave that city alone!"
+    },
+    {
+      "id": "0x0010fb97",
+      "text": "Get your eyes off my city!"
+    },
+    {
+      "id": "0x0010fbb2",
+      "text": "Bombers use multiple payloads."
+    },
+    {
+      "id": "0x0010fbd1",
+      "text": "Missiles are easier to kill."
+    },
+    {
+      "id": "0x0010fbee",
+      "text": "Mega Cannons kill all!"
+    },
+    {
+      "id": "0x0010fc05",
+      "text": "100 Megatons hurts bad!"
+    },
+    {
+      "id": "0x0010fc1d",
+      "text": "Attack everyone."
+    },
+    {
+      "id": "0x0010fc2e",
+      "text": "Anger no one."
+    },
+    {
+      "id": "0x0010fc3c",
+      "text": "Everyone has a favorite city."
+    },
+    {
+      "id": "0x0010fc5a",
+      "text": "Warmongers are easy."
+    },
+    {
+      "id": "0x0010fc6f",
+      "text": "Never rely on chaos!"
+    },
+    {
+      "id": "0x0010fc84",
+      "text": "400 Million will never happen."
+    },
+    {
+      "id": "0x0010fca3",
+      "text": "Get a highscore, win A prize."
+    },
+    {
+      "id": "0x0010fcc1",
+      "text": "I am the Puppet Master."
+    },
+    {
+      "id": "0x0010fcd9",
+      "text": "Hey? Who's whistling?"
+    },
+    {
+      "id": "0x0010fcef",
+      "text": "Whos bad?"
+    },
+    {
+      "id": "0x0010fcf9",
+      "text": "May I help you?"
+    },
+    {
+      "id": "0x0010fd09",
+      "text": "NW = ELH + JVC."
+    },
+    {
+      "id": "0x0010fd19",
+      "text": "Seen any good weights lately?"
+    },
+    {
+      "id": "0x0010fd37",
+      "text": "Are aliens illegal?"
+    },
+    {
+      "id": "0x0010fd4b",
+      "text": "Pass the cow."
+    },
+    {
+      "id": "0x0010fd59",
+      "text": "Have any undesireables?"
+    },
+    {
+      "id": "0x0010fd71",
+      "text": "Ever play Might And Magic?"
+    },
+    {
+      "id": "0x0010fd8c",
+      "text": "Send in your Registration card."
+    },
+    {
+      "id": "0x0010fdac",
+      "text": "Suggestions? Write us a letter."
+    },
+    {
+      "id": "0x0010fdcc",
+      "text": "I've done worse than kill you."
+    },
+    {
+      "id": "0x0010fdeb",
+      "text": "I've hurt you."
+    },
+    {
+      "id": "0x0010fdfa",
+      "text": "Revenge is Best served cold."
+    },
+    {
+      "id": "0x0010fe17",
+      "text": "Well....I don't remember."
+    },
+    {
+      "id": "0x0010fe31",
+      "text": "Are we having fun yet?"
+    },
+    {
+      "id": "0x0010fe48",
+      "text": "Play a game, get a message."
+    },
+    {
+      "id": "0x0010fe64",
+      "text": "Play a turn, get a message."
+    },
+    {
+      "id": "0x0010fe80",
+      "text": "Incoming!"
+    },
+    {
+      "id": "0x0010fe8a",
+      "text": "Fire in the hole!"
+    },
+    {
+      "id": "0x0010fe9c",
+      "text": "I'll be back!"
+    },
+    {
+      "id": "0x0010feaa",
+      "text": "I know his name!"
+    },
+    {
+      "id": "0x0010febb",
+      "text": "What he said."
+    },
+    {
+      "id": "0x0010fec9",
+      "text": "I concur."
+    },
+    {
+      "id": "0x0010fed3",
+      "text": "Nuke 'em till they glow."
+    },
+    {
+      "id": "0x0010feec",
+      "text": "Never mind."
+    },
+    {
+      "id": "0x0010fef8",
+      "text": "Go Goobers!"
+    },
+    {
+      "id": "0x0010ff04",
+      "text": "I'm moving to L5."
+    },
+    {
+      "id": "0x0010ff16",
+      "text": "Kill the human!"
+    },
+    {
+      "id": "0x0010ff26",
+      "text": "Don't know my own strength!"
+    },
+    {
+      "id": "0x0010ff42",
+      "text": "Lets you and him fight!"
+    },
+    {
+      "id": "0x0010ff5a",
+      "text": "What a country!"
+    },
+    {
+      "id": "0x0010ff6a",
+      "text": "You MUST be kidding."
+    },
+    {
+      "id": "0x0010ff7f",
+      "text": "Yes, I am picking on you."
+    },
+    {
+      "id": "0x0010ff99",
+      "text": "What goes around, comes around."
+    },
+    {
+      "id": "0x0010ffb9",
+      "text": "The end is near!"
+    },
+    {
+      "id": "0x0010ffca",
+      "text": "Whos your pal?"
+    },
+    {
+      "id": "0x0010ffd9",
+      "text": "The world will end in 5 minutes."
+    },
+    {
+      "id": "0x0010fffa",
+      "text": "That was a fatal mistake."
+    },
+    {
+      "id": "0x00110014",
+      "text": "You are the Evil Empire!"
+    },
+    {
+      "id": "0x0011002d",
+      "text": "It's bedtime for you, bozo!"
+    },
+    {
+      "id": "0x00110049",
+      "text": "Run, but you can't hide!"
+    },
+    {
+      "id": "0x00110062",
+      "text": "Ready the Royal Navy!"
+    },
+    {
+      "id": "0x00110078",
+      "text": "Prepare for war!,We are not amused."
+    },
+    {
+      "id": "0x0011009c",
+      "text": "Die Infidel!..Oops, Nevermind."
+    },
+    {
+      "id": "0x001100bb",
+      "text": "I am realy mad at you."
+    },
+    {
+      "id": "0x001100d2",
+      "text": "That burns my embers."
+    },
+    {
+      "id": "0x001100e8",
+      "text": "Aha! I Knew it! Treachery!"
+    },
+    {
+      "id": "0x00110103",
+      "text": "You crossed the Line of Death!"
+    },
+    {
+      "id": "0x00110122",
+      "text": "I hope you like sheets."
+    },
+    {
+      "id": "0x0011013a",
+      "text": "Time for another strike!"
+    },
+    {
+      "id": "0x00110153",
+      "text": "You are The Great Evil!"
+    },
+    {
+      "id": "0x0011016b",
+      "text": "May all your nukes dud!"
+    },
+    {
+      "id": "0x00110183",
+      "text": "That was not funny, enemy mine!"
+    },
+    {
+      "id": "0x001101a3",
+      "text": "My horde will get you!"
+    },
+    {
+      "id": "0x001101ba",
+      "text": "I will kill you with puns!"
+    },
+    {
+      "id": "0x001101d5",
+      "text": "I know how to handle threats!"
+    },
+    {
+      "id": "0x001101f3",
+      "text": "Please don't hurt me again."
+    },
+    {
+      "id": "0x0011020f",
+      "text": "Oh no! Not the peanut farm!"
+    },
+    {
+      "id": "0x0011022b",
+      "text": "And they say I lie!"
+    },
+    {
+      "id": "0x0011023f",
+      "text": "That was an accident, Right?"
+    },
+    {
+      "id": "0x0011025c",
+      "text": "But we had an understanding!"
+    },
+    {
+      "id": "0x00110279",
+      "text": "I wanted to be your friend!"
+    },
+    {
+      "id": "0x00110295",
+      "text": "I will crush you!"
+    },
+    {
+      "id": "0x001102a7",
+      "text": "Come on! Trust me!"
+    },
+    {
+      "id": "0x001102ba",
+      "text": "Now I am distressed!"
+    },
+    {
+      "id": "0x001102cf",
+      "text": "Prepare to eat propaganda!"
+    },
+    {
+      "id": "0x001102ea",
+      "text": "That hurt you more than me."
+    },
+    {
+      "id": "0x00110306",
+      "text": "Stay on target!"
+    },
+    {
+      "id": "0x00110316",
+      "text": "Go for the hill!"
+    },
+    {
+      "id": "0x00110327",
+      "text": "Its better to burn out..."
+    },
+    {
+      "id": "0x00110341",
+      "text": "I give up."
+    },
+    {
+      "id": "0x0011034c",
+      "text": "You my friend, are hopeless."
+    },
+    {
+      "id": "0x00110369",
+      "text": "Barbarian."
+    },
+    {
+      "id": "0x00110374",
+      "text": "You are a nit."
+    },
+    {
+      "id": "0x00110383",
+      "text": "I bet you think thats funny!"
+    },
+    {
+      "id": "0x001103a0",
+      "text": "Not even a scratch!"
+    },
+    {
+      "id": "0x001103b4",
+      "text": "How dare you!"
+    },
+    {
+      "id": "0x001103c2",
+      "text": "It is time for retribution!"
+    },
+    {
+      "id": "0x001103de",
+      "text": "You will pay for that."
+    },
+    {
+      "id": "0x001103f5",
+      "text": "Thou shalt not win."
+    },
+    {
+      "id": "0x00110409",
+      "text": "I'll get you yet!"
+    },
+    {
+      "id": "0x0011041b",
+      "text": "Did you attack me?"
+    },
+    {
+      "id": "0x0011042e",
+      "text": "Please spare me!"
+    },
+    {
+      "id": "0x0011043f",
+      "text": "Mercy...Mercy!"
+    },
+    {
+      "id": "0x0011044e",
+      "text": "Now I am really mad!"
+    },
+    {
+      "id": "0x00110463",
+      "text": "Was that really necessary."
+    },
+    {
+      "id": "0x0011047e",
+      "text": "I will crush you like a bug!"
+    },
+    {
+      "id": "0x0011049b",
+      "text": "You couldn't harm a fly."
+    },
+    {
+      "id": "0x001104b4",
+      "text": "That will hasten your fall."
+    },
+    {
+      "id": "0x001104d0",
+      "text": "HAHAHAHAHAHAHA."
+    },
+    {
+      "id": "0x001104e0",
+      "text": "I don't need that city anyway."
+    },
+    {
+      "id": "0x001104ff",
+      "text": "You lied to me!"
+    },
+    {
+      "id": "0x0011050f",
+      "text": "Hrumph, Well I never!"
+    },
+    {
+      "id": "0x00110525",
+      "text": "Are you my freind?"
+    },
+    {
+      "id": "0x00110538",
+      "text": "You will die for that!"
+    },
+    {
+      "id": "0x0011054f",
+      "text": "Laugh now monkey boy!"
+    },
+    {
+      "id": "0x00110565",
+      "text": "Time out! Time out!"
+    },
+    {
+      "id": "0x00110579",
+      "text": "Leave me alone!"
+    },
+    {
+      "id": "0x00110589",
+      "text": "Why'd you pick on me!?"
+    },
+    {
+      "id": "0x001105a0",
+      "text": "You dirty Rat!"
+    },
+    {
+      "id": "0x001105af",
+      "text": "You'll pay for that."
+    },
+    {
+      "id": "0x001105c4",
+      "text": "You shall be punished."
+    },
+    {
+      "id": "0x001105db",
+      "text": "I'll get you yet!"
+    },
+    {
+      "id": "0x001105ed",
+      "text": "Not even a scratch!"
+    },
+    {
+      "id": "0x00110601",
+      "text": "Didn't bother me!"
+    },
+    {
+      "id": "0x00110613",
+      "text": "Now you've got me mad."
+    },
+    {
+      "id": "0x0011062a",
+      "text": "Go away!"
+    },
+    {
+      "id": "0x00110633",
+      "text": "I WILL kill you!"
+    },
+    {
+      "id": "0x00110644",
+      "text": "Watch it!"
+    },
+    {
+      "id": "0x0011064e",
+      "text": "I'm Batman."
+    },
+    {
+      "id": "0x0011065a",
+      "text": "Always expect the unexpected!"
+    },
+    {
+      "id": "0x00110678",
+      "text": "I expected that from you!"
+    },
+    {
+      "id": "0x00110692",
+      "text": "You are lower than low!"
+    },
+    {
+      "id": "0x001106aa",
+      "text": "I should have known!"
+    },
+    {
+      "id": "0x001106bf",
+      "text": "'Tis A flesh wound!"
+    },
+    {
+      "id": "0x001106d3",
+      "text": "Nuke them instead!"
+    },
+    {
+      "id": "0x001106e6",
+      "text": "Prop them instead."
+    },
+    {
+      "id": "0x001106f9",
+      "text": "No! Build! The end is near!"
+    },
+    {
+      "id": "0x00110715",
+      "text": "My final strike will get you!"
+    },
+    {
+      "id": "0x00110733",
+      "text": "My power is beyond you."
+    },
+    {
+      "id": "0x0011074b",
+      "text": "We can still be friends."
+    },
+    {
+      "id": "0x00110764",
+      "text": "So this is what has come to!"
+    },
+    {
+      "id": "0x00110781",
+      "text": "Draw!"
+    },
+    {
+      "id": "0x00110787",
+      "text": "I know something you don't."
+    },
+    {
+      "id": "0x001107a3",
+      "text": "Prepare to meet your maker."
+    },
+    {
+      "id": "0x001107bf",
+      "text": "You should floss more often."
+    },
+    {
+      "id": "0x001107dc",
+      "text": "Fire the Euclid Cannon!"
+    },
+    {
+      "id": "0x001107f4",
+      "text": "My ghost will haunt you."
+    },
+    {
+      "id": "0x0011080d",
+      "text": "This is your last chance!"
+    },
+    {
+      "id": "0x00110827",
+      "text": "Revenge is best served cold."
+    },
+    {
+      "id": "0x00110844",
+      "text": "Are we having fun yet?"
+    },
+    {
+      "id": "0x0011085b",
+      "text": "I'll be back!"
+    },
+    {
+      "id": "0x00110869",
+      "text": "That was a fatal mistake."
+    },
+    {
+      "id": "0x00110884",
+      "text": "Good Luck!"
+    },
+    {
+      "id": "0x0011088f",
+      "text": "Best Wishes!"
+    },
+    {
+      "id": "0x0011089c",
+      "text": "Let the game begin!"
+    },
+    {
+      "id": "0x001108b0",
+      "text": "The end is near."
+    },
+    {
+      "id": "0x001108c1",
+      "text": "The coin is tossed."
+    },
+    {
+      "id": "0x001108d5",
+      "text": "The die is cast."
+    },
+    {
+      "id": "0x001108e6",
+      "text": "Survive, if you can."
+    },
+    {
+      "id": "0x001108fb",
+      "text": "Diplomacy Terminal #1."
+    },
+    {
+      "id": "0x00110912",
+      "text": "Your opponents await."
+    },
+    {
+      "id": "0x00110928",
+      "text": "Let the contest begin."
+    },
+    {
+      "id": "0x0011093f",
+      "text": "Dawn is in 32 minutes."
+    },
+    {
+      "id": "0x00110956",
+      "text": "Everyone is here."
+    },
+    {
+      "id": "0x00110968",
+      "text": "All eyes are upon you."
+    },
+    {
+      "id": "0x0011097f",
+      "text": "Do you have insurance?"
+    },
+    {
+      "id": "0x00110996",
+      "text": "Your destiny awaits."
+    },
+    {
+      "id": "0x001109ab",
+      "text": "Thermo Nuclear war?"
+    },
+    {
+      "id": "0x001109bf",
+      "text": "Alert stats: RED."
+    },
+    {
+      "id": "0x001109d1",
+      "text": "All wings standing by."
+    },
+    {
+      "id": "0x001109e8",
+      "text": "All systems are go."
+    },
+    {
+      "id": "0x001109fc",
+      "text": "Are you ready?"
+    },
+    {
+      "id": "0x00110a0b",
+      "text": "Can you take the heat."
+    },
+    {
+      "id": "0x00110a22",
+      "text": "Got what it takes?"
+    },
+    {
+      "id": "0x00110a35",
+      "text": "Think you can surive?"
+    },
+    {
+      "id": "0x00110a4b",
+      "text": "Go for the Hill!"
+    },
+    {
+      "id": "0x00110a5c",
+      "text": "You have 1 credit."
+    },
+    {
+      "id": "0x00110a6f",
+      "text": "You don't have a chance."
+    },
+    {
+      "id": "0x00110a88",
+      "text": "Can you get Highscore?"
+    },
+    {
+      "id": "0x00110a9f",
+      "text": "Millions count on you."
+    },
+    {
+      "id": "0x00110ab6",
+      "text": "No turning back now."
+    },
+    {
+      "id": "0x00110acb",
+      "text": "Think you can win?"
+    },
+    {
+      "id": "0x00110ade",
+      "text": "Can you save Cron?"
+    },
+    {
+      "id": "0x00110af1",
+      "text": "Good Morning."
+    },
+    {
+      "id": "0x00110aff",
+      "text": "Good Afternoon."
+    },
+    {
+      "id": "0x00110b0f",
+      "text": "Good Evening."
+    },
+    {
+      "id": "0x00110b1d",
+      "text": "Good Day."
+    },
+    {
+      "id": "0x00110b27",
+      "text": "Good Bye."
+    },
+    {
+      "id": "0x00110b31",
+      "text": "I am fully functional."
+    },
+    {
+      "id": "0x00110b48",
+      "text": "Terminal mode enabled."
+    },
+    {
+      "id": "0x00110b5f",
+      "text": "Terminal active."
+    },
+    {
+      "id": "0x00110b70",
+      "text": "Everything is lit."
+    },
+    {
+      "id": "0x00110b83",
+      "text": "Power up complete."
+    },
+    {
+      "id": "0x00110b96",
+      "text": "Status: Green."
+    },
+    {
+      "id": "0x00110ba5",
+      "text": "This space for lease."
+    },
+    {
+      "id": "0x00110bbb",
+      "text": "Sequence initiated."
+    },
+    {
+      "id": "0x00110bcf",
+      "text": "Welcome aboard, Captain."
+    },
+    {
+      "id": "0x00110be8",
+      "text": "All stations ready."
+    },
+    {
+      "id": "0x00110bfc",
+      "text": "You have the Con."
+    },
+    {
+      "id": "0x00110c0e",
+      "text": "Nuke em till they glow."
+    },
+    {
+      "id": "0x00110f48",
+      "text": "Defectors leave %s for %s."
+    },
+    {
+      "id": "0x001113da",
+      "text": "%s launches leftist liberals laterally."
+    },
+    {
+      "id": "0x00111402",
+      "text": "%s expels undesirables par avion."
+    },
+    {
+      "id": "0x00111424",
+      "text": "%s fires the human catapult."
+    },
+    {
+      "id": "0x00111441",
+      "text": "%s gives a flying lesson."
+    },
+    {
+      "id": "0x00111936",
+      "text": "%s fires the Moo Missile at %s."
+    },
+    {
+      "id": "0x00111956",
+      "text": "%s Drops the Bovine Bomb on %s."
+    },
+    {
+      "id": "0x00111976",
+      "text": "%s uses Cattletech against %s."
+    },
+    {
+      "id": "0x00111995",
+      "text": "%s shoots the Cattle Cannon at %s."
+    },
+    {
+      "id": "0x00111ef0",
+      "text": "%s's people procreate profusely."
+    },
+    {
+      "id": "0x00111f11",
+      "text": "Mr. Stork makes a delivery to %s."
+    },
+    {
+      "id": "0x00111f33",
+      "text": "%s has a baby boom."
+    },
+    {
+      "id": "0x00111f47",
+      "text": "%s's fertility drug works!"
+    },
+    {
+      "id": "0x001123e6",
+      "text": "%s looses a city to the L-5 Colony."
+    },
+    {
+      "id": "0x0011240a",
+      "text": "%s's city rises above it all."
+    },
+    {
+      "id": "0x00112428",
+      "text": "%s's city is lost to space."
+    },
+    {
+      "id": "0x00112444",
+      "text": "%s's city goes real high."
+    },
+    {
+      "id": "0x00112878",
+      "text": "%s suffers an earthquake."
+    },
+    {
+      "id": "0x00112892",
+      "text": "%s has a seismic catastrophy!"
+    },
+    {
+      "id": "0x001128b0",
+      "text": "%s is hit by the big one."
+    },
+    {
+      "id": "0x001128ca",
+      "text": "%s shakes rattles and rolls."
+    },
+    {
+      "id": "0x00112bc2",
+      "text": "%s readies a lone missile."
+    },
+    {
+      "id": "0x00112bdd",
+      "text": "%s prepares a missile for launch."
+    },
+    {
+      "id": "0x00112bff",
+      "text": "%s puts a missile on the launch pad."
+    },
+    {
+      "id": "0x00112c24",
+      "text": "%s prepares a missile strike."
+    },
+    {
+      "id": "0x00112e80",
+      "text": "%s deploys a defense system."
+    },
+    {
+      "id": "0x00112e9d",
+      "text": "%s Assumes a defensive posture."
+    },
+    {
+      "id": "0x00112ebd",
+      "text": "%s Prepares for impact."
+    },
+    {
+      "id": "0x00112ed5",
+      "text": "%s initiates a strategic defense."
+    },
+    {
+      "id": "0x001131e2",
+      "text": "Eric+Jacy "
+    },
+    {
+      "id": "0x001131ed",
+      "text": "Mark      "
+    },
+    {
+      "id": "0x001131f8",
+      "text": "Jon       "
+    },
+    {
+      "id": "0x00113203",
+      "text": "Ron       "
+    },
+    {
+      "id": "0x0011320e",
+      "text": "Nicholas  "
+    },
+    {
+      "id": "0x00113219",
+      "text": "Ben       "
+    },
+    {
+      "id": "0x00113224",
+      "text": "Allen     "
+    },
+    {
+      "id": "0x0011322f",
+      "text": "Rob+Jamie "
+    },
+    {
+      "id": "0x0011323a",
+      "text": "Johnno    "
+    },
+    {
+      "id": "0x00113245",
+      "text": "Irene     "
+    },
+    {
+      "id": "0x00113aca",
+      "text": " NUCLEAR WAR"
+    },
+    {
+      "id": "0x00113ad7",
+      "text": "Hall -O- Fame"
+    },
+    {
+      "id": "0x00113ae5",
+      "text": "#    Name   % Left  Cities  Score"
+    },
+    {
+      "id": "0x00113b07",
+      "text": "%2.2d %-10.10s  %3.3d    %1.1d   %3.3d Million"
+    },
+    {
+      "id": "0x00113fc0",
+      "text": "\\"
+    },
+    {
+      "id": "0x00113fc2",
+      "text": "\\"
+    },
+    {
+      "id": "0x00113fc4",
+      "text": "%c\\"
+    },
+    {
+      "id": "0x00113fc8",
+      "text": "%c"
+    },
+    {
+      "id": "0x001140a2",
+      "text": "Nuclear War 2:HighScores"
+    },
+    {
+      "id": "0x001140bb",
+      "text": "r"
+    },
+    {
+      "id": "0x00114194",
+      "text": "Nuclear War 2:HighScores"
+    },
+    {
+      "id": "0x001141ad",
+      "text": "w"
+    },
+    {
+      "id": "0x00114368",
+      "text": "%-10.10s"
+    },
+    {
+      "id": "0x00114371",
+      "text": "          "
+    },
+    {
+      "id": "0x00114efa",
+      "text": "Nuclear war 2:data/iwon"
+    },
+    {
+      "id": "0x00114f12",
+      "text": "Nuclear War 2:data/desolate.map.z"
+    },
+    {
+      "id": "0x00114f34",
+      "text": "Nuclear War 2:data/endchar"
+    },
+    {
+      "id": "0x00114f4f",
+      "text": "Nuclear War 2:data/endchar.mask"
+    },
+    {
+      "id": "0x00114f6f",
+      "text": "Nuclear War 2:data/spacemap.z"
+    },
+    {
+      "id": "0x00114f8d",
+      "text": "Nuclear War 2:data/expmap.z"
+    },
+    {
+      "id": "0x00114fa9",
+      "text": "Nuclear War 2:data/smallexp.z"
+    },
+    {
+      "id": "0x00114fc7",
+      "text": "Nuclear War 2:data/bigexp.z"
+    },
+    {
+      "id": "0x00114fe3",
+      "text": " Your Score:  %3.3d    %1.1d   %3.3d Million"
+    },
+    {
+      "id": "0x00115010",
+      "text": " %-10.10s:  %3.3d    %1.1d   %3.3d Million"
+    },
+    {
+      "id": "0x001150fc",
+      "text": "Ron Raygun"
+    },
+    {
+      "id": "0x00115107",
+      "text": "PM Satcher"
+    },
+    {
+      "id": "0x00115112",
+      "text": "Infidel"
+    },
+    {
+      "id": "0x0011511a",
+      "text": "Jimi Farmer"
+    },
+    {
+      "id": "0x00115126",
+      "text": "Khadaffy"
+    },
+    {
+      "id": "0x0011512f",
+      "text": "Tricky Dick"
+    },
+    {
+      "id": "0x0011513b",
+      "text": "Kookamamie"
+    },
+    {
+      "id": "0x00115146",
+      "text": "Gorbachef"
+    },
+    {
+      "id": "0x00115150",
+      "text": "Mao The Pun"
+    },
+    {
+      "id": "0x0011515c",
+      "text": "Ghanji"
+    },
+    {
+      "id": "0x00116066",
+      "text": "Nuclear war 2:data/door.snd"
+    },
+    {
+      "id": "0x00116082",
+      "text": "Nuclear War 2:data/smallmask.z.m"
+    },
+    {
+      "id": "0x001160a3",
+      "text": "Can't Open smallmask!1\n"
+    },
+    {
+      "id": "0x001160bb",
+      "text": "Nuclear War 2:data/smalltiles.z"
+    },
+    {
+      "id": "0x001160db",
+      "text": "Can't Open smalltiles.z!1\n"
+    },
+    {
+      "id": "0x001160f6",
+      "text": "Nuclear War 2:data/dip.z"
+    },
+    {
+      "id": "0x0011610f",
+      "text": "Can't Open Diplo Screen!1\n"
+    },
+    {
+      "id": "0x0011612a",
+      "text": "Nuclear War 2:data/start.z"
+    },
+    {
+      "id": "0x00116145",
+      "text": "Can't Open start\n"
+    },
+    {
+      "id": "0x00116157",
+      "text": "Nuclear War 2:data/leaders"
+    },
+    {
+      "id": "0x00116172",
+      "text": "Can't Open leaders\n"
+    },
+    {
+      "id": "0x00116186",
+      "text": "Nuclear War 2:data/big512.z"
+    },
+    {
+      "id": "0x001161a2",
+      "text": "Nuclear War 2:data/bigtiles.z"
+    },
+    {
+      "id": "0x001161c0",
+      "text": "Can't Open bigtiles!1\n"
+    },
+    {
+      "id": "0x001161d7",
+      "text": "Nuclear War 2:data/world.map.z"
+    },
+    {
+      "id": "0x001161f6",
+      "text": "Can't Open world.map.z\n"
+    },
+    {
+      "id": "0x0011620e",
+      "text": "Nuclear War 2:data/big512mask"
+    },
+    {
+      "id": "0x0011622c",
+      "text": "Nuclear War 2:data/bigmask"
+    },
+    {
+      "id": "0x00116247",
+      "text": "Can't Open bigmask!1\n"
+    },
+    {
+      "id": "0x0011698c",
+      "text": "%s Drops the Bomb on %s!"
+    },
+    {
+      "id": "0x001169a5",
+      "text": "%s sends a warhead to %s!"
+    },
+    {
+      "id": "0x001169bf",
+      "text": "%s delivers death to %s!"
+    },
+    {
+      "id": "0x001169d8",
+      "text": "%s rains flaming death on %s!"
+    },
+    {
+      "id": "0x00116c22",
+      "text": "%s Deploys a bomber."
+    },
+    {
+      "id": "0x00116c37",
+      "text": "%s puts a bomber on the runway."
+    },
+    {
+      "id": "0x00116c57",
+      "text": "%s fuels up a bomber."
+    },
+    {
+      "id": "0x00116c6d",
+      "text": "%s scrambles a bomber."
+    },
+    {
+      "id": "0x00116f12",
+      "text": "%s conducts propoganda towards %s."
+    },
+    {
+      "id": "0x00116f35",
+      "text": "%s blitzs %s's people with lies."
+    },
+    {
+      "id": "0x00116f56",
+      "text": "%s invites %s's people to a BBQ."
+    },
+    {
+      "id": "0x00116f77",
+      "text": "%s has a concert for %s's people."
+    },
+    {
+      "id": "0x001171fc",
+      "text": "%s suffers from a nuclear meltdown."
+    },
+    {
+      "id": "0x00117220",
+      "text": "%s opens the Chernobyl Theme Park."
+    },
+    {
+      "id": "0x00117243",
+      "text": "%s re-enacts the pepse syndrome."
+    },
+    {
+      "id": "0x00117264",
+      "text": "%s has a nuclear disaster."
+    },
+    {
+      "id": "0x0011727f",
+      "text": "%s has an Atomic accident."
+    },
+    {
+      "id": "0x001174ea",
+      "text": "%s prepares for war."
+    },
+    {
+      "id": "0x001174ff",
+      "text": "%s produces weapons."
+    },
+    {
+      "id": "0x00117514",
+      "text": "%s creates instruments of destruction."
+    },
+    {
+      "id": "0x0011753b",
+      "text": "%s builds nuclear toys."
+    },
+    {
+      "id": "0x00117553",
+      "text": "%s's people add to their arsenal."
+    },
+    {
+      "id": "0x00117bc4",
+      "text": "%s Launches a missile at %s."
+    },
+    {
+      "id": "0x00117be1",
+      "text": "%s delivers a nuclear blow to %s."
+    },
+    {
+      "id": "0x00117c03",
+      "text": "%s targets %s for destruction."
+    },
+    {
+      "id": "0x00117ed6",
+      "text": "A 16 Ton Weight crushes %s's city."
+    },
+    {
+      "id": "0x00117ef9",
+      "text": "%s's city is flattened by a 16 Ton Weight."
+    },
+    {
+      "id": "0x00117f24",
+      "text": "16 tons of doom destroy %s's city."
+    },
+    {
+      "id": "0x0011817a",
+      "text": "Space Aliens land on %s."
+    },
+    {
+      "id": "0x0011853a",
+      "text": ""
+    },
+    {
+      "id": "0x001185ec",
+      "text": "trackdisk.device"
+    },
+    {
+      "id": "0x00118d1c",
+      "text": "*"
+    },
+    {
+      "id": "0x00118fca",
+      "text": "dos.library"
+    },
+    {
+      "id": "0x00119ece",
+      "text": "diskfont.library"
+    },
+    {
+      "id": "0x00119edf",
+      "text": "Can't Open DiskfontBase Library!\n"
+    },
+    {
+      "id": "0x00119f01",
+      "text": "Can't Open your disk damn font!"
+    },
+    {
+      "id": "0x00119f21",
+      "text": "Nuclear war 2:Highscores"
+    },
+    {
+      "id": "0x00119f3a",
+      "text": "intuition.library"
+    },
+    {
+      "id": "0x00119f4c",
+      "text": "Can't Open Intution Lib!\n"
+    },
+    {
+      "id": "0x00119f66",
+      "text": "Not enough memory."
+    },
+    {
+      "id": "0x00119f79",
+      "text": "dos.library"
+    },
+    {
+      "id": "0x00119f85",
+      "text": "Can't Open DosBase Library!\n"
+    },
+    {
+      "id": "0x00119fa2",
+      "text": "graphics.library"
+    },
+    {
+      "id": "0x00119fb3",
+      "text": "Can't Open Graphics Lib!\n"
+    },
+    {
+      "id": "0x00119fcd",
+      "text": "Can't Open Screen!\n"
+    },
+    {
+      "id": "0x00119fe1",
+      "text": "Can't Allocate Memory for Bitmap\n"
+    },
+    {
+      "id": "0x0011a003",
+      "text": "Can't Open Window!1\n"
+    },
+    {
+      "id": "0x0011a018",
+      "text": "Can't Allocate Big 1\n"
+    },
+    {
+      "id": "0x0011a02e",
+      "text": "Can't Allocate Big 2\n"
+    },
+    {
+      "id": "0x0011a044",
+      "text": "Can't Allocate Big 2\n"
+    },
+    {
+      "id": "0x0011a05a",
+      "text": "Can't Allocate Big 3\n"
+    },
+    {
+      "id": "0x0011a070",
+      "text": "Can't Allocate Big 4\n"
+    },
+    {
+      "id": "0x0011a086",
+      "text": "Can't Allocate Big 5\n"
+    },
+    {
+      "id": "0x0011a09c",
+      "text": "Can't Allocate Big 1\n"
+    },
+    {
+      "id": "0x0011a0b2",
+      "text": "Big1"
+    },
+    {
+      "id": "0x0011a0b7",
+      "text": "big 2"
+    },
+    {
+      "id": "0x0011a0bd",
+      "text": "big 3"
+    },
+    {
+      "id": "0x0011a0c3",
+      "text": "big 4"
+    },
+    {
+      "id": "0x0011a0c9",
+      "text": "big 5"
+    },
+    {
+      "id": "0x0011a0cf",
+      "text": "dip 1"
+    },
+    {
+      "id": "0x0011a0d5",
+      "text": "dip 2"
+    },
+    {
+      "id": "0x0011a0db",
+      "text": "dip 3"
+    },
+    {
+      "id": "0x0011a0e1",
+      "text": "dip 4"
+    },
+    {
+      "id": "0x0011a0e7",
+      "text": "dip 5"
+    },
+    {
+      "id": "0x0011a0ed",
+      "text": "Cant allocate frame\n"
+    },
+    {
+      "id": "0x0011a102",
+      "text": "Cant allocate frame\n"
+    },
+    {
+      "id": "0x0011a117",
+      "text": "Cant allocate frame\n"
+    },
+    {
+      "id": "0x0011a12c",
+      "text": "Cant allocate frame\n"
+    },
+    {
+      "id": "0x0011a141",
+      "text": "Cant allocate frame\n"
+    },
+    {
+      "id": "0x0011a156",
+      "text": "Can't Alloc Cpr\n"
+    },
+    {
+      "id": "0x0011a167",
+      "text": "Nuclear war 2:data/door.snd"
+    },
+    {
+      "id": "0x0011a183",
+      "text": "Nuclear war 2:data/exp"
+    },
+    {
+      "id": "0x0011a19a",
+      "text": "Nuclear war 2:data/prop"
+    },
+    {
+      "id": "0x0011a1b2",
+      "text": "Nuclear war 2:data/engine"
+    },
+    {
+      "id": "0x0011a1cc",
+      "text": "Nuclear war 2:data/missile"
+    },
+    {
+      "id": "0x0011a1e7",
+      "text": "Nuclear war 2:data/feet"
+    },
+    {
+      "id": "0x0011a1ff",
+      "text": "Nuclear war 2:data/moo"
+    },
+    {
+      "id": "0x0011a216",
+      "text": "Nuclear war 2:data/ooo"
+    },
+    {
+      "id": "0x0011a22d",
+      "text": "Nuclear war 2:data/16ton"
+    },
+    {
+      "id": "0x0011a246",
+      "text": "Nuclear war 2:data/build"
+    },
+    {
+      "id": "0x0011a9d6",
+      "text": "mathffp.library"
+    },
+    {
+      "id": "0x0011aa44",
+      "text": "mathtrans.library"
+    },
+    {
+      "id": "0x0011aa56",
+      "text": "No MathTrans Library!!\n"
+    },
+    {
+      "id": "0x0011aa94",
+      "text": "^C\n"
+    },
+    {
+      "id": "0x0011af06",
+      "text": "dos.library"
+    },
+    {
+      "id": "0x0011af12",
+      "text": ""
+    },
+    {
+      "id": "0x0011b060",
+      "text": "dos.library"
+    },
+    {
+      "id": "0x0011b23a",
+      "text": " "
+    },
+    {
+      "id": "0x0011b34a",
+      "text": "icon.library"
+    },
+    {
+      "id": "0x0011b357",
+      "text": "WINDOW"
+    },
+    {
+      "id": "0x0011b35e",
+      "text": "*"
+    },
+    {
+      "id": "0x00131228",
+      "text": "|/-\\"
+    },
+    {
+      "id": "0x001316b6",
+      "text": "0123456789abcdef"
+    }
+  ],
+  "tables": [
+    {
+      "name": "leader_names",
+      "index": 0,
+      "id": "0x001150fc"
+    },
+    {
+      "name": "leader_names",
+      "index": 1,
+      "id": "0x00115107"
+    },
+    {
+      "name": "leader_names",
+      "index": 2,
+      "id": "0x00115112"
+    },
+    {
+      "name": "leader_names",
+      "index": 3,
+      "id": "0x0011511a"
+    },
+    {
+      "name": "leader_names",
+      "index": 4,
+      "id": "0x00115126"
+    },
+    {
+      "name": "leader_names",
+      "index": 5,
+      "id": "0x0011512f"
+    },
+    {
+      "name": "leader_names",
+      "index": 6,
+      "id": "0x0011513b"
+    },
+    {
+      "name": "leader_names",
+      "index": 7,
+      "id": "0x00115146"
+    },
+    {
+      "name": "leader_names",
+      "index": 8,
+      "id": "0x00115150"
+    },
+    {
+      "name": "leader_names",
+      "index": 9,
+      "id": "0x0011515c"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 0,
+      "id": "0x0010f224"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 1,
+      "id": "0x0010f23f"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 2,
+      "id": "0x0010f250"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 3,
+      "id": "0x0010f26c"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 4,
+      "id": "0x0010f27a"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 5,
+      "id": "0x0010f294"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 6,
+      "id": "0x0010f2ad"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 7,
+      "id": "0x0010f2c1"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 8,
+      "id": "0x0010f2dd"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 9,
+      "id": "0x0010f2f5"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 10,
+      "id": "0x0010f30d"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 11,
+      "id": "0x0010f326"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 12,
+      "id": "0x0010f33e"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 13,
+      "id": "0x0010f34b"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 14,
+      "id": "0x0010f360"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 15,
+      "id": "0x0010f377"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 16,
+      "id": "0x0010f38e"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 17,
+      "id": "0x0010f3ac"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 18,
+      "id": "0x0010f3bf"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 19,
+      "id": "0x0010f3d8"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 20,
+      "id": "0x0010f3f3"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 21,
+      "id": "0x0010f40f"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 22,
+      "id": "0x0010f424"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 23,
+      "id": "0x0010f43a"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 24,
+      "id": "0x0010f456"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 25,
+      "id": "0x0010f472"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 26,
+      "id": "0x0010f48a"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 27,
+      "id": "0x0010f4a3"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 28,
+      "id": "0x0010f4be"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 29,
+      "id": "0x0010f4d0"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 30,
+      "id": "0x0010f4e0"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 31,
+      "id": "0x0010f4f4"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 32,
+      "id": "0x0010f501"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 33,
+      "id": "0x0010f510"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 34,
+      "id": "0x0010f51d"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 35,
+      "id": "0x0010f538"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 36,
+      "id": "0x0010f548"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 37,
+      "id": "0x0010f560"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 38,
+      "id": "0x0010f576"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 39,
+      "id": "0x0010f58c"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 40,
+      "id": "0x0010f5a1"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 41,
+      "id": "0x0010f5bc"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 42,
+      "id": "0x0010f5c5"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 43,
+      "id": "0x0010f5d6"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 44,
+      "id": "0x0010f5e9"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 45,
+      "id": "0x0010f5fb"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 46,
+      "id": "0x0010f614"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 47,
+      "id": "0x0010f61e"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 48,
+      "id": "0x0010f634"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 49,
+      "id": "0x0010f653"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 50,
+      "id": "0x0010f668"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 51,
+      "id": "0x0010f67a"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 52,
+      "id": "0x0010f692"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 53,
+      "id": "0x0010f6a8"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 54,
+      "id": "0x0010f6bf"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 55,
+      "id": "0x0010f6de"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 56,
+      "id": "0x0010f6fc"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 57,
+      "id": "0x0010f719"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 58,
+      "id": "0x0010f72f"
+    },
+    {
+      "name": "fixed_identity_speech",
+      "index": 59,
+      "id": "0x0010f744"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 0,
+      "id": "0x0010f762"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 1,
+      "id": "0x0010f76c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 2,
+      "id": "0x0010f783"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 3,
+      "id": "0x0010f799"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 4,
+      "id": "0x0010f7b7"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 5,
+      "id": "0x0010f7c8"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 6,
+      "id": "0x0010f7d8"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 7,
+      "id": "0x0010f7eb"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 8,
+      "id": "0x0010f807"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 9,
+      "id": "0x0010f820"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 10,
+      "id": "0x0010f838"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 11,
+      "id": "0x0010f848"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 12,
+      "id": "0x0010f858"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 13,
+      "id": "0x0010f86e"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 14,
+      "id": "0x0010f889"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 15,
+      "id": "0x0010f8a1"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 16,
+      "id": "0x0010f8ae"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 17,
+      "id": "0x0010f8bc"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 18,
+      "id": "0x0010f8ca"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 19,
+      "id": "0x0010f8e2"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 20,
+      "id": "0x0010f900"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 21,
+      "id": "0x0010f91c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 22,
+      "id": "0x0010f92a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 23,
+      "id": "0x0010f93f"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 24,
+      "id": "0x0010f955"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 25,
+      "id": "0x0010f970"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 26,
+      "id": "0x0010f98a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 27,
+      "id": "0x0010f9a7"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 28,
+      "id": "0x0010f9b9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 29,
+      "id": "0x0010f9d3"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 30,
+      "id": "0x0010f9e5"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 31,
+      "id": "0x0010fa04"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 32,
+      "id": "0x0010fa22"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 33,
+      "id": "0x0010fa37"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 34,
+      "id": "0x0010fa4c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 35,
+      "id": "0x0010fa5f"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 36,
+      "id": "0x0010fa6d"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 37,
+      "id": "0x0010fa83"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 38,
+      "id": "0x0010fa9c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 39,
+      "id": "0x0010faa8"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 40,
+      "id": "0x0010fab8"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 41,
+      "id": "0x0010fac4"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 42,
+      "id": "0x0010fadf"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 43,
+      "id": "0x0010fafb"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 44,
+      "id": "0x0010fb18"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 45,
+      "id": "0x0010fb30"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 46,
+      "id": "0x0010fb4e"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 47,
+      "id": "0x0010fb62"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 48,
+      "id": "0x0010fb7c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 49,
+      "id": "0x0010fb97"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 50,
+      "id": "0x0010fbb2"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 51,
+      "id": "0x0010fbd1"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 52,
+      "id": "0x0010fbee"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 53,
+      "id": "0x0010fc05"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 54,
+      "id": "0x0010fc1d"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 55,
+      "id": "0x0010fc2e"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 56,
+      "id": "0x0010fc3c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 57,
+      "id": "0x0010fc5a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 58,
+      "id": "0x0010fc6f"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 59,
+      "id": "0x0010fc84"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 60,
+      "id": "0x0010fca3"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 61,
+      "id": "0x0010fcc1"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 62,
+      "id": "0x0010fcd9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 63,
+      "id": "0x0010fcef"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 64,
+      "id": "0x0010fcf9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 65,
+      "id": "0x0010fd09"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 66,
+      "id": "0x0010fd19"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 67,
+      "id": "0x0010fd37"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 68,
+      "id": "0x0010fd4b"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 69,
+      "id": "0x0010fd59"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 70,
+      "id": "0x0010fd71"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 71,
+      "id": "0x0010fd8c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 72,
+      "id": "0x0010fdac"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 73,
+      "id": "0x0010fdcc"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 74,
+      "id": "0x0010fdeb"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 75,
+      "id": "0x0010fdfa"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 76,
+      "id": "0x0010fe17"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 77,
+      "id": "0x0010fe31"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 78,
+      "id": "0x0010fe48"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 79,
+      "id": "0x0010fe64"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 80,
+      "id": "0x0010fe80"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 81,
+      "id": "0x0010fe8a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 82,
+      "id": "0x0010fe9c"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 83,
+      "id": "0x0010feaa"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 84,
+      "id": "0x0010febb"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 85,
+      "id": "0x0010fec9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 86,
+      "id": "0x0010fed3"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 87,
+      "id": "0x0010feec"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 88,
+      "id": "0x0010fef8"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 89,
+      "id": "0x0010ff04"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 90,
+      "id": "0x0010ff16"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 91,
+      "id": "0x0010ff26"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 92,
+      "id": "0x0010ff42"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 93,
+      "id": "0x0010ff5a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 94,
+      "id": "0x0010ff6a"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 95,
+      "id": "0x0010ff7f"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 96,
+      "id": "0x0010ff99"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 97,
+      "id": "0x0010ffb9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 98,
+      "id": "0x0010ffca"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 99,
+      "id": "0x0010ffd9"
+    },
+    {
+      "name": "fixed_general_speech",
+      "index": 100,
+      "id": "0x0010fffa"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 0,
+      "id": "0x00110014"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 1,
+      "id": "0x0011002d"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 2,
+      "id": "0x00110049"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 3,
+      "id": "0x00110062"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 4,
+      "id": "0x00110078"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 5,
+      "id": "0x0011009c"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 6,
+      "id": "0x001100bb"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 7,
+      "id": "0x001100d2"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 8,
+      "id": "0x001100e8"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 9,
+      "id": "0x00110103"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 10,
+      "id": "0x00110122"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 11,
+      "id": "0x0011013a"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 12,
+      "id": "0x00110153"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 13,
+      "id": "0x0011016b"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 14,
+      "id": "0x00110183"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 15,
+      "id": "0x001101a3"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 16,
+      "id": "0x001101ba"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 17,
+      "id": "0x001101d5"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 18,
+      "id": "0x001101f3"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 19,
+      "id": "0x0011020f"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 20,
+      "id": "0x0011022b"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 21,
+      "id": "0x0011023f"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 22,
+      "id": "0x0011025c"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 23,
+      "id": "0x00110279"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 24,
+      "id": "0x00110295"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 25,
+      "id": "0x001102a7"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 26,
+      "id": "0x001102ba"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 27,
+      "id": "0x001102cf"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 28,
+      "id": "0x001102ea"
+    },
+    {
+      "name": "reaction_identity_speech",
+      "index": 29,
+      "id": "0x00000000"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 0,
+      "id": "0x00110306"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 1,
+      "id": "0x00110316"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 2,
+      "id": "0x00110327"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 3,
+      "id": "0x00110341"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 4,
+      "id": "0x0011034c"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 5,
+      "id": "0x00110369"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 6,
+      "id": "0x00110374"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 7,
+      "id": "0x00110383"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 8,
+      "id": "0x001103a0"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 9,
+      "id": "0x001103b4"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 10,
+      "id": "0x001103c2"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 11,
+      "id": "0x001103de"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 12,
+      "id": "0x001103f5"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 13,
+      "id": "0x00110409"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 14,
+      "id": "0x0011041b"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 15,
+      "id": "0x0011042e"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 16,
+      "id": "0x0011043f"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 17,
+      "id": "0x0011044e"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 18,
+      "id": "0x00110463"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 19,
+      "id": "0x0011047e"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 20,
+      "id": "0x0011049b"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 21,
+      "id": "0x001104b4"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 22,
+      "id": "0x001104d0"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 23,
+      "id": "0x001104e0"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 24,
+      "id": "0x001104ff"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 25,
+      "id": "0x0011050f"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 26,
+      "id": "0x00110525"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 27,
+      "id": "0x00110538"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 28,
+      "id": "0x0011054f"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 29,
+      "id": "0x00110565"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 30,
+      "id": "0x00110579"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 31,
+      "id": "0x00110589"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 32,
+      "id": "0x001105a0"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 33,
+      "id": "0x001105af"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 34,
+      "id": "0x001105c4"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 35,
+      "id": "0x001105db"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 36,
+      "id": "0x001105ed"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 37,
+      "id": "0x00110601"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 38,
+      "id": "0x00110613"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 39,
+      "id": "0x0011062a"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 40,
+      "id": "0x00110633"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 41,
+      "id": "0x00110644"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 42,
+      "id": "0x0011064e"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 43,
+      "id": "0x0011065a"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 44,
+      "id": "0x00110678"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 45,
+      "id": "0x00110692"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 46,
+      "id": "0x001106aa"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 47,
+      "id": "0x001106bf"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 48,
+      "id": "0x001106d3"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 49,
+      "id": "0x001106e6"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 50,
+      "id": "0x001106f9"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 51,
+      "id": "0x00110715"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 52,
+      "id": "0x00110733"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 53,
+      "id": "0x0011074b"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 54,
+      "id": "0x00110764"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 55,
+      "id": "0x00110781"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 56,
+      "id": "0x00110787"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 57,
+      "id": "0x001107a3"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 58,
+      "id": "0x001107bf"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 59,
+      "id": "0x001107dc"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 60,
+      "id": "0x001107f4"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 61,
+      "id": "0x0011080d"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 62,
+      "id": "0x00110827"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 63,
+      "id": "0x00110844"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 64,
+      "id": "0x0011085b"
+    },
+    {
+      "name": "reaction_general_speech",
+      "index": 65,
+      "id": "0x00110869"
+    },
+    {
+      "name": "welcome_table",
+      "index": 0,
+      "id": "0x110884"
+    },
+    {
+      "name": "welcome_table",
+      "index": 1,
+      "id": "0x11088f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 2,
+      "id": "0x11089c"
+    },
+    {
+      "name": "welcome_table",
+      "index": 3,
+      "id": "0x1108b0"
+    },
+    {
+      "name": "welcome_table",
+      "index": 4,
+      "id": "0x1108c1"
+    },
+    {
+      "name": "welcome_table",
+      "index": 5,
+      "id": "0x1108d5"
+    },
+    {
+      "name": "welcome_table",
+      "index": 6,
+      "id": "0x1108e6"
+    },
+    {
+      "name": "welcome_table",
+      "index": 7,
+      "id": "0x1108fb"
+    },
+    {
+      "name": "welcome_table",
+      "index": 8,
+      "id": "0x110912"
+    },
+    {
+      "name": "welcome_table",
+      "index": 9,
+      "id": "0x110928"
+    },
+    {
+      "name": "welcome_table",
+      "index": 10,
+      "id": "0x11093f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 11,
+      "id": "0x110956"
+    },
+    {
+      "name": "welcome_table",
+      "index": 12,
+      "id": "0x110968"
+    },
+    {
+      "name": "welcome_table",
+      "index": 13,
+      "id": "0x11097f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 14,
+      "id": "0x110996"
+    },
+    {
+      "name": "welcome_table",
+      "index": 15,
+      "id": "0x1109ab"
+    },
+    {
+      "name": "welcome_table",
+      "index": 16,
+      "id": "0x1109bf"
+    },
+    {
+      "name": "welcome_table",
+      "index": 17,
+      "id": "0x1109d1"
+    },
+    {
+      "name": "welcome_table",
+      "index": 18,
+      "id": "0x1109e8"
+    },
+    {
+      "name": "welcome_table",
+      "index": 19,
+      "id": "0x1109fc"
+    },
+    {
+      "name": "welcome_table",
+      "index": 20,
+      "id": "0x110a0b"
+    },
+    {
+      "name": "welcome_table",
+      "index": 21,
+      "id": "0x110a22"
+    },
+    {
+      "name": "welcome_table",
+      "index": 22,
+      "id": "0x110a35"
+    },
+    {
+      "name": "welcome_table",
+      "index": 23,
+      "id": "0x110a4b"
+    },
+    {
+      "name": "welcome_table",
+      "index": 24,
+      "id": "0x110a5c"
+    },
+    {
+      "name": "welcome_table",
+      "index": 25,
+      "id": "0x110a6f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 26,
+      "id": "0x110a88"
+    },
+    {
+      "name": "welcome_table",
+      "index": 27,
+      "id": "0x110a9f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 28,
+      "id": "0x110ab6"
+    },
+    {
+      "name": "welcome_table",
+      "index": 29,
+      "id": "0x110acb"
+    },
+    {
+      "name": "welcome_table",
+      "index": 30,
+      "id": "0x110ade"
+    },
+    {
+      "name": "welcome_table",
+      "index": 31,
+      "id": "0x110af1"
+    },
+    {
+      "name": "welcome_table",
+      "index": 32,
+      "id": "0x110aff"
+    },
+    {
+      "name": "welcome_table",
+      "index": 33,
+      "id": "0x110b0f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 34,
+      "id": "0x110b1d"
+    },
+    {
+      "name": "welcome_table",
+      "index": 35,
+      "id": "0x110b27"
+    },
+    {
+      "name": "welcome_table",
+      "index": 36,
+      "id": "0x110b31"
+    },
+    {
+      "name": "welcome_table",
+      "index": 37,
+      "id": "0x110b48"
+    },
+    {
+      "name": "welcome_table",
+      "index": 38,
+      "id": "0x110b5f"
+    },
+    {
+      "name": "welcome_table",
+      "index": 39,
+      "id": "0x110b70"
+    },
+    {
+      "name": "welcome_table",
+      "index": 40,
+      "id": "0x110b83"
+    },
+    {
+      "name": "welcome_table",
+      "index": 41,
+      "id": "0x110b96"
+    },
+    {
+      "name": "welcome_table",
+      "index": 42,
+      "id": "0x110ba5"
+    },
+    {
+      "name": "welcome_table",
+      "index": 43,
+      "id": "0x110bbb"
+    },
+    {
+      "name": "welcome_table",
+      "index": 44,
+      "id": "0x110bcf"
+    },
+    {
+      "name": "welcome_table",
+      "index": 45,
+      "id": "0x110be8"
+    },
+    {
+      "name": "welcome_table",
+      "index": 46,
+      "id": "0x110bfc"
+    },
+    {
+      "name": "welcome_table",
+      "index": 47,
+      "id": "0x110c0e"
+    }
+  ]
+}

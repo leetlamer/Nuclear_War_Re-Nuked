@@ -1,0 +1,854 @@
+{
+  "palette": [
+    0,
+    1344,
+    2689,
+    3138,
+    3683,
+    3717,
+    4023,
+    3328,
+    3648,
+    3713,
+    4049,
+    4072,
+    99,
+    131,
+    148,
+    180,
+    212,
+    2025,
+    1047,
+    1065,
+    1100,
+    1661,
+    2222,
+    3039,
+    819,
+    1092,
+    1638,
+    1911,
+    2184,
+    2730,
+    3549,
+    4095
+  ],
+  "ending_palette": [
+    0,
+    1344,
+    2689,
+    3156,
+    3444,
+    3733,
+    4023,
+    3328,
+    3249,
+    256,
+    512,
+    1024,
+    1297,
+    1826,
+    2116,
+    2662,
+    4064,
+    257,
+    785,
+    1058,
+    1587,
+    1860,
+    2150,
+    2696,
+    3276,
+    273,
+    546,
+    819,
+    1365,
+    1638,
+    2184,
+    4095
+  ],
+  "all_dead_palette": [
+    0,
+    4095,
+    4095,
+    1825,
+    2866,
+    3906,
+    3973,
+    4023,
+    18,
+    53,
+    72,
+    92,
+    111,
+    911,
+    1967,
+    2767,
+    1280,
+    2560,
+    3840,
+    3888,
+    3953,
+    4001,
+    4049,
+    4072,
+    802,
+    1075,
+    1604,
+    1894,
+    2423,
+    2713,
+    3259,
+    4095
+  ],
+  "portraits": [
+    [
+      0,
+      50,
+      68,
+      50
+    ],
+    [
+      252,
+      50,
+      68,
+      50
+    ],
+    [
+      0,
+      100,
+      68,
+      50
+    ],
+    [
+      0,
+      150,
+      68,
+      50
+    ],
+    [
+      84,
+      100,
+      68,
+      50
+    ],
+    [
+      84,
+      150,
+      68,
+      50
+    ],
+    [
+      168,
+      100,
+      68,
+      50
+    ],
+    [
+      168,
+      150,
+      68,
+      50
+    ],
+    [
+      252,
+      100,
+      68,
+      50
+    ],
+    [
+      252,
+      150,
+      68,
+      50
+    ]
+  ],
+  "profiles": [
+    1,
+    1,
+    0,
+    2,
+    3,
+    4,
+    3,
+    4,
+    0,
+    2
+  ],
+  "names": [
+    "Ron Raygun",
+    "PM Satcher",
+    "Infidel",
+    "Jimi Farmer",
+    "Khadaffy",
+    "Tricky Dick",
+    "Kookamamie",
+    "Gorbachef",
+    "Mao The Pun",
+    "Ghanji"
+  ],
+  "origin_x": [
+    19,
+    3,
+    197,
+    197,
+    96
+  ],
+  "origin_y": [
+    19,
+    108,
+    35,
+    108,
+    81
+  ],
+  "glyphs": [
+    {
+      "offset": 0,
+      "width": 6
+    },
+    {
+      "offset": 6,
+      "width": 6
+    },
+    {
+      "offset": 12,
+      "width": 6
+    },
+    {
+      "offset": 18,
+      "width": 6
+    },
+    {
+      "offset": 24,
+      "width": 6
+    },
+    {
+      "offset": 30,
+      "width": 6
+    },
+    {
+      "offset": 36,
+      "width": 6
+    },
+    {
+      "offset": 42,
+      "width": 6
+    },
+    {
+      "offset": 48,
+      "width": 6
+    },
+    {
+      "offset": 54,
+      "width": 6
+    },
+    {
+      "offset": 60,
+      "width": 6
+    },
+    {
+      "offset": 66,
+      "width": 6
+    },
+    {
+      "offset": 72,
+      "width": 6
+    },
+    {
+      "offset": 78,
+      "width": 6
+    },
+    {
+      "offset": 84,
+      "width": 6
+    },
+    {
+      "offset": 90,
+      "width": 6
+    },
+    {
+      "offset": 96,
+      "width": 6
+    },
+    {
+      "offset": 102,
+      "width": 6
+    },
+    {
+      "offset": 108,
+      "width": 6
+    },
+    {
+      "offset": 114,
+      "width": 6
+    },
+    {
+      "offset": 120,
+      "width": 6
+    },
+    {
+      "offset": 126,
+      "width": 6
+    },
+    {
+      "offset": 132,
+      "width": 6
+    },
+    {
+      "offset": 138,
+      "width": 6
+    },
+    {
+      "offset": 144,
+      "width": 6
+    },
+    {
+      "offset": 150,
+      "width": 6
+    },
+    {
+      "offset": 156,
+      "width": 6
+    },
+    {
+      "offset": 162,
+      "width": 6
+    },
+    {
+      "offset": 168,
+      "width": 6
+    },
+    {
+      "offset": 174,
+      "width": 6
+    },
+    {
+      "offset": 180,
+      "width": 6
+    },
+    {
+      "offset": 186,
+      "width": 6
+    },
+    {
+      "offset": 192,
+      "width": 6
+    },
+    {
+      "offset": 198,
+      "width": 6
+    },
+    {
+      "offset": 204,
+      "width": 6
+    },
+    {
+      "offset": 210,
+      "width": 6
+    },
+    {
+      "offset": 216,
+      "width": 6
+    },
+    {
+      "offset": 222,
+      "width": 6
+    },
+    {
+      "offset": 228,
+      "width": 6
+    },
+    {
+      "offset": 234,
+      "width": 6
+    },
+    {
+      "offset": 240,
+      "width": 6
+    },
+    {
+      "offset": 246,
+      "width": 6
+    },
+    {
+      "offset": 252,
+      "width": 6
+    },
+    {
+      "offset": 258,
+      "width": 6
+    },
+    {
+      "offset": 264,
+      "width": 6
+    },
+    {
+      "offset": 270,
+      "width": 6
+    },
+    {
+      "offset": 276,
+      "width": 6
+    },
+    {
+      "offset": 282,
+      "width": 6
+    },
+    {
+      "offset": 288,
+      "width": 6
+    },
+    {
+      "offset": 294,
+      "width": 6
+    },
+    {
+      "offset": 300,
+      "width": 6
+    },
+    {
+      "offset": 306,
+      "width": 6
+    },
+    {
+      "offset": 312,
+      "width": 6
+    },
+    {
+      "offset": 318,
+      "width": 6
+    },
+    {
+      "offset": 324,
+      "width": 6
+    },
+    {
+      "offset": 330,
+      "width": 6
+    },
+    {
+      "offset": 336,
+      "width": 6
+    },
+    {
+      "offset": 342,
+      "width": 6
+    },
+    {
+      "offset": 348,
+      "width": 6
+    },
+    {
+      "offset": 354,
+      "width": 6
+    },
+    {
+      "offset": 360,
+      "width": 6
+    },
+    {
+      "offset": 366,
+      "width": 6
+    },
+    {
+      "offset": 372,
+      "width": 6
+    },
+    {
+      "offset": 378,
+      "width": 6
+    },
+    {
+      "offset": 384,
+      "width": 6
+    },
+    {
+      "offset": 390,
+      "width": 6
+    },
+    {
+      "offset": 396,
+      "width": 6
+    },
+    {
+      "offset": 402,
+      "width": 6
+    },
+    {
+      "offset": 408,
+      "width": 6
+    },
+    {
+      "offset": 414,
+      "width": 6
+    },
+    {
+      "offset": 420,
+      "width": 6
+    },
+    {
+      "offset": 426,
+      "width": 6
+    },
+    {
+      "offset": 432,
+      "width": 6
+    },
+    {
+      "offset": 438,
+      "width": 6
+    },
+    {
+      "offset": 444,
+      "width": 6
+    },
+    {
+      "offset": 450,
+      "width": 6
+    },
+    {
+      "offset": 456,
+      "width": 6
+    },
+    {
+      "offset": 462,
+      "width": 6
+    },
+    {
+      "offset": 468,
+      "width": 6
+    },
+    {
+      "offset": 474,
+      "width": 6
+    },
+    {
+      "offset": 480,
+      "width": 6
+    },
+    {
+      "offset": 486,
+      "width": 6
+    },
+    {
+      "offset": 492,
+      "width": 6
+    },
+    {
+      "offset": 498,
+      "width": 6
+    },
+    {
+      "offset": 504,
+      "width": 6
+    },
+    {
+      "offset": 510,
+      "width": 6
+    },
+    {
+      "offset": 516,
+      "width": 6
+    },
+    {
+      "offset": 522,
+      "width": 6
+    },
+    {
+      "offset": 528,
+      "width": 6
+    },
+    {
+      "offset": 534,
+      "width": 6
+    },
+    {
+      "offset": 540,
+      "width": 6
+    },
+    {
+      "offset": 546,
+      "width": 6
+    },
+    {
+      "offset": 552,
+      "width": 6
+    },
+    {
+      "offset": 546,
+      "width": 6
+    },
+    {
+      "offset": 558,
+      "width": 6
+    },
+    {
+      "offset": 564,
+      "width": 6
+    },
+    {
+      "offset": 570,
+      "width": 6
+    }
+  ],
+  "gadgets": [
+    {
+      "id": 52,
+      "left": 0,
+      "top": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 51,
+      "left": 0,
+      "top": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 50,
+      "left": 0,
+      "top": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 49,
+      "left": 0,
+      "top": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 48,
+      "left": 0,
+      "top": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 100,
+      "left": 296,
+      "top": 154,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 99,
+      "left": 296,
+      "top": 5,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 98,
+      "left": 45,
+      "top": 154,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 97,
+      "left": 45,
+      "top": 5,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 113,
+      "left": 104,
+      "top": 5,
+      "width": 110,
+      "height": 45
+    },
+    {
+      "id": 108,
+      "left": 232,
+      "top": 124,
+      "width": 29,
+      "height": 9
+    },
+    {
+      "id": 108,
+      "left": 232,
+      "top": 106,
+      "width": 29,
+      "height": 9
+    },
+    {
+      "id": 108,
+      "left": 261,
+      "top": 100,
+      "width": 59,
+      "height": 42
+    },
+    {
+      "id": 122,
+      "left": 232,
+      "top": 76,
+      "width": 29,
+      "height": 9
+    },
+    {
+      "id": 122,
+      "left": 232,
+      "top": 58,
+      "width": 29,
+      "height": 9
+    },
+    {
+      "id": 122,
+      "left": 261,
+      "top": 51,
+      "width": 59,
+      "height": 42
+    },
+    {
+      "id": 109,
+      "left": 59,
+      "top": 82,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 109,
+      "left": 59,
+      "top": 73,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 109,
+      "left": 59,
+      "top": 64,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 109,
+      "left": 59,
+      "top": 55,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 109,
+      "left": 0,
+      "top": 51,
+      "width": 59,
+      "height": 42
+    },
+    {
+      "id": 112,
+      "left": 217,
+      "top": 7,
+      "width": 32,
+      "height": 34
+    },
+    {
+      "id": 115,
+      "left": 70,
+      "top": 7,
+      "width": 32,
+      "height": 34
+    },
+    {
+      "id": 119,
+      "left": 59,
+      "top": 131,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 119,
+      "left": 59,
+      "top": 122,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 119,
+      "left": 59,
+      "top": 113,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 119,
+      "left": 59,
+      "top": 104,
+      "width": 35,
+      "height": 9
+    },
+    {
+      "id": 119,
+      "left": 0,
+      "top": 100,
+      "width": 59,
+      "height": 42
+    }
+  ],
+  "initial_high_scores": [
+    {
+      "name": "Khadaffy  ",
+      "population": 203,
+      "cities": 128,
+      "score": 4
+    },
+    {
+      "name": "Ghanji    ",
+      "population": 200,
+      "cities": 125,
+      "score": 4
+    },
+    {
+      "name": "Jimi      ",
+      "population": 197,
+      "cities": 97,
+      "score": 5
+    },
+    {
+      "name": "Khadaffy  ",
+      "population": 193,
+      "cities": 118,
+      "score": 4
+    },
+    {
+      "name": "Kookamamie",
+      "population": 189,
+      "cities": 139,
+      "score": 3
+    },
+    {
+      "name": "Jimi      ",
+      "population": 186,
+      "cities": 111,
+      "score": 4
+    },
+    {
+      "name": "Gorbachef ",
+      "population": 183,
+      "cities": 108,
+      "score": 4
+    },
+    {
+      "name": "Jimi      ",
+      "population": 178,
+      "cities": 103,
+      "score": 4
+    },
+    {
+      "name": "Infidel   ",
+      "population": 175,
+      "cities": 100,
+      "score": 4
+    },
+    {
+      "name": "Ron       ",
+      "population": 161,
+      "cities": 86,
+      "score": 4
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+/build*/
+/.migration/
+/.cache/
+*.dSYM/
+.DS_Store
