@@ -18,8 +18,8 @@
     "ui_waveforms": "ticker and selection bleep independently byte-compared to original generators"
   },
   "headless_replay_pairs": 39,
-  "compared_frames": 731,
-  "matching_outside_wall_clock_console": 663,
+  "compared_frames": 724,
+  "matching_outside_wall_clock_console": 666,
   "native_pre_present": {
     "pre_present_matching_frames": [
       "action_11_0_pre.bmp",
@@ -63,5 +63,12 @@
   "platform_tested": "macOS27 arm64,AppleClang17,SDL2 2.32.10",
   "other_platforms": "CMake/CI configured; not executed locally",
   "audio_listening": "not performed",
-  "published": false
+  "published": false,
+  "native_final_pre_present_frames": 29,
+  "installed_unicode_prefix_test": {
+    "installed_native_launch_from_foreign_cwd": true,
+    "unicode_and_spaces_in_install_prefix": true,
+    "asset_override": false,
+    "terminated_own_test_process_after_seconds": 2
+  }
 }

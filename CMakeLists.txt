@@ -152,5 +152,6 @@ set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_SOURCE_GENERATOR "ZIP")
 set(CPACK_SOURCE_IGNORE_FILES
-    "/\\.git/;/\\.migration/;/build[^/]*/;\\.DS_Store$")
+    "/[.]git/;/[.]migration/;/build[^/]*/;/dist/;/_CPack_Packages/;[.]DS_Store$;[.]zip$"
+)
 include(CPack)

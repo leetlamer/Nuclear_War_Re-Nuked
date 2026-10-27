@@ -1,4 +1,4 @@
-four_rounds 122 / 158
+four_rounds 126 / 151
 missile 6 / 6
 bomber-attack 5 / 5
 interception 6 / 6
@@ -26,15 +26,15 @@ revenge-ai 37 / 37
 revenge-human 37 / 37
 revenge-bomber 16 / 16
 missile_click 7 / 7
-missile_hold 3 / 6
+missile_hold 2 / 6
 bomber-attack_click 6 / 6
-bomber-attack_hold 5 / 5
+bomber-attack_hold 3 / 5
 revenge-ai_click 37 / 37
-revenge-ai_hold 23 / 37
+revenge-ai_hold 22 / 37
 revenge-human_click 37 / 37
-revenge-human_hold 25 / 37
+revenge-human_hold 29 / 37
 revenge-bomber_click 16 / 16
-revenge-bomber_hold 13 / 16
+revenge-bomber_hold 12 / 16
 human-victoryrestart 21 / 21
 ai-onlyrestart 57 / 57
 PASS 39 reference/candidate SDL replay pairs

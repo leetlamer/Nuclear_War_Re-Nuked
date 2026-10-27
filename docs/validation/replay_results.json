@@ -1,38 +1,27 @@
 [
   {
     "case": "four_rounds",
-    "compared_frames": 158,
-    "exact_frames_outside_wall_clock_console": 122,
+    "compared_frames": 151,
+    "exact_frames_outside_wall_clock_console": 126,
     "transient_differences": [
       "banner.bmp",
-      "door_5_1_1.bmp",
+      "door_4_2_1.bmp",
       "door_5_1_2.bmp",
       "door_5_1_3.bmp",
-      "door_5_1_4.bmp",
       "door_5_2_0.bmp",
       "door_5_2_1.bmp",
       "door_5_2_2.bmp",
       "production.bmp",
-      "round_4_event_1_phase_0.bmp",
-      "round_4_event_1_phase_1.bmp",
-      "round_4_event_1_phase_2.bmp",
-      "round_4_event_3_message_23.bmp",
-      "round_4_event_3_phase_0.bmp",
-      "round_4_event_3_phase_1.bmp",
-      "round_4_event_3_phase_2.bmp",
-      "round_4_event_3_phase_3.bmp",
-      "round_4_event_4_message_24.bmp",
-      "round_4_event_4_phase_0.bmp",
-      "round_4_event_4_phase_1.bmp",
-      "round_4_event_5_message_25.bmp",
-      "round_4_event_5_phase_0.bmp",
+      "round_1_event_5_phase_0.bmp",
+      "round_3_event_5_phase_1.bmp",
+      "round_3_event_5_phase_3.bmp",
+      "round_3_event_5_phase_4.bmp",
       "round_4_event_5_phase_1.bmp",
       "round_4_event_5_phase_2.bmp",
       "round_4_main.bmp",
       "selection_1.bmp",
       "selection_2.bmp",
       "selection_3.bmp",
-      "selection_4.bmp",
       "selection_empty.bmp",
       "target_door_0_3_1.bmp",
       "target_door_0_3_4.bmp",
@@ -207,11 +196,12 @@
   {
     "case": "missile_hold",
     "compared_frames": 6,
-    "exact_frames_outside_wall_clock_console": 3,
+    "exact_frames_outside_wall_clock_console": 2,
     "transient_differences": [
-      "round_1_event_0_phase_0.bmp",
       "round_1_event_0_phase_1.bmp",
-      "round_1_event_0_phase_2.bmp"
+      "round_1_event_0_phase_2.bmp",
+      "round_1_event_0_phase_3.bmp",
+      "round_1_event_0_phase_4.bmp"
     ]
   },
   {
@@ -223,8 +213,11 @@
   {
     "case": "bomber-attack_hold",
     "compared_frames": 5,
-    "exact_frames_outside_wall_clock_console": 5,
-    "transient_differences": []
+    "exact_frames_outside_wall_clock_console": 3,
+    "transient_differences": [
+      "round_1_event_0_phase_1.bmp",
+      "round_1_event_0_phase_2.bmp"
+    ]
   },
   {
     "case": "revenge-ai_click",
@@ -235,21 +228,22 @@
   {
     "case": "revenge-ai_hold",
     "compared_frames": 37,
-    "exact_frames_outside_wall_clock_console": 23,
+    "exact_frames_outside_wall_clock_console": 22,
     "transient_differences": [
       "round_1_event_2_phase_0.bmp",
       "round_1_event_2_phase_1.bmp",
       "round_1_event_2_phase_2.bmp",
       "round_1_event_2_phase_3.bmp",
+      "round_1_event_2_phase_4.bmp",
       "round_1_event_3_phase_0.bmp",
       "round_1_event_3_phase_1.bmp",
       "round_1_event_3_phase_2.bmp",
+      "round_1_event_4_phase_0.bmp",
       "round_1_event_4_phase_1.bmp",
       "round_1_event_4_phase_2.bmp",
       "round_1_event_5_phase_0.bmp",
       "round_1_event_5_phase_1.bmp",
       "round_1_event_5_phase_2.bmp",
-      "round_1_event_5_phase_3.bmp",
       "round_1_event_5_phase_4.bmp"
     ]
   },
@@ -262,20 +256,16 @@
   {
     "case": "revenge-human_hold",
     "compared_frames": 37,
-    "exact_frames_outside_wall_clock_console": 25,
+    "exact_frames_outside_wall_clock_console": 29,
     "transient_differences": [
       "round_1_event_2_phase_0.bmp",
       "round_1_event_2_phase_1.bmp",
-      "round_1_event_2_phase_4.bmp",
-      "round_1_event_3_phase_0.bmp",
-      "round_1_event_3_phase_1.bmp",
-      "round_1_event_3_phase_2.bmp",
-      "round_1_event_4_phase_0.bmp",
       "round_1_event_4_phase_2.bmp",
-      "round_1_event_4_phase_4.bmp",
+      "round_1_event_4_phase_3.bmp",
       "round_1_event_5_phase_0.bmp",
       "round_1_event_5_phase_1.bmp",
-      "round_1_event_5_phase_2.bmp"
+      "round_1_event_5_phase_2.bmp",
+      "round_1_event_5_phase_4.bmp"
     ]
   },
   {
@@ -287,9 +277,10 @@
   {
     "case": "revenge-bomber_hold",
     "compared_frames": 16,
-    "exact_frames_outside_wall_clock_console": 13,
+    "exact_frames_outside_wall_clock_console": 12,
     "transient_differences": [
       "round_1_event_2_phase_0.bmp",
+      "round_1_event_2_phase_1.bmp",
       "round_1_event_2_phase_2.bmp",
       "round_1_event_2_phase_3.bmp"
     ]

@@ -79,7 +79,7 @@ generators. Original samples were not modified or artistically processed.
 Readable JSON preserves **743 exact strings /315 ordered references**, names,
 profiles, palettes, coordinates, glyph metrics, default scores, asset metadata
 and named animation mappings. Generated C++ tables are checked in; normal builds
-need no Python. Configure-time fingerprints and regeneration validation prevent
+need no Python. Configure-time fingerprints cover declared assets only (not OS .DS_Store metadata); regeneration validation prevents
 stale/missing asset/data references. Native text IDs remain stable identifiers.
 The animation C++ functions remain timing authorities; JSON does not introduce
 loosely configured RNG/gameplay logic. Packed-atlas independent frame counts that

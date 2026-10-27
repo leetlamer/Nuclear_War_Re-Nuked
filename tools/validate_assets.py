@@ -47,3 +47,19 @@ assert all(int(x["id"], 16) == 0 or int(x["id"], 16) in ids for x in d["tables"]
 print(
     f"PASS {len(m['images'])} exact RGBA images, {len(m['audio'])} reversible PCM WAVs,743 texts /315 references"
 )
+
+images = {entry["file"]: entry for entry in m["images"]}
+animations = json.loads((R / "assets/data/animations.json").read_text())["animations"]
+for animation in animations:
+    assert animation["image"] in images, animation["name"]
+    if "behind" in animation:
+        assert animation["behind"] in images
+    rectangles = [animation["rectangle"]] if "rectangle" in animation else []
+    if "frames" in animation and animation["frames"] and isinstance(animation["frames"][0], dict):
+        rectangles += [f["source"] for f in animation["frames"]]
+    for x, y, width, height in rectangles:
+        image = images[animation["image"]]
+        assert (
+            x >= 0 and y >= 0 and x + width <= image["width"] and y + height <= image["height"]
+        ), animation["name"]
+print("PASS animation asset references and explicit source rectangles")
