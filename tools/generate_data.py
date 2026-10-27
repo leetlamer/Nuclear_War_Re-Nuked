@@ -111,7 +111,12 @@ print("Generated layout, exact text tables and asset registry; references valida
 # CMake validates generated data and assets without needing Python at build/runtime.
 import hashlib
 
-files = sorted((R / "assets").rglob("*")) + [
+files = [
+    R / "assets/data" / name
+    for name in ["manifest.json", "interface_layout.json", "dialogue.json", "animations.json"]
+]
+files += [R / "assets" / entry["file"] for entry in m["images"] + m["audio"]]
+files += [
     R / "src/rendering/asset_layout.hpp",
     R / "src/core/game_text_data.hpp",
     R / "src/core/asset_registry.hpp",

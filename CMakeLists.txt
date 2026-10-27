@@ -40,7 +40,10 @@ if(WIN32)
                                                       WIN32_LEAN_AND_MEAN)
 endif()
 target_link_libraries(nuclear_resources PUBLIC SDL2::SDL2 PNG::PNG)
-file(COPY assets DESTINATION "${CMAKE_BINARY_DIR}")
+file(
+  COPY assets
+  DESTINATION "${CMAKE_BINARY_DIR}"
+  PATTERN ".DS_Store" EXCLUDE)
 add_executable(nuclearwar src/platform/application.cpp)
 target_link_libraries(nuclearwar PRIVATE nuclear_game nuclear_resources
                                          SDL2::SDL2 PNG::PNG)
@@ -50,8 +53,10 @@ endif()
 if(BUILD_TESTING)
   add_executable(state_trace EXCLUDE_FROM_ALL tools/deterministic_trace.cpp)
   target_link_libraries(state_trace PRIVATE nuclear_game)
-  add_executable(render_frame_trace EXCLUDE_FROM_ALL tools/render_frame_trace.cpp)
-  target_link_libraries(render_frame_trace PRIVATE nuclear_game nuclear_resources)
+  add_executable(render_frame_trace EXCLUDE_FROM_ALL
+                 tools/render_frame_trace.cpp)
+  target_link_libraries(render_frame_trace PRIVATE nuclear_game
+                                                   nuclear_resources)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/test_output")
   add_executable(nuclearwar_replay src/platform/application.cpp)
   target_compile_definitions(nuclearwar_replay PRIVATE NWR_WITH_REPLAY=1)
@@ -106,8 +111,10 @@ foreach(target nuclearwar nuclearwar_replay)
       TARGET ${target}
       POST_BUILD
       COMMAND
-        ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-        "$<TARGET_FILE_DIR:${target}>/assets")
+        ${CMAKE_COMMAND}
+        "-DNWR_ASSET_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "-DNWR_ASSET_DEST=$<TARGET_FILE_DIR:${target}>/assets" -P
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyAssets.cmake")
   endif()
 endforeach()
 if(MSVC)
@@ -134,8 +141,10 @@ if(Python3_FOUND)
 endif()
 include(GNUInstallDirs)
 install(TARGETS nuclearwar RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(DIRECTORY assets/
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/nuclearwar/assets)
+install(
+  DIRECTORY assets/
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/nuclearwar/assets
+  PATTERN ".DS_Store" EXCLUDE)
 install(FILES README.md BUILDING.md ARCHITECTURE.md CONTRIBUTING.md CHANGELOG.md
         DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/nuclearwar)
 set(CPACK_PACKAGE_NAME "NuclearWar-ReNuked")
