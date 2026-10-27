@@ -1,29 +1,115 @@
 #!/usr/bin/env python3
 """Generate checked-in C++ tables from readable UTF-8 data. No source game required."""
+
 from pathlib import Path
 import json
-R=Path(__file__).resolve().parents[1]
-l=json.loads((R/'assets/data/interface_layout.json').read_text());m=json.loads((R/'assets/data/manifest.json').read_text());d=json.loads((R/'assets/data/dialogue.json').read_text())
-def array(typ,name,values):return f'inline constexpr std::array<{typ},{len(values)}> {name}{{{{'+'\n'+''.join('    '+v+',\n' for v in values)+'}};\n'
-j=lambda s:json.dumps(s,ensure_ascii=True)
-s='#pragma once\n#include <array>\nnamespace player_assets {\n'
-for key in ['palette','ending_palette','all_dead_palette','profiles','origin_x','origin_y']:s+=array('unsigned' if key not in ['origin_x','origin_y'] else 'int',key,list(map(str,l[key])))
-s+='struct Rect{int x,y,w,h;};\n'+array('Rect','portraits',['{'+','.join(map(str,r))+'}' for r in l['portraits']]);s+='struct Glyph{int offset,width;};\n'+array('Glyph','glyphs',['{'+str(g['offset'])+','+str(g['width'])+'}' for g in l['glyphs']]);s+=array('const char*','names',[j(n) for n in l['names']]);s+='struct Gadget{int id,x,y,w,h;};\n'+array('Gadget','gadgets',['{'+','.join(str(g[k]) for k in ['id','left','top','width','height'])+'}' for g in l['gadgets']])
-high=bytearray()
-for h in l['initial_high_scores']:
- high+=h['name'].encode('ascii').ljust(11,b'\0')
- for key in ['population','cities','score']:high+=h[key].to_bytes(2,'big')
-s+=array('unsigned char','highscores',list(map(str,high)))+'}\n';(R/'src/rendering/asset_layout.hpp').write_text(s)
-s='#pragma once\n#include <array>\n#include <cstdint>\n#include <string_view>\nnamespace nuclear::text::generated {\nstruct Row{std::uint32_t address;std::string_view text;};\n'+array('Row','rows',['{'+r['id']+'u,'+j(r['text'])+'}' for r in d['entries']]);s+='struct Pointer{std::string_view table;unsigned index;std::uint32_t address;};\n'+array('Pointer','pointers',['{'+j(t['name'])+','+str(t['index'])+'u,'+t['id']+'u}' for t in d['tables']])+'}\n';(R/'src/core/game_text_data.hpp').write_text(s)
-s='#pragma once\n#include <array>\n#include <string_view>\nnamespace nuclear::assets {\nstruct ImageSpec{std::string_view key,mask,file;unsigned width,height;};\n'+array('ImageSpec','images',['{'+','.join([j(e['key']),j(e.get('mask','')),j(e['file']),str(e['width']),str(e['height'])])+'}' for e in m['images']]);s+='struct AudioSpec{std::string_view key,file;unsigned samples,rate;};\n'+array('AudioSpec','audio',['{'+','.join([j(e['key']),j(e['file']),str(e['samples']),str(e['sample_rate'])])+'}' for e in m['audio']])+'}\n';(R/'src/core/asset_registry.hpp').write_text(s)
-assert len(set(r['id'] for r in d['entries']))==len(d['entries']);ids={int(r['id'],16) for r in d['entries']};assert all(t['id']=='0x0' or int(t['id'],16)==0 or int(t['id'],16) in ids for t in d['tables'])
-print('Generated layout, exact text tables and asset registry; references validated')
+
+R = Path(__file__).resolve().parents[1]
+l = json.loads((R / "assets/data/interface_layout.json").read_text())
+m = json.loads((R / "assets/data/manifest.json").read_text())
+d = json.loads((R / "assets/data/dialogue.json").read_text())
+
+
+def array(typ, name, values):
+    return (
+        f"inline constexpr std::array<{typ},{len(values)}> {name}{{{{"
+        + "\n"
+        + "".join("    " + v + ",\n" for v in values)
+        + "}};\n"
+    )
+
+
+j = lambda s: json.dumps(s, ensure_ascii=True)
+s = "#pragma once\n#include <array>\nnamespace player_assets {\n"
+for key in ["palette", "ending_palette", "all_dead_palette", "profiles", "origin_x", "origin_y"]:
+    s += array(
+        "unsigned" if key not in ["origin_x", "origin_y"] else "int", key, list(map(str, l[key]))
+    )
+s += "struct Rect{int x,y,w,h;};\n" + array(
+    "Rect", "portraits", ["{" + ",".join(map(str, r)) + "}" for r in l["portraits"]]
+)
+s += "struct Glyph{int offset,width;};\n" + array(
+    "Glyph", "glyphs", ["{" + str(g["offset"]) + "," + str(g["width"]) + "}" for g in l["glyphs"]]
+)
+s += array("const char*", "names", [j(n) for n in l["names"]])
+s += "struct Gadget{int id,x,y,w,h;};\n" + array(
+    "Gadget",
+    "gadgets",
+    [
+        "{" + ",".join(str(g[k]) for k in ["id", "left", "top", "width", "height"]) + "}"
+        for g in l["gadgets"]
+    ],
+)
+high = bytearray()
+for h in l["initial_high_scores"]:
+    high += h["name"].encode("ascii").ljust(11, b"\0")
+    for key in ["population", "cities", "score"]:
+        high += h[key].to_bytes(2, "big")
+s += array("unsigned char", "highscores", list(map(str, high))) + "}\n"
+(R / "src/rendering/asset_layout.hpp").write_text(s)
+s = (
+    "#pragma once\n#include <array>\n#include <cstdint>\n#include <string_view>\nnamespace nuclear::text::generated {\nstruct Row{std::uint32_t address;std::string_view text;};\n"
+    + array("Row", "rows", ["{" + r["id"] + "u," + j(r["text"]) + "}" for r in d["entries"]])
+)
+s += (
+    "struct Pointer{std::string_view table;unsigned index;std::uint32_t address;};\n"
+    + array(
+        "Pointer",
+        "pointers",
+        ["{" + j(t["name"]) + "," + str(t["index"]) + "u," + t["id"] + "u}" for t in d["tables"]],
+    )
+    + "}\n"
+)
+(R / "src/core/game_text_data.hpp").write_text(s)
+s = (
+    "#pragma once\n#include <array>\n#include <string_view>\nnamespace nuclear::assets {\nstruct ImageSpec{std::string_view key,mask,file;unsigned width,height;};\n"
+    + array(
+        "ImageSpec",
+        "images",
+        [
+            "{"
+            + ",".join(
+                [j(e["key"]), j(e.get("mask", "")), j(e["file"]), str(e["width"]), str(e["height"])]
+            )
+            + "}"
+            for e in m["images"]
+        ],
+    )
+)
+s += (
+    "struct AudioSpec{std::string_view key,file;unsigned samples,rate;};\n"
+    + array(
+        "AudioSpec",
+        "audio",
+        [
+            "{"
+            + ",".join([j(e["key"]), j(e["file"]), str(e["samples"]), str(e["sample_rate"])])
+            + "}"
+            for e in m["audio"]
+        ],
+    )
+    + "}\n"
+)
+(R / "src/core/asset_registry.hpp").write_text(s)
+assert len(set(r["id"] for r in d["entries"])) == len(d["entries"])
+ids = {int(r["id"], 16) for r in d["entries"]}
+assert all(
+    t["id"] == "0x0" or int(t["id"], 16) == 0 or int(t["id"], 16) in ids for t in d["tables"]
+)
+print("Generated layout, exact text tables and asset registry; references validated")
 
 # CMake validates generated data and assets without needing Python at build/runtime.
 import hashlib
-files=sorted((R/'assets').rglob('*'))+[R/'src/rendering/asset_layout.hpp',R/'src/core/game_text_data.hpp',R/'src/core/asset_registry.hpp']
-lines=['# Generated by tools/generate_data.py; do not edit.']
+
+files = sorted((R / "assets").rglob("*")) + [
+    R / "src/rendering/asset_layout.hpp",
+    R / "src/core/game_text_data.hpp",
+    R / "src/core/asset_registry.hpp",
+]
+lines = ["# Generated by tools/generate_data.py; do not edit."]
 for file in files:
- if file.is_file():
-  name=file.relative_to(R).as_posix();digest=hashlib.sha256(file.read_bytes()).hexdigest();lines.append(f'nwr_verify_file("{name}" "{digest}")')
-(R/'cmake/GeneratedData.cmake').write_text('\n'.join(lines)+'\n')
+    if file.is_file():
+        name = file.relative_to(R).as_posix()
+        digest = hashlib.sha256(file.read_bytes()).hexdigest()
+        lines.append(f'nwr_verify_file("{name}" "{digest}")')
+(R / "cmake/GeneratedData.cmake").write_text("\n".join(lines) + "\n")

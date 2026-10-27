@@ -19,7 +19,7 @@ inline constexpr std::array<ImageSpec,13> images{{
     {"font","","fonts/original_bitmap.png",576,8},
 }};
 struct AudioSpec{std::string_view key,file;unsigned samples,rate;};
-inline constexpr std::array<AudioSpec,14> audio{{
+inline constexpr std::array<AudioSpec,13> audio{{
     {"16ton","audio/effects/falling_weight.wav",5406,4961},
     {"build","audio/effects/factory.wav",20032,27284},
     {"door.snd","audio/effects/shutter.wav",8820,8547},
@@ -32,7 +32,6 @@ inline constexpr std::array<AudioSpec,14> audio{{
     {"ooo","audio/effects/warhead_exclamation.wav",12904,5358},
     {"prop","audio/effects/propaganda.wav",5400,3550},
     {"selection_bleep","audio/effects/selection_bleep.wav",506,5067},
-    {"siren","audio/effects/siren.wav",32760,4961},
     {"ticker","audio/effects/typewriter.wav",128,27928},
 }};
 }

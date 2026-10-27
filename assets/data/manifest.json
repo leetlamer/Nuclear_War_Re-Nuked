@@ -278,17 +278,6 @@
       "rate_policy": "cue period and 3546895 clock still determine effective source rate; production ooo 1.08x"
     },
     {
-      "key": "siren",
-      "file": "audio/effects/siren.wav",
-      "channels": 1,
-      "bits": 8,
-      "sample_rate": 4961,
-      "samples": 32760,
-      "signed_source_sha256": "fc83dddd4840f8e80b26ae72ad9ef0d07c399207aaf3122954db6882745ae525",
-      "source_mapping": "siren.s8",
-      "rate_policy": "cue period and 3546895 clock still determine effective source rate; production ooo 1.08x"
-    },
-    {
       "key": "ticker",
       "file": "audio/effects/typewriter.wav",
       "channels": 1,

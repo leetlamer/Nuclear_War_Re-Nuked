@@ -13,7 +13,7 @@
     "port/engine/src/engine.cpp": "src/game/game_rules.cpp",
     "port/engine/src/ending.cpp": "src/game/scoring.cpp",
     "port/engine/src/resolver_markers.cpp": "src/game/combat/resolver_markers.cpp",
-    "port/engine/src/round_plan.cpp": "src/game/ai/round_plan.cpp",
+    "port/engine/src/round_plan.cpp": "src/game/turn_plan.cpp",
     "port/engine/src/human_commands.cpp": "src/ui/human_commands.cpp",
     "port/engine/src/human_messages.cpp": "src/ui/action_messages.cpp",
     "port/engine/src/bomber_navigation.cpp": "src/game/combat/bomber_navigation.cpp",
@@ -81,5 +81,22 @@
     "generated smoke captures",
     "old shell build wrappers"
   ],
-  "runtime_baseline": "latest emoji speech refresh checkpoint; no source workspace writes"
+  "runtime_baseline": "latest emoji speech refresh checkpoint; no source workspace writes",
+  "additional_renderer_split": {
+    "source": "port/player/main.cpp",
+    "destinations": [
+      "src/rendering/renderer.hpp",
+      "src/platform/application.cpp",
+      "src/platform/launch_options.hpp",
+      "tests/support/replay_*.inc"
+    ]
+  },
+  "additional_imported_test": {
+    "source": "analysis/emoji_speech/renderer_test.cpp",
+    "destination": "tests/frontend/emoji_renderer_tests.cpp"
+  },
+  "ai_entry_split": {
+    "source": "port/engine/src/engine.cpp::ai_turn",
+    "destination": "src/game/ai/ai_controller.cpp"
+  }
 }

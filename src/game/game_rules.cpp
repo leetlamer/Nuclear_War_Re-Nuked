@@ -1551,31 +1551,4 @@ void resolve_action(State &, std::size_t, Rng &) {
     throw Unsupported("TODO complete two-pass animation/collision resolver 1028c8");
 }
 void human_turn(State &) { throw Unsupported("TODO complete human command transitions 106712"); }
-void ai_turn(State &s, Rng &rng) {
-    auto copy = s;
-    auto random = rng;
-    for (std::size_t i = 0; i < 4; ++i) {
-        Word row = add_word(select_opponent(copy, i, random), 2);
-        auto &a = copy.actors[i];
-        bool defended = false;
-        if (a.defenses[0] != 0 || a.defenses[1] != 0)
-            defended = plan_defense(copy, i);
-        if (!defended) {
-            Word category = (a.action == 4 || a.action == 5 || a.action == 2)
-                                ? 2
-                                : ai_category(row, a.profile, random);
-            if (copy.identity[i] == 9)
-                category = 1;
-            auto target = std::size_t(copy.selected_opponent[i]);
-            if (category == 1)
-                plan_propaganda(copy, i, target, random);
-            else if (category == 2)
-                plan_weapons(copy, i, target, random);
-            else if (category == 3)
-                a.action = 6;
-        }
-    }
-    s = copy;
-    rng = random;
-}
 } // namespace nuclear

@@ -204,6 +204,120 @@
       ],
       "timing_source": "rendering/animations/console_and_sound_cues.hpp",
       "behind": "images/interface/main_window.png"
+    },
+    {
+      "name": "stork and delivery bundle",
+      "image": "images/effects/small_sprites.png",
+      "stork_frames": [
+        72,
+        74,
+        76
+      ],
+      "bundle_frames": [
+        203,
+        204,
+        205,
+        206
+      ],
+      "frame_rate": 8,
+      "movement_speed": 0.5,
+      "timing_source": "rendering/animations/special_events.hpp"
+    },
+    {
+      "name": "alien spacecraft delivery",
+      "image": "images/effects/small_sprites.png",
+      "frames": [
+        260,
+        262,
+        264,
+        266,
+        268,
+        270,
+        272,
+        274
+      ],
+      "frame_rate": 8,
+      "sprite_size": [
+        32,
+        10
+      ],
+      "source_row_offset": 2,
+      "duration_seconds": 3
+    },
+    {
+      "name": "defector",
+      "image": "images/effects/small_sprites.png",
+      "frames": [
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249
+      ],
+      "frame_rate": 8,
+      "sprite_size": [
+        16,
+        18
+      ]
+    },
+    {
+      "name": "meltdown",
+      "image": "images/effects/small_sprites.png",
+      "frames": [
+        286,
+        288,
+        290,
+        292,
+        294,
+        296,
+        298
+      ],
+      "sprite_size": [
+        32,
+        32
+      ],
+      "duration_seconds": 3
+    },
+    {
+      "name": "catapult payloads",
+      "image": "images/effects/small_sprites.png",
+      "launcher_frames": [
+        280,
+        282,
+        284
+      ],
+      "cow_frames": [
+        255,
+        256,
+        257,
+        258,
+        259
+      ],
+      "person_frames": [
+        250,
+        251,
+        252,
+        253,
+        254
+      ],
+      "frame_rate": 8
+    },
+    {
+      "name": "bomber flight and orbit",
+      "image": "images/effects/small_sprites.png",
+      "timing_source": "nuclear/bomber_navigation.hpp and rendering/animations/action_sprites.hpp",
+      "frame_sequence": "preserved direction-dependent flight/orbit functions"
+    },
+    {
+      "name": "earthquake",
+      "image": "images/effects/small_sprites.png",
+      "timing_source": "rendering/animations/earthquake.hpp",
+      "shake": "unchanged presentation-only deterministic displacement; no gameplay RNG"
     }
   ]
 }
