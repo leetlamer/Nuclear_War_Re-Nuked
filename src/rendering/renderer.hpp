@@ -1,4 +1,5 @@
 #pragma once
+#include "platform/resources.hpp"
 #include "ui/player_controller.hpp"
 #include "ui/turn_presentation.hpp"
 #include "ui/animation_playback.hpp"
@@ -44,12 +45,11 @@ public:const ConsoleTranscript& console_history()const{return console_;}
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"0");window=SDL_CreateWindow("Nuclear War",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,960,600,SDL_WINDOW_RESIZABLE|SDL_WINDOW_ALLOW_HIGHDPI);if(!window)throw std::runtime_error(SDL_GetError());SDL_SetWindowMinimumSize(window,320,200);
   renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);if(!renderer)renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_SOFTWARE);if(!renderer)throw std::runtime_error(SDL_GetError());SDL_RenderSetLogicalSize(renderer,320,200);SDL_RenderSetIntegerScale(renderer,SDL_TRUE);
   winner_art_=sheet("endchar",112,"mask_endchar_mask",true);space_=sheet("spacemap",200,"",true,true);ending_=sheet("desolate_map",200,"",true);large_=sheet("bigtiles",432,"mask_bigmask");large_opaque_=sheet("bigtiles",432);controls_=sheet("smalltiles",272);missiles_=sheet("big512",288,"mask_big512mask");start_=sheet("start",200);dip_=sheet("dip",200);heads_=sheet("leaders",160);world_=sheet("world_map",200);tiles_=sheet("smalltiles",272,"mask_smallmask_z_m");
-  auto b=bytes("port/assets/extracted/fonts/ld_8_strike.raw");std::vector<unsigned char> p(576*8*4,255);for(int y=0;y<8;++y)for(int x=0;x<576;++x)p[(y*576+x)*4+3]=((b[y*72+x/8]>>(7-x%8))&1)?255:0;font_=texture(p,576,8);
+  auto bitmap=nuclear::assets::image("font");font_=texture(bitmap.rgba,int(bitmap.width),int(bitmap.height));
  }
  ~Renderer(){for(auto t:{winner_art_,space_,ending_,start_,dip_,heads_,world_,tiles_,font_,missiles_,controls_,large_,large_opaque_})SDL_DestroyTexture(t);SDL_DestroyRenderer(renderer);SDL_DestroyWindow(window);SDL_Quit();}
  SDL_Texture* texture(const std::vector<unsigned char>& p,int w,int h){auto t=SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_STATIC,w,h);if(!t)throw std::runtime_error(SDL_GetError());SDL_UpdateTexture(t,nullptr,p.data(),w*4);SDL_SetTextureBlendMode(t,SDL_BLENDMODE_BLEND);return t;}
- SDL_Texture* sheet(std::string name,int h,std::string mask="",bool ending=false,bool all_dead=false){auto b=bytes("port/assets/extracted/raw/graphics/"+name+".indices");if(b.size()!=std::size_t(320*h))throw std::runtime_error("bad asset length");auto m=mask.empty()?std::vector<unsigned char>{}:bytes("port/assets/extracted/raw/graphics/"+mask+".1bit");std::vector<unsigned char> p(320*h*4);
-  for(int i=0;i<320*h;++i){auto c=all_dead?player_assets::all_dead_palette.at(b[i]):ending?player_assets::ending_palette.at(b[i]):player_assets::palette.at(b[i]);p[i*4]=((c>>8)&15)*17;p[i*4+1]=((c>>4)&15)*17;p[i*4+2]=(c&15)*17;p[i*4+3]=m.empty()||((m[i/8]>>(7-i%8))&1)?255:0;}return texture(p,320,h);}
+ SDL_Texture* sheet(std::string name,int h,std::string mask="",bool ending=false,bool all_dead=false){(void)ending;(void)all_dead;auto image=nuclear::assets::image(name,mask);if(int(image.height)!=h)throw std::runtime_error("image height disagrees with atlas");return texture(image.rgba,int(image.width),int(image.height));}
  void copy(SDL_Texture* t,SDL_Rect s,SDL_Rect d){SDL_RenderCopy(renderer,t,&s,&d);}
  void text(std::string s,int x,int y,SDL_Color color={0,0,0,255}){SDL_SetTextureColorMod(font_,color.r,color.g,color.b);int origin=x;for(unsigned char c:s){if(c=='\n'){x=origin;y+=8;continue;}auto g=player_assets::glyphs[c>=32&&c<=127?c-32:96];copy(font_,{g.offset,0,g.width,8},{x,y,g.width,8});x+=6;}}
  void speech_text(const std::string& s,int x,int y){SDL_SetTextureColorMod(font_,187,0,0);for(unsigned char c:s){auto g=player_assets::glyphs[c>=32&&c<=127?c-32:96];copy(font_,{g.offset,0,g.width,8},{x,y,std::max(1,int(g.width)*5/6),7});x+=5;}}
