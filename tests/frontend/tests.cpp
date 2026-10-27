@@ -1,304 +1,3485 @@
-#include "ui/player_controller.hpp"
-#include "ui/turn_presentation.hpp"
-#include "ui/animation_playback.hpp"
+#include "platform/city_diagnostics.hpp"
 #include "rendering/animations/action_sprites.hpp"
+#include "rendering/animations/earthquake.hpp"
 #include "rendering/animations/special_events.hpp"
 #include "tests/support/session_fixtures.hpp"
-#include "platform/city_diagnostics.hpp"
+#include "ui/action_selection_shutters.hpp"
+#include "ui/animation_playback.hpp"
+#include "ui/endgame.hpp"
+#include "ui/new_game_transition.hpp"
+#include "ui/player_controller.hpp"
 #include "ui/portrait_mood.hpp"
 #include "ui/selection_chrome.hpp"
-#include "ui/endgame.hpp"
 #include "ui/target_selection.hpp"
-#include "ui/action_selection_shutters.hpp"
-#include "ui/new_game_transition.hpp"
-#include "rendering/animations/earthquake.hpp"
-#include <iostream>
+#include "ui/turn_presentation.hpp"
 #include <cstdlib>
+#include <iostream>
 using namespace nuclear;
 using namespace nuclear::player;
-unsigned checks=0,groups=0;
-void check(bool b,int line){++checks;if(!b){std::cerr<<"failure "<<line<<'\n';std::exit(1);}}
-#define CHECK(x) check(bool(x),__LINE__)
-template<class F>void group(const char* n,F f){f();++groups;std::cout<<"PASS "<<n<<'\n';}
-void choose_four(Player& p){p.enter_selection();for(Word id:{Word(0),Word(4),Word(2),Word(7)}){auto r=portrait_rect(id);CHECK(p.click(r.x+20,r.y+15));}CHECK(p.selection().count==4&&p.screen()==Screen::selection);}
-void main_screen(Player& p){choose_four(p);CHECK(p.click(110,20)&&p.screen()==Screen::main);CHECK(p.coordinator()->phase()==session::Phase::human_selection);}
-int main(){
- group("original header strict hit boundaries",[]{CHECK(selection_header(0,46));CHECK(!selection_header(0,47));CHECK(!selection_header(83,60));CHECK(selection_header(84,60));CHECK(selection_header(235,87));CHECK(!selection_header(236,60));CHECK(!selection_header(100,88));});
- group("portrait geometry and cap4; fourth never automatically completes",[]{Player p;CHECK(p.screen()==Screen::title);choose_four(p);auto seed=p.selection().rng.seed();auto r=portrait_rect(8);CHECK(!p.click(r.x+20,r.y+15)&&p.selection().count==4&&p.selection().rng.seed()==seed);r=portrait_rect(0);CHECK(p.click(r.x+20,r.y+15)&&p.selection().count==3&&p.selection().rng.seed()==seed);CHECK(p.click(r.x+20,r.y+15)&&p.selection().count==4&&p.screen()==Screen::selection);});
- group("synchronous20 initialization and9 selected-reaction draws only",[]{Selection s(1);Rng expected(1);for(int i=0;i<20;++i)expected.next();CHECK(s.rng.seed()==expected.seed());auto timers=s.timers;CHECK(s.toggle(0));for(int i=1;i<10;++i)CHECK(s.timers[i]==add_word(timers[i],Word(expected.next()%12+1)));CHECK(s.timers[0]==timers[0]&&s.rng.seed()==expected.seed());CHECK(s.toggle(0)&&s.rng.seed()==expected.seed());});
- group("four-selected completion golden preserves cyclic assignment",[]{std::array<Word,10> flags{};for(int i=0;i<4;++i)flags[i]=1;Rng rng(1);auto c=complete_selection(flags,rng);CHECK((c.identity==std::array<Word,4>{0,1,3,2}));CHECK(c.fill_draws==0&&c.assignment_draws==4&&rng.seed()==0xc46b9b3d);for(auto f:flags)CHECK(f==0);});
- group("vacancy fill retains duplicate draws; never substitute shuffle",[]{std::array<Word,10> flags{};Rng rng(1);auto c=complete_selection(flags,rng);CHECK((c.identity==std::array<Word,4>{8,1,3,5}));CHECK(c.fill_draws==5&&c.assignment_draws==4&&rng.seed()==0xbf54bc7e);});
- group("setup copies verified profiles and human initialized resources",[]{Player p;main_screen(p);auto& d=p.coordinator()->data();for(int i=0;i<4;++i){auto id=d.state.identity[i];CHECK(d.state.actors[i].profile==player_assets::profiles[id]);CHECK(d.names[i]==player_assets::names[id]);CHECK(populated_cities(d.state.actors[i])==5);}CHECK(d.state.actors[4].missiles[0]==1&&d.state.actors[4].warheads[0]==1);CHECK(d.state.actors[4].action==0);CHECK(!p.messages().empty()&&p.messages()[0]=="Welcome to Nuclear War.");});
- group("banner without action keeps selection with original validation text",[]{Player p;main_screen(p);CHECK(p.click(110,20));CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.messages()[0]=="Select an action");});
- group("original missile gadget only selects; separate banner consumes once",[]{Player p;main_screen(p);CHECK(p.click(60,56));auto before=p.coordinator()->data();CHECK(before.human.selection.pending_action==2&&before.state.actors[4].action==0&&before.state.actors[4].missiles[0]==1);CHECK(p.click(110,20));auto& after=p.coordinator()->data();CHECK(after.state.actors[4].action==2&&after.state.actors[4].missiles[0]==0);CHECK(after.state.actors[4].warheads[0]==1);CHECK(p.diagnostic().empty());auto seed=after.rng.seed();CHECK(!p.click(110,20));CHECK(p.coordinator()->data().rng.seed()==seed&&p.coordinator()->data().state.actors[4].missiles[0]==0);});
- group("production fields do not create items early; no synthetic next turn",[]{Player p;main_screen(p);auto inventory=p.coordinator()->data().state.actors[4].missiles;CHECK(p.click(80,20));CHECK(p.coordinator()->data().human.selection.pending_action==6&&p.coordinator()->data().state.actors[4].action==0);CHECK(p.click(110,20));CHECK(p.coordinator()->data().state.actors[4].action==6);CHECK(p.coordinator()->data().state.actors[4].missiles==inventory);CHECK(p.coordinator()->phase()!=session::Phase::living_human_entry);});
- group("original actor viewport/city hit translates to existing target command",[]{Player p;main_screen(p);CHECK(p.click(20,15));CHECK(p.coordinator()->data().human.logical_view==0);auto r=p.city_rect(0,2);CHECK(r.x==206&&r.y==60&&r.w==16&&r.h==16);CHECK(p.click(r.x+2,r.y+2));CHECK(p.coordinator()->data().human.target_marker==0&&p.coordinator()->data().state.actors[4].target_city==2);CHECK(p.coordinator()->data().state.actors[4].action==0);});
- group("no rendering or idle-time RNG; original portrait coordinates",[]{Player p;main_screen(p);auto seed=p.coordinator()->data().rng.seed();for(int i=0;i<10000;++i){auto r=p.city_rect(4,i%5);CHECK(r.x>=100&&r.x<224&&r.y>=57&&r.y<138);}CHECK(p.coordinator()->data().rng.seed()==seed);CHECK(portrait_rect(4).x==84&&portrait_rect(4).y==100);CHECK(portrait_rect(9).x==252&&portrait_rect(9).y==150);});
- group("population icon thresholds exactly match cached instructions",[]{CHECK(city_frame(0)==150);CHECK(city_frame(1)==220);CHECK(city_frame(5)==221);CHECK(city_frame(10)==222);CHECK(city_frame(20)==223);CHECK(city_frame(30)==224);CHECK(city_frame(60)==151);CHECK(city_frame(0xffff)==150);});
- group("five actor round returns to human with deferred production",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::production,0}));auto seed=p.coordinator()->data().rng.seed();CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.coordinator()->data().rng.seed()==seed);CHECK(p.confirm_banner());for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i){auto ok=p.advance_turn(123);if(!ok)std::cerr<<p.diagnostic()<<"\n";CHECK(ok);}CHECK(p.round()==2);CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.diagnostic().empty());});
- group("prototype missile damage and RNG match verified slices exactly",[]{
-  session::Data d(1,true);for(auto& a:d.state.actors)a.profile=1;
-  d.state.actors[4].population[0]=30;d.state.actors[0].population[2]=20;
-  auto& a=d.state.actors[4];a.target_actor=0;a.target_city=2;a.missiles[1]=1;a.warheads[1]=1;
-  human_commit(d.state,2,1,20);HumanSelection choice;choice.selected_class=1;choice.selected_capacity=20;finish_human_attack_fields(d.state,choice);human_commit(d.state,choice.pending_action,1,20);
-  auto expected=d;auto start=start_resolver_action(expected.state,4,0,expected.rng);
-  resolver::ImpactState local;local.context={0,2,5,0};local.selector=start.handler.effect;local.magnitude_was_25=start.prelude.magnitude_was_25;
-  auto impact=resolver::primary_impact(expected.state,4,0x5208,local,expected.rng);resolver::DamageAcknowledgment ack(4,impact.local);CHECK(ack.write_at_gate(expected.state,0,true).written);CHECK(ack.observe_render_request(expected.state,0));
-  TurnResolverAdapter adapter;StaticSchedule schedule;session::ResolverRequest req;req.microseconds_low16=1;CHECK(adapter.resolve(d,req,schedule)==0);
-  CHECK(d.rng.seed()==0xc46b9b3d&&d.rng.seed()==expected.rng.seed());CHECK(d.state.actors[0].population[2]==11);
-  for(int i=0;i<5;++i)CHECK(encode_actor(d.state.actors[i])==encode_actor(expected.state.actors[i]));
-  CHECK(d.state.actors[4].missiles[1]==0&&d.state.actors[4].warheads[1]==0);
- });
- group("invalid target cannot confirm and does not consume missile",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::warhead,0}));CHECK(p.confirm_banner());CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.coordinator()->data().state.actors[4].warheads[0]==1);});
- group("AI ordered planning exactly equals unchanged ai_turn including RNG",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());auto expected=p.coordinator()->data();ai_turn(expected.state,expected.rng);CHECK(p.advance_turn(123));CHECK(p.coordinator()->phase()==session::Phase::attitudes);CHECK(expected.rng.seed()==p.coordinator()->data().rng.seed());for(int i=0;i<5;++i)CHECK(encode_actor(expected.state.actors[i])==encode_actor(p.coordinator()->data().state.actors[i]));});
- group("synthetic interception commits no population loss",[]{session::Data d(1,true);for(auto& a:d.state.actors)a.profile=1;auto& attacker=d.state.actors[4];attacker.population[0]=30;attacker.action=1;attacker.target_actor=0;attacker.target_city=2;attacker.magnitude=5;auto& target=d.state.actors[0];target.population[2]=20;target.action=7;target.magnitude=0;TurnResolverAdapter adapter;StaticSchedule schedule;session::ResolverRequest request;request.microseconds_low16=1;CHECK(adapter.resolve(d,request,schedule)==0);CHECK(target.population[2]==20);CHECK(attacker.magnitude==0);});
- group("preparation and launch span rounds without duplicate inventory consumption",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::missile,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i)CHECK(p.advance_turn(123));CHECK(p.round()==2);CHECK(p.coordinator()->data().state.actors[4].missiles[0]==0);CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,0}));CHECK(p.command({HumanCommandKind::warhead,0}));CHECK(p.confirm_banner());CHECK(p.coordinator()->data().state.actors[4].warheads[0]==0);for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i){auto ok=p.advance_turn(123);if(!ok)std::cerr<<p.diagnostic()<<"\n";CHECK(ok);}CHECK(p.round()==3);auto seed=p.coordinator()->data().rng.seed();CHECK(!p.advance_turn(123));CHECK(p.coordinator()->data().rng.seed()==seed);CHECK(p.coordinator()->data().state.actors[4].missiles[0]==0&&p.coordinator()->data().state.actors[4].warheads[0]==0);});
- group("consecutive turns retain and visibly resolve all four AI plans",[]{Player p;main_screen(p);for(unsigned round=1;round<=4;++round){CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());CHECK(p.advance_turn(123));auto planned=p.coordinator()->data().state;CHECK(p.activity().size()==8);for(int i=0;i<4;++i)CHECK(p.activity()[2*i].find(p.coordinator()->data().names[i])!=std::string::npos);while(p.coordinator()->phase()!=session::Phase::resolver_handoff){CHECK(p.advance_turn(123));for(int i=0;i<4;++i)CHECK(p.coordinator()->data().state.actors[i].action==planned.actors[i].action);}CHECK(p.advance_turn(123));for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i){bool ok=p.advance_turn(123);if(!ok)std::cerr<<p.diagnostic()<<"\n";CHECK(ok);}CHECK(p.round()==round+1);CHECK(p.diagnostic().empty());for(auto& line:p.activity())std::cout<<"ROUND "<<round<<" "<<line<<"\n";}});
- group("unsupported resolver action names actor and code",[]{session::Data d(1,true);d.state.actors[2].population[0]=10;d.state.actors[2].action=99;TurnResolverAdapter adapter;StaticSchedule callbacks;session::ResolverRequest request;request.microseconds_low16=1;bool caught=false;try{adapter.resolve(d,request,callbacks);}catch(const Unsupported& e){caught=true;CHECK(std::string(e.what()).find("actor 2 action 99")!=std::string::npos);}CHECK(caught);});
- group("busy controls cannot freeze or overwrite AI planning",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());auto seed=p.coordinator()->data().rng.seed();CHECK(!p.command({HumanCommandKind::production,0}));CHECK(!p.confirm_banner());CHECK(p.diagnostic().empty());CHECK(p.coordinator()->data().rng.seed()==seed);CHECK(p.advance_turn(123));CHECK(p.coordinator()->phase()==session::Phase::attitudes);});
- group("four rounds freeze graphical events; presentation cannot mutate gameplay",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);for(unsigned r=0;r<4;++r){CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());for(int step=0;step<30&&!scene.active();++step){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(scene.active());CHECK(scene.events().size()>=5);auto before=p.coordinator()->data();for(std::size_t i=0;i<scene.events().size();++i){CHECK(scene.event().actor==(i<5?i:4));CHECK(!scene.next());scene.presented();CHECK(scene.rendered());CHECK(scene.next());for(int j=0;j<5;++j)CHECK(encode_actor(before.state.actors[j])==encode_actor(p.coordinator()->data().state.actors[j]));CHECK(before.rng.seed()==p.coordinator()->data().rng.seed());}CHECK(!scene.active());scene.observe(p);CHECK(!scene.active());CHECK(p.round()==r+2);}});
- group("original announcements use supplied variants without random draws",[]{MediaEvidence e;e.supported=true;e.action=2;e.variant=4;CHECK(original_caption(e,"Infidel","Khadaffy")=="Infidel prepares a missile strike.");e.action=6;e.variant=2;CHECK(original_caption(e,"Infidel","Khadaffy")=="Infidel produces weapons.");e.variant=0;CHECK(original_caption(e,"Infidel","Khadaffy")=="Infidel: original message unavailable.");e.supported=false;CHECK(original_caption(e,"Infidel","Khadaffy")=="Infidel: action details unavailable.");});
- group("private replay exactly reproduces ordinary missile impact metadata",[]{State s;for(auto& a:s.actors)a.profile=1;s.actors[4].population[0]=30;s.actors[0].population[2]=20;auto& a=s.actors[4];a.action=1;a.target_actor=0;a.target_city=2;a.magnitude=5;auto before=s;auto r=replay_media(s,1);CHECK(same_state(s,before));CHECK(r.actions[4].supported&&r.actions[4].loss==9&&r.seed==0xc46b9b3d);CHECK(r.state.actors[0].population[2]==11);CHECK(r.before[4].actors[0].population[2]==20);CHECK(r.after[4].actors[0].population[2]==11);CHECK(impact_visual(r.actions[4])==ImpactVisual::explosion);s.actors[0].action=7;s.actors[0].magnitude=0;r=replay_media(s,1);CHECK(r.actions[4].effect==13&&r.actions[4].loss==0);CHECK(r.state.actors[0].population[2]==20);CHECK(impact_visual(r.actions[4])==ImpactVisual::interception);});
- group("presentation trajectory endpoints growth rotation shrink; no RNG",[]{auto first=flight_pose(0,57,45,250,140),middle=flight_pose(.5,57,45,250,140),last=flight_pose(1,57,45,250,140);CHECK(first.x==57&&first.y==45);CHECK(last.x==250&&last.y==140);CHECK(middle.scale>first.scale&&middle.scale>last.scale);CHECK(first.angle!=last.angle);});
- group("audio cue identity period and once-per-event gate",[]{MediaEvidence e;e.supported=true;e.action=2;auto cue=sound_cue(e);CHECK(cue&&std::string(cue->sample)=="missile"&&cue->period==715&&cue->length==6467);e.action=6;CHECK(sound_cue(e)->period==130);e.action=99;CHECK(!sound_cue(e));SoundGate gate;CHECK(gate.claim(1));CHECK(!gate.claim(1));CHECK(gate.claim(2));});
- group("matched metadata timeline and skip preserve all live state",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(scene.active()&&scene.event().media.supported);CHECK(!scene.events()[4].production_lines.empty());auto data=p.coordinator()->data();for(int i=0;i<100;++i)scene.tick(.05);CHECK(scene.animation_complete());CHECK(!scene.skip());scene.presented();CHECK(scene.skip());CHECK(!scene.active());CHECK(same_state(data.state,p.coordinator()->data().state));CHECK(data.rng.seed()==p.coordinator()->data().rng.seed());});
- group("combat result wording uses verified effect and destruction branch",[]{MediaEvidence e;e.supported=true;e.action=1;e.effect=8;e.loss=9;e.magnitude=5;e.population_before=20;CHECK(combat_caption(e)=="Radioactive fallout kills 9 million.");e.effect=6;CHECK(combat_caption(e)=="Nuclear explosion kills 9 million.");e.loss=20;CHECK(combat_caption(e)=="Nuclear explosion destroys city");e.effect=13;e.loss=0;CHECK(combat_caption(e)=="Missile Destroyed by ABM. City is safe!");e.effect=3;CHECK(combat_caption(e)=="Dud warhead saves the city!");e.population_before=0xffff;CHECK(combat_caption(e)=="Population loss: 0 million.");});
- group("eliminated-human and ending rounds trigger presentation without human entry",[]{session::Event e;e.from=session::Phase::survivor_counting;e.survivors=3;CHECK(completed_without_human_entry(e));e.state_after.actors[4].population[0]=10;CHECK(!completed_without_human_entry(e));e.survivors=1;CHECK(completed_without_human_entry(e));e.from=session::Phase::ai_planning;CHECK(!completed_without_human_entry(e));e.from=session::Phase::survivor_counting;e.survivors.reset();CHECK(!completed_without_human_entry(e));});
+unsigned checks = 0, groups = 0;
+void check(bool b, int line) {
+    ++checks;
+    if (!b) {
+        std::cerr << "failure " << line << '\n';
+        std::exit(1);
+    }
+}
+#define CHECK(x) check(bool(x), __LINE__)
+template <class F> void group(const char *n, F f) {
+    f();
+    ++groups;
+    std::cout << "PASS " << n << '\n';
+}
+void choose_four(Player &p) {
+    p.enter_selection();
+    for (Word id : {Word(0), Word(4), Word(2), Word(7)}) {
+        auto r = portrait_rect(id);
+        CHECK(p.click(r.x + 20, r.y + 15));
+    }
+    CHECK(p.selection().count == 4 && p.screen() == Screen::selection);
+}
+void main_screen(Player &p) {
+    choose_four(p);
+    CHECK(p.click(110, 20) && p.screen() == Screen::main);
+    CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+}
+int main() {
+    group("original header strict hit boundaries", [] {
+        CHECK(selection_header(0, 46));
+        CHECK(!selection_header(0, 47));
+        CHECK(!selection_header(83, 60));
+        CHECK(selection_header(84, 60));
+        CHECK(selection_header(235, 87));
+        CHECK(!selection_header(236, 60));
+        CHECK(!selection_header(100, 88));
+    });
+    group("portrait geometry and cap4; fourth never automatically completes", [] {
+        Player p;
+        CHECK(p.screen() == Screen::title);
+        choose_four(p);
+        auto seed = p.selection().rng.seed();
+        auto r = portrait_rect(8);
+        CHECK(!p.click(r.x + 20, r.y + 15) && p.selection().count == 4 &&
+              p.selection().rng.seed() == seed);
+        r = portrait_rect(0);
+        CHECK(p.click(r.x + 20, r.y + 15) && p.selection().count == 3 &&
+              p.selection().rng.seed() == seed);
+        CHECK(p.click(r.x + 20, r.y + 15) && p.selection().count == 4 &&
+              p.screen() == Screen::selection);
+    });
+    group("synchronous20 initialization and9 selected-reaction draws only", [] {
+        Selection s(1);
+        Rng expected(1);
+        for (int i = 0; i < 20; ++i)
+            expected.next();
+        CHECK(s.rng.seed() == expected.seed());
+        auto timers = s.timers;
+        CHECK(s.toggle(0));
+        for (int i = 1; i < 10; ++i)
+            CHECK(s.timers[i] == add_word(timers[i], Word(expected.next() % 12 + 1)));
+        CHECK(s.timers[0] == timers[0] && s.rng.seed() == expected.seed());
+        CHECK(s.toggle(0) && s.rng.seed() == expected.seed());
+    });
+    group("four-selected completion golden preserves cyclic assignment", [] {
+        std::array<Word, 10> flags{};
+        for (int i = 0; i < 4; ++i)
+            flags[i] = 1;
+        Rng rng(1);
+        auto c = complete_selection(flags, rng);
+        CHECK((c.identity == std::array<Word, 4>{0, 1, 3, 2}));
+        CHECK(c.fill_draws == 0 && c.assignment_draws == 4 && rng.seed() == 0xc46b9b3d);
+        for (auto f : flags)
+            CHECK(f == 0);
+    });
+    group("vacancy fill retains duplicate draws; never substitute shuffle", [] {
+        std::array<Word, 10> flags{};
+        Rng rng(1);
+        auto c = complete_selection(flags, rng);
+        CHECK((c.identity == std::array<Word, 4>{8, 1, 3, 5}));
+        CHECK(c.fill_draws == 5 && c.assignment_draws == 4 && rng.seed() == 0xbf54bc7e);
+    });
+    group("setup copies verified profiles and human initialized resources", [] {
+        Player p;
+        main_screen(p);
+        auto &d = p.coordinator()->data();
+        for (int i = 0; i < 4; ++i) {
+            auto id = d.state.identity[i];
+            CHECK(d.state.actors[i].profile == player_assets::profiles[id]);
+            CHECK(d.names[i] == player_assets::names[id]);
+            CHECK(populated_cities(d.state.actors[i]) == 5);
+        }
+        CHECK(d.state.actors[4].missiles[0] == 1 && d.state.actors[4].warheads[0] == 1);
+        CHECK(d.state.actors[4].action == 0);
+        CHECK(!p.messages().empty() && p.messages()[0] == "Welcome to Nuclear War.");
+    });
+    group("banner without action keeps selection with original validation text", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.click(110, 20));
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(p.messages()[0] == "Select an action");
+    });
+    group("original missile gadget only selects; separate banner consumes once", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.click(60, 56));
+        auto before = p.coordinator()->data();
+        CHECK(before.human.selection.pending_action == 2 && before.state.actors[4].action == 0 &&
+              before.state.actors[4].missiles[0] == 1);
+        CHECK(p.click(110, 20));
+        auto &after = p.coordinator()->data();
+        CHECK(after.state.actors[4].action == 2 && after.state.actors[4].missiles[0] == 0);
+        CHECK(after.state.actors[4].warheads[0] == 1);
+        CHECK(p.diagnostic().empty());
+        auto seed = after.rng.seed();
+        CHECK(!p.click(110, 20));
+        CHECK(p.coordinator()->data().rng.seed() == seed &&
+              p.coordinator()->data().state.actors[4].missiles[0] == 0);
+    });
+    group("production fields do not create items early; no synthetic next turn", [] {
+        Player p;
+        main_screen(p);
+        auto inventory = p.coordinator()->data().state.actors[4].missiles;
+        CHECK(p.click(80, 20));
+        CHECK(p.coordinator()->data().human.selection.pending_action == 6 &&
+              p.coordinator()->data().state.actors[4].action == 0);
+        CHECK(p.click(110, 20));
+        CHECK(p.coordinator()->data().state.actors[4].action == 6);
+        CHECK(p.coordinator()->data().state.actors[4].missiles == inventory);
+        CHECK(p.coordinator()->phase() != session::Phase::living_human_entry);
+    });
+    group("original actor viewport/city hit translates to existing target command", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.click(20, 15));
+        CHECK(p.coordinator()->data().human.logical_view == 0);
+        auto r = p.city_rect(0, 2);
+        CHECK(r.x == 206 && r.y == 60 && r.w == 16 && r.h == 16);
+        CHECK(p.click(r.x + 2, r.y + 2));
+        CHECK(p.coordinator()->data().human.target_marker == 0 &&
+              p.coordinator()->data().state.actors[4].target_city == 2);
+        CHECK(p.coordinator()->data().state.actors[4].action == 0);
+    });
+    group("no rendering or idle-time RNG; original portrait coordinates", [] {
+        Player p;
+        main_screen(p);
+        auto seed = p.coordinator()->data().rng.seed();
+        for (int i = 0; i < 10000; ++i) {
+            auto r = p.city_rect(4, i % 5);
+            CHECK(r.x >= 100 && r.x < 224 && r.y >= 57 && r.y < 138);
+        }
+        CHECK(p.coordinator()->data().rng.seed() == seed);
+        CHECK(portrait_rect(4).x == 84 && portrait_rect(4).y == 100);
+        CHECK(portrait_rect(9).x == 252 && portrait_rect(9).y == 150);
+    });
+    group("population icon thresholds exactly match cached instructions", [] {
+        CHECK(city_frame(0) == 150);
+        CHECK(city_frame(1) == 220);
+        CHECK(city_frame(5) == 221);
+        CHECK(city_frame(10) == 222);
+        CHECK(city_frame(20) == 223);
+        CHECK(city_frame(30) == 224);
+        CHECK(city_frame(60) == 151);
+        CHECK(city_frame(0xffff) == 150);
+    });
+    group("five actor round returns to human with deferred production", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        auto seed = p.coordinator()->data().rng.seed();
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(p.coordinator()->data().rng.seed() == seed);
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection;
+             ++i) {
+            auto ok = p.advance_turn(123);
+            if (!ok)
+                std::cerr << p.diagnostic() << "\n";
+            CHECK(ok);
+        }
+        CHECK(p.round() == 2);
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(p.diagnostic().empty());
+    });
+    group("prototype missile damage and RNG match verified slices exactly", [] {
+        session::Data d(1, true);
+        for (auto &a : d.state.actors)
+            a.profile = 1;
+        d.state.actors[4].population[0] = 30;
+        d.state.actors[0].population[2] = 20;
+        auto &a = d.state.actors[4];
+        a.target_actor = 0;
+        a.target_city = 2;
+        a.missiles[1] = 1;
+        a.warheads[1] = 1;
+        human_commit(d.state, 2, 1, 20);
+        HumanSelection choice;
+        choice.selected_class = 1;
+        choice.selected_capacity = 20;
+        finish_human_attack_fields(d.state, choice);
+        human_commit(d.state, choice.pending_action, 1, 20);
+        auto expected = d;
+        auto start = start_resolver_action(expected.state, 4, 0, expected.rng);
+        resolver::ImpactState local;
+        local.context = {0, 2, 5, 0};
+        local.selector = start.handler.effect;
+        local.magnitude_was_25 = start.prelude.magnitude_was_25;
+        auto impact = resolver::primary_impact(expected.state, 4, 0x5208, local, expected.rng);
+        resolver::DamageAcknowledgment ack(4, impact.local);
+        CHECK(ack.write_at_gate(expected.state, 0, true).written);
+        CHECK(ack.observe_render_request(expected.state, 0));
+        TurnResolverAdapter adapter;
+        StaticSchedule schedule;
+        session::ResolverRequest req;
+        req.microseconds_low16 = 1;
+        CHECK(adapter.resolve(d, req, schedule) == 0);
+        CHECK(d.rng.seed() == 0xc46b9b3d && d.rng.seed() == expected.rng.seed());
+        CHECK(d.state.actors[0].population[2] == 11);
+        for (int i = 0; i < 5; ++i)
+            CHECK(encode_actor(d.state.actors[i]) == encode_actor(expected.state.actors[i]));
+        CHECK(d.state.actors[4].missiles[1] == 0 && d.state.actors[4].warheads[1] == 0);
+    });
+    group("invalid target cannot confirm and does not consume missile", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::warhead, 0}));
+        CHECK(p.confirm_banner());
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(p.coordinator()->data().state.actors[4].warheads[0] == 1);
+    });
+    group("AI ordered planning exactly equals unchanged ai_turn including RNG", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        auto expected = p.coordinator()->data();
+        ai_turn(expected.state, expected.rng);
+        CHECK(p.advance_turn(123));
+        CHECK(p.coordinator()->phase() == session::Phase::attitudes);
+        CHECK(expected.rng.seed() == p.coordinator()->data().rng.seed());
+        for (int i = 0; i < 5; ++i)
+            CHECK(encode_actor(expected.state.actors[i]) ==
+                  encode_actor(p.coordinator()->data().state.actors[i]));
+    });
+    group("synthetic interception commits no population loss", [] {
+        session::Data d(1, true);
+        for (auto &a : d.state.actors)
+            a.profile = 1;
+        auto &attacker = d.state.actors[4];
+        attacker.population[0] = 30;
+        attacker.action = 1;
+        attacker.target_actor = 0;
+        attacker.target_city = 2;
+        attacker.magnitude = 5;
+        auto &target = d.state.actors[0];
+        target.population[2] = 20;
+        target.action = 7;
+        target.magnitude = 0;
+        TurnResolverAdapter adapter;
+        StaticSchedule schedule;
+        session::ResolverRequest request;
+        request.microseconds_low16 = 1;
+        CHECK(adapter.resolve(d, request, schedule) == 0);
+        CHECK(target.population[2] == 20);
+        CHECK(attacker.magnitude == 0);
+    });
+    group("preparation and launch span rounds without duplicate inventory consumption", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::missile, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection; ++i)
+            CHECK(p.advance_turn(123));
+        CHECK(p.round() == 2);
+        CHECK(p.coordinator()->data().state.actors[4].missiles[0] == 0);
+        CHECK(p.command({HumanCommandKind::actor_view, 0}));
+        CHECK(p.command({HumanCommandKind::city_target, 0}));
+        CHECK(p.command({HumanCommandKind::warhead, 0}));
+        CHECK(p.confirm_banner());
+        CHECK(p.coordinator()->data().state.actors[4].warheads[0] == 0);
+        for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection;
+             ++i) {
+            auto ok = p.advance_turn(123);
+            if (!ok)
+                std::cerr << p.diagnostic() << "\n";
+            CHECK(ok);
+        }
+        CHECK(p.round() == 3);
+        auto seed = p.coordinator()->data().rng.seed();
+        CHECK(!p.advance_turn(123));
+        CHECK(p.coordinator()->data().rng.seed() == seed);
+        CHECK(p.coordinator()->data().state.actors[4].missiles[0] == 0 &&
+              p.coordinator()->data().state.actors[4].warheads[0] == 0);
+    });
+    group("consecutive turns retain and visibly resolve all four AI plans", [] {
+        Player p;
+        main_screen(p);
+        for (unsigned round = 1; round <= 4; ++round) {
+            CHECK(p.command({HumanCommandKind::production, 0}));
+            CHECK(p.confirm_banner());
+            CHECK(p.advance_turn(123));
+            auto planned = p.coordinator()->data().state;
+            CHECK(p.activity().size() == 8);
+            for (int i = 0; i < 4; ++i)
+                CHECK(p.activity()[2 * i].find(p.coordinator()->data().names[i]) !=
+                      std::string::npos);
+            while (p.coordinator()->phase() != session::Phase::resolver_handoff) {
+                CHECK(p.advance_turn(123));
+                for (int i = 0; i < 4; ++i)
+                    CHECK(p.coordinator()->data().state.actors[i].action ==
+                          planned.actors[i].action);
+            }
+            CHECK(p.advance_turn(123));
+            for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection;
+                 ++i) {
+                bool ok = p.advance_turn(123);
+                if (!ok)
+                    std::cerr << p.diagnostic() << "\n";
+                CHECK(ok);
+            }
+            CHECK(p.round() == round + 1);
+            CHECK(p.diagnostic().empty());
+            for (auto &line : p.activity())
+                std::cout << "ROUND " << round << " " << line << "\n";
+        }
+    });
+    group("unsupported resolver action names actor and code", [] {
+        session::Data d(1, true);
+        d.state.actors[2].population[0] = 10;
+        d.state.actors[2].action = 99;
+        TurnResolverAdapter adapter;
+        StaticSchedule callbacks;
+        session::ResolverRequest request;
+        request.microseconds_low16 = 1;
+        bool caught = false;
+        try {
+            adapter.resolve(d, request, callbacks);
+        } catch (const Unsupported &e) {
+            caught = true;
+            CHECK(std::string(e.what()).find("actor 2 action 99") != std::string::npos);
+        }
+        CHECK(caught);
+    });
+    group("busy controls cannot freeze or overwrite AI planning", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        auto seed = p.coordinator()->data().rng.seed();
+        CHECK(!p.command({HumanCommandKind::production, 0}));
+        CHECK(!p.confirm_banner());
+        CHECK(p.diagnostic().empty());
+        CHECK(p.coordinator()->data().rng.seed() == seed);
+        CHECK(p.advance_turn(123));
+        CHECK(p.coordinator()->phase() == session::Phase::attitudes);
+    });
+    group("four rounds freeze graphical events; presentation cannot mutate gameplay", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        for (unsigned r = 0; r < 4; ++r) {
+            CHECK(p.command({HumanCommandKind::production, 0}));
+            CHECK(p.confirm_banner());
+            for (int step = 0; step < 30 && !scene.active(); ++step) {
+                CHECK(p.advance_turn(123));
+                scene.observe(p);
+            }
+            CHECK(scene.active());
+            CHECK(scene.events().size() >= 5);
+            auto before = p.coordinator()->data();
+            for (std::size_t i = 0; i < scene.events().size(); ++i) {
+                CHECK(scene.event().actor == (i < 5 ? i : 4));
+                CHECK(!scene.next());
+                scene.presented();
+                CHECK(scene.rendered());
+                CHECK(scene.next());
+                for (int j = 0; j < 5; ++j)
+                    CHECK(encode_actor(before.state.actors[j]) ==
+                          encode_actor(p.coordinator()->data().state.actors[j]));
+                CHECK(before.rng.seed() == p.coordinator()->data().rng.seed());
+            }
+            CHECK(!scene.active());
+            scene.observe(p);
+            CHECK(!scene.active());
+            CHECK(p.round() == r + 2);
+        }
+    });
+    group("original announcements use supplied variants without random draws", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 2;
+        e.variant = 4;
+        CHECK(original_caption(e, "Infidel", "Khadaffy") == "Infidel prepares a missile strike.");
+        e.action = 6;
+        e.variant = 2;
+        CHECK(original_caption(e, "Infidel", "Khadaffy") == "Infidel produces weapons.");
+        e.variant = 0;
+        CHECK(original_caption(e, "Infidel", "Khadaffy") ==
+              "Infidel: original message unavailable.");
+        e.supported = false;
+        CHECK(original_caption(e, "Infidel", "Khadaffy") == "Infidel: action details unavailable.");
+    });
+    group("private replay exactly reproduces ordinary missile impact metadata", [] {
+        State s;
+        for (auto &a : s.actors)
+            a.profile = 1;
+        s.actors[4].population[0] = 30;
+        s.actors[0].population[2] = 20;
+        auto &a = s.actors[4];
+        a.action = 1;
+        a.target_actor = 0;
+        a.target_city = 2;
+        a.magnitude = 5;
+        auto before = s;
+        auto r = replay_media(s, 1);
+        CHECK(same_state(s, before));
+        CHECK(r.actions[4].supported && r.actions[4].loss == 9 && r.seed == 0xc46b9b3d);
+        CHECK(r.state.actors[0].population[2] == 11);
+        CHECK(r.before[4].actors[0].population[2] == 20);
+        CHECK(r.after[4].actors[0].population[2] == 11);
+        CHECK(impact_visual(r.actions[4]) == ImpactVisual::explosion);
+        s.actors[0].action = 7;
+        s.actors[0].magnitude = 0;
+        r = replay_media(s, 1);
+        CHECK(r.actions[4].effect == 13 && r.actions[4].loss == 0);
+        CHECK(r.state.actors[0].population[2] == 20);
+        CHECK(impact_visual(r.actions[4]) == ImpactVisual::interception);
+    });
+    group("presentation trajectory endpoints growth rotation shrink; no RNG", [] {
+        auto first = flight_pose(0, 57, 45, 250, 140), middle = flight_pose(.5, 57, 45, 250, 140),
+             last = flight_pose(1, 57, 45, 250, 140);
+        CHECK(first.x == 57 && first.y == 45);
+        CHECK(last.x == 250 && last.y == 140);
+        CHECK(middle.scale > first.scale && middle.scale > last.scale);
+        CHECK(first.angle != last.angle);
+    });
+    group("audio cue identity period and once-per-event gate", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 2;
+        auto cue = sound_cue(e);
+        CHECK(cue && std::string(cue->sample) == "missile" && cue->period == 715 &&
+              cue->length == 6467);
+        e.action = 6;
+        CHECK(sound_cue(e)->period == 130);
+        e.action = 99;
+        CHECK(!sound_cue(e));
+        SoundGate gate;
+        CHECK(gate.claim(1));
+        CHECK(!gate.claim(1));
+        CHECK(gate.claim(2));
+    });
+    group("matched metadata timeline and skip preserve all live state", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(scene.active() && scene.event().media.supported);
+        CHECK(!scene.events()[4].production_lines.empty());
+        auto data = p.coordinator()->data();
+        for (int i = 0; i < 100; ++i)
+            scene.tick(.05);
+        CHECK(scene.animation_complete());
+        CHECK(!scene.skip());
+        scene.presented();
+        CHECK(scene.skip());
+        CHECK(!scene.active());
+        CHECK(same_state(data.state, p.coordinator()->data().state));
+        CHECK(data.rng.seed() == p.coordinator()->data().rng.seed());
+    });
+    group("combat result wording uses verified effect and destruction branch", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 1;
+        e.effect = 8;
+        e.loss = 9;
+        e.magnitude = 5;
+        e.population_before = 20;
+        CHECK(combat_caption(e) == "Radioactive fallout kills 9 million.");
+        e.effect = 6;
+        CHECK(combat_caption(e) == "Nuclear explosion kills 9 million.");
+        e.loss = 20;
+        CHECK(combat_caption(e) == "Nuclear explosion destroys city");
+        e.effect = 13;
+        e.loss = 0;
+        CHECK(combat_caption(e) == "Missile Destroyed by ABM. City is safe!");
+        e.effect = 3;
+        CHECK(combat_caption(e) == "Dud warhead saves the city!");
+        e.population_before = 0xffff;
+        CHECK(combat_caption(e) == "Population loss: 0 million.");
+    });
+    group("eliminated-human and ending rounds trigger presentation without human entry", [] {
+        session::Event e;
+        e.from = session::Phase::survivor_counting;
+        e.survivors = 3;
+        CHECK(completed_without_human_entry(e));
+        e.state_after.actors[4].population[0] = 10;
+        CHECK(!completed_without_human_entry(e));
+        e.survivors = 1;
+        CHECK(completed_without_human_entry(e));
+        e.from = session::Phase::ai_planning;
+        CHECK(!completed_without_human_entry(e));
+        e.from = session::Phase::survivor_counting;
+        e.survivors.reset();
+        CHECK(!completed_without_human_entry(e));
+    });
 
- group("actual production records include bombers defenses and exact quantities",[]{Production actual;actual.missiles[0]=1;actual.warheads[3]=2;actual.bombers[1]=1;actual.defenses[0]=1;auto lines=production_summary_messages(actual);CHECK(lines.size()==4);CHECK(lines[0].find("01  10MT Missile")!=std::string::npos);CHECK(lines[1].find("L.N.D.S.")!=std::string::npos);CHECK(lines[2].find("GR-2 Bomber")!=std::string::npos);CHECK(lines[3].find("02 100MT Warheads")!=std::string::npos);CHECK(production_item(55,1).kind==InventoryKind::Warhead);CHECK(production_item(56,1).kind==InventoryKind::Missile);CHECK(production_item(81,1).kind==InventoryKind::Bomber);CHECK(production_item(96,1).kind==InventoryKind::Defense);});
- group("bomber and defense gadget hit routes preserve verified command behavior",[]{for(auto point:{Rect{264,58,0,0},Rect{233,58,0,0},Rect{264,106,0,0},Rect{233,106,0,0}}){Player click,command;main_screen(click);main_screen(command);auto before=click.coordinator()->data();CHECK(click.click(point.x,point.y));CHECK(command.command({point.y<100?HumanCommandKind::bomber:HumanCommandKind::defense,Word(point.x>260?0:1)}));CHECK(same_state(click.coordinator()->data().state,command.coordinator()->data().state));CHECK(click.coordinator()->data().human.selection.pending_action==command.coordinator()->data().human.selection.pending_action);CHECK(click.coordinator()->data().rng.seed()==command.coordinator()->data().rng.seed());CHECK(click.coordinator()->data().state.actors[4].bombers==before.state.actors[4].bombers);CHECK(click.coordinator()->data().state.actors[4].defenses==before.state.actors[4].defenses);}});
- group("cached factory radio walking defector bomber and radar frame bounds",[]{CHECK(action_sprite(6,0)->index==160);CHECK(action_sprite(6,.625)->index==165);CHECK(action_sprite(6,.75)->index==160);CHECK(action_sprite(3,0)->index==10&&action_sprite(3,.625)->index==15);CHECK(action_sprite(8,1.125)->index==249&&action_sprite(8,1.25)->index==240);CHECK(action_sprite(4,0)->index==209);CHECK(action_sprite(4,.625)->index==214);CHECK(action_sprite(4,.75)->index==207);CHECK(action_sprite(7,.75)->index==59);CHECK(action_sprite(7,1.5)->index==53);CHECK(!action_sprite(12,0));CHECK(!action_sprite(99,0));CHECK(action_origin(6,4).x==143&&action_origin(6,4).y==101);CHECK(action_origin(4,4).y==69);});
- group("prepared pad uses authoritative state without consuming any class",[]{State s;for(Word c:{Word(10),Word(20),Word(50),Word(100)}){s.actors[4].action=2;s.human_prepared_capacity=c;auto before=s;for(int i=0;i<100;++i)CHECK(prepared_missile(s));CHECK(same_state(before,s));s.actors[4].action=1;CHECK(!prepared_missile(s));}s.actors[4].action=2;s.human_prepared_capacity=0;CHECK(!prepared_missile(s));s.human_prepared_capacity=0xffff;CHECK(!prepared_missile(s));});
- group("smaller centered explosion and impact-only once phase sounds",[]{auto small=centered_effect(123,99,40),old=centered_effect(123,99,48);CHECK(small.w==40&&small.h==40);CHECK(small.x+small.w/2==old.x+old.w/2);CHECK(small.y+small.h/2==old.y+old.h/2);MediaEvidence e;e.supported=true;e.action=6;CHECK(sound_cue(e)->repeats==2);e.action=8;CHECK(std::string(sound_cue(e)->sample)=="feet");e.action=13;CHECK(std::string(sound_cue(e)->sample)=="moo");e.action=1;e.effect=6;e.loss=9;CHECK(impact_sound(e)->period==650);CHECK(impact_sound(e)->length==4998);e.effect=13;CHECK(!impact_sound(e));e.action=3;e.effect=6;CHECK(!impact_sound(e));SoundGate gate;CHECK(gate.claim(4));CHECK(gate.claim(5));CHECK(!gate.claim(4));CHECK(!gate.claim(5));});
- group("nonblocking typewriter newline wrapping pagination and empty messages",[]{TextFlow t;t.speed(10);t.set("Alpha\nBeta",5,2);CHECK(t.visible().empty());t.tick(.3);CHECK(t.visible()=="Alp");CHECK(!t.complete());CHECK(t.advance());CHECK(t.visible()=="Alpha\nBeta");CHECK(!t.advance());CHECK((wrap_text("abcdefghij\nX Y Z",4)==std::vector<std::string>{"abcd","efgh","ij","X Y","Z"}));t.set("one\ntwo\nthree",6,2);t.tick(100);CHECK(t.visible()=="one\ntwo");CHECK(t.advance());CHECK(t.visible().empty());t.tick(100);CHECK(t.visible()=="three");CHECK(!t.advance());t.set("");CHECK(t.complete()&&t.visible().empty()&&!t.advance());});
- group("main console retains typing click completion first-frame barrier and debounce",[]{ActionEvent e;e.region=EventRegion::human_console;e.production_heading="Human console message";State state;auto scene=ActionPresentation::replay_event(e,state);scene.typing_speed(1);CHECK(!scene.click(0));scene.tick(.1);CHECK(!scene.text_complete());scene.presented();CHECK(scene.click(1000));CHECK(scene.text_complete());CHECK(scene.active());scene.presented();CHECK(!scene.click(1001));CHECK(scene.click(1180));CHECK(!scene.active());});
- group("production item stream scrolls and returns automatically without clicks",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(scene.active());for(int i=0;i<5;++i){scene.presented();CHECK(scene.next());}CHECK(scene.human_console());auto data=p.coordinator()->data();auto expected=scene.event().production_lines;std::set<std::string> seen;for(int tick=0;scene.active()&&scene.human_console()&&tick<2000;++tick){scene.presented();scene.tick(.02);if(!scene.active()||!scene.human_console())break;auto visible=scene.visible_text();for(const auto& line:expected)if(visible.find(line)!=std::string::npos)seen.insert(line);CHECK(!scene.click(1000+tick*200));}CHECK(seen.size()==expected.size());CHECK(!scene.human_console());CHECK(same_state(data.state,p.coordinator()->data().state)&&data.rng.seed()==p.coordinator()->data().rng.seed());});
+    group("actual production records include bombers defenses and exact quantities", [] {
+        Production actual;
+        actual.missiles[0] = 1;
+        actual.warheads[3] = 2;
+        actual.bombers[1] = 1;
+        actual.defenses[0] = 1;
+        auto lines = production_summary_messages(actual);
+        CHECK(lines.size() == 4);
+        CHECK(lines[0].find("01  10MT Missile") != std::string::npos);
+        CHECK(lines[1].find("L.N.D.S.") != std::string::npos);
+        CHECK(lines[2].find("GR-2 Bomber") != std::string::npos);
+        CHECK(lines[3].find("02 100MT Warheads") != std::string::npos);
+        CHECK(production_item(55, 1).kind == InventoryKind::Warhead);
+        CHECK(production_item(56, 1).kind == InventoryKind::Missile);
+        CHECK(production_item(81, 1).kind == InventoryKind::Bomber);
+        CHECK(production_item(96, 1).kind == InventoryKind::Defense);
+    });
+    group("bomber and defense gadget hit routes preserve verified command behavior", [] {
+        for (auto point : {Rect{264, 58, 0, 0}, Rect{233, 58, 0, 0}, Rect{264, 106, 0, 0},
+                           Rect{233, 106, 0, 0}}) {
+            Player click, command;
+            main_screen(click);
+            main_screen(command);
+            auto before = click.coordinator()->data();
+            CHECK(click.click(point.x, point.y));
+            CHECK(command.command(
+                {point.y < 100 ? HumanCommandKind::bomber : HumanCommandKind::defense,
+                 Word(point.x > 260 ? 0 : 1)}));
+            CHECK(
+                same_state(click.coordinator()->data().state, command.coordinator()->data().state));
+            CHECK(click.coordinator()->data().human.selection.pending_action ==
+                  command.coordinator()->data().human.selection.pending_action);
+            CHECK(click.coordinator()->data().rng.seed() ==
+                  command.coordinator()->data().rng.seed());
+            CHECK(click.coordinator()->data().state.actors[4].bombers ==
+                  before.state.actors[4].bombers);
+            CHECK(click.coordinator()->data().state.actors[4].defenses ==
+                  before.state.actors[4].defenses);
+        }
+    });
+    group("cached factory radio walking defector bomber and radar frame bounds", [] {
+        CHECK(action_sprite(6, 0)->index == 160);
+        CHECK(action_sprite(6, .625)->index == 165);
+        CHECK(action_sprite(6, .75)->index == 160);
+        CHECK(action_sprite(3, 0)->index == 10 && action_sprite(3, .625)->index == 15);
+        CHECK(action_sprite(8, 1.125)->index == 249 && action_sprite(8, 1.25)->index == 240);
+        CHECK(action_sprite(4, 0)->index == 209);
+        CHECK(action_sprite(4, .625)->index == 214);
+        CHECK(action_sprite(4, .75)->index == 207);
+        CHECK(action_sprite(7, .75)->index == 59);
+        CHECK(action_sprite(7, 1.5)->index == 53);
+        CHECK(!action_sprite(12, 0));
+        CHECK(!action_sprite(99, 0));
+        CHECK(action_origin(6, 4).x == 143 && action_origin(6, 4).y == 101);
+        CHECK(action_origin(4, 4).y == 69);
+    });
+    group("prepared pad uses authoritative state without consuming any class", [] {
+        State s;
+        for (Word c : {Word(10), Word(20), Word(50), Word(100)}) {
+            s.actors[4].action = 2;
+            s.human_prepared_capacity = c;
+            auto before = s;
+            for (int i = 0; i < 100; ++i)
+                CHECK(prepared_missile(s));
+            CHECK(same_state(before, s));
+            s.actors[4].action = 1;
+            CHECK(!prepared_missile(s));
+        }
+        s.actors[4].action = 2;
+        s.human_prepared_capacity = 0;
+        CHECK(!prepared_missile(s));
+        s.human_prepared_capacity = 0xffff;
+        CHECK(!prepared_missile(s));
+    });
+    group("smaller centered explosion and impact-only once phase sounds", [] {
+        auto small = centered_effect(123, 99, 40), old = centered_effect(123, 99, 48);
+        CHECK(small.w == 40 && small.h == 40);
+        CHECK(small.x + small.w / 2 == old.x + old.w / 2);
+        CHECK(small.y + small.h / 2 == old.y + old.h / 2);
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 6;
+        CHECK(sound_cue(e)->repeats == 2);
+        e.action = 8;
+        CHECK(std::string(sound_cue(e)->sample) == "feet");
+        e.action = 13;
+        CHECK(std::string(sound_cue(e)->sample) == "moo");
+        e.action = 1;
+        e.effect = 6;
+        e.loss = 9;
+        CHECK(impact_sound(e)->period == 650);
+        CHECK(impact_sound(e)->length == 4998);
+        e.effect = 13;
+        CHECK(!impact_sound(e));
+        e.action = 3;
+        e.effect = 6;
+        CHECK(!impact_sound(e));
+        SoundGate gate;
+        CHECK(gate.claim(4));
+        CHECK(gate.claim(5));
+        CHECK(!gate.claim(4));
+        CHECK(!gate.claim(5));
+    });
+    group("nonblocking typewriter newline wrapping pagination and empty messages", [] {
+        TextFlow t;
+        t.speed(10);
+        t.set("Alpha\nBeta", 5, 2);
+        CHECK(t.visible().empty());
+        t.tick(.3);
+        CHECK(t.visible() == "Alp");
+        CHECK(!t.complete());
+        CHECK(t.advance());
+        CHECK(t.visible() == "Alpha\nBeta");
+        CHECK(!t.advance());
+        CHECK((wrap_text("abcdefghij\nX Y Z", 4) ==
+               std::vector<std::string>{"abcd", "efgh", "ij", "X Y", "Z"}));
+        t.set("one\ntwo\nthree", 6, 2);
+        t.tick(100);
+        CHECK(t.visible() == "one\ntwo");
+        CHECK(t.advance());
+        CHECK(t.visible().empty());
+        t.tick(100);
+        CHECK(t.visible() == "three");
+        CHECK(!t.advance());
+        t.set("");
+        CHECK(t.complete() && t.visible().empty() && !t.advance());
+    });
+    group("main console retains typing click completion first-frame barrier and debounce", [] {
+        ActionEvent e;
+        e.region = EventRegion::human_console;
+        e.production_heading = "Human console message";
+        State state;
+        auto scene = ActionPresentation::replay_event(e, state);
+        scene.typing_speed(1);
+        CHECK(!scene.click(0));
+        scene.tick(.1);
+        CHECK(!scene.text_complete());
+        scene.presented();
+        CHECK(scene.click(1000));
+        CHECK(scene.text_complete());
+        CHECK(scene.active());
+        scene.presented();
+        CHECK(!scene.click(1001));
+        CHECK(scene.click(1180));
+        CHECK(!scene.active());
+    });
+    group("production item stream scrolls and returns automatically without clicks", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(scene.active());
+        for (int i = 0; i < 5; ++i) {
+            scene.presented();
+            CHECK(scene.next());
+        }
+        CHECK(scene.human_console());
+        auto data = p.coordinator()->data();
+        auto expected = scene.event().production_lines;
+        std::set<std::string> seen;
+        for (int tick = 0; scene.active() && scene.human_console() && tick < 2000; ++tick) {
+            scene.presented();
+            scene.tick(.02);
+            if (!scene.active() || !scene.human_console())
+                break;
+            auto visible = scene.visible_text();
+            for (const auto &line : expected)
+                if (visible.find(line) != std::string::npos)
+                    seen.insert(line);
+            CHECK(!scene.click(1000 + tick * 200));
+        }
+        CHECK(seen.size() == expected.size());
+        CHECK(!scene.human_console());
+        CHECK(same_state(data.state, p.coordinator()->data().state) &&
+              data.rng.seed() == p.coordinator()->data().rng.seed());
+    });
 
- group("faster configurable preparation is independent of renderer frame count",[]{CHECK(preparation_height(0)==0);CHECK(preparation_height(.2)==8);CHECK(preparation_height(.4)==16);CHECK(preparation_height(99)==16);CHECK(preparation_height(.2,.8)==4);double seconds=0;for(int i=0;i<40;++i)seconds+=.01;CHECK(preparation_height(seconds)==16);});
- group("country orbit heading and target flight use original bomber directional cells",[]{CHECK(bomber_heading(0,-1)==207);CHECK(bomber_heading(1,0)==209);CHECK(bomber_heading(0,1)==211);CHECK(bomber_heading(-1,0)==213);for(std::size_t a=0;a<5;++a){auto center=action_origin(0,a);auto first=bomber_orbit(a,0);CHECK(first.x==center.x&&first.y==center.y-28+(a==4?6:0));auto quarter=bomber_orbit(a,.625);CHECK(quarter.x>first.x&&quarter.y>first.y);auto last=bomber_attack(a,2.8,222,140);CHECK(last.x==222&&last.y==140);for(int i=0;i<100;++i){auto p=bomber_orbit(a,i*.1);CHECK(p.x>=8&&p.x<=304&&p.y>=8&&p.y<=176);CHECK(p.frame>=207&&p.frame<=214);}}});
- group("radio and defector source crops never leak into adjacent cells",[]{for(int i=0;i<100;++i){auto radio=action_sprite(3,i*.1),walker=action_sprite(8,i*.1);CHECK(radio&&radio->width==16&&radio->height==21);CHECK(walker&&walker->width==16&&walker->height==18);CHECK(radio->index>=10&&radio->index<=15);CHECK(walker->index>=240&&walker->index<=249);}auto x=centered_effect(200,100,20);CHECK(x.x==190&&x.y==90&&x.w==20);});
- group("availability lights match original DIP cells not selected command state",[]{Actor a;auto r=availability(a);CHECK(r.size()==12);for(auto i:r)CHECK(!i.available);a.missiles[2]=1;a.warheads[1]=3;a.bombers[0]=1;a.defenses[1]=1;r=availability(a);CHECK(r[4].available&&r[4].box.x==61&&r[4].box.y==76);CHECK(r[3].available&&r[3].box.y==116);CHECK(r[8].available&&r[8].box.x==256&&r[8].box.y==61);CHECK(r[11].available&&r[11].box.y==127);a.missiles[2]=0;CHECK(!availability(a)[4].available);a.missiles[2]=0xffff;CHECK(availability(a)[4].available);});
- group("original character identities and supplied speech rolls use no RNG",[]{Rng rng(999);auto seed=rng.seed();CHECK(mood_frame(0,0)==2&&mood_frame(0,100)==2);CHECK(mood_frame(-2,0)==0&&mood_frame(2,0)==4);for(Word id=0;id<10;++id)CHECK(!reaction_text(id,1).empty());CHECK(reaction_text(10,1).empty()&&reaction_text(0,0).empty());for(std::size_t a=0;a<4;++a){auto b=bubble_rect(a,20);CHECK(b.x>=0&&b.x+b.w<=320&&b.y+b.h<=200);}CHECK(rng.seed()==seed);});
- group("ticker uses bounded private envelope and no gameplay RNG",[]{Rng rng(100);auto state=rng.seed();auto wave=ticker_wave();CHECK(wave.size()==128);CHECK(wave==ticker_wave());CHECK(wave.back()==1);CHECK(rng.seed()==state);});
- group("human production details route once to yellow console AI details stay private",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(scene.events().size()==6);for(int i=0;i<5;++i){CHECK(scene.event().region==EventRegion::action);scene.tick(100);scene.presented();CHECK(scene.visible_text().find("MT Warhead")==std::string::npos);CHECK(scene.next());}CHECK(scene.human_console()&&scene.event().actor==4);CHECK(!scene.event().production_lines.empty());auto copy=p.coordinator()->data();scene.tick(100);scene.presented();CHECK(scene.skip());CHECK(same_state(copy.state,p.coordinator()->data().state)&&copy.rng.seed()==p.coordinator()->data().rng.seed());});
- group("recorded human reaction produces exact target speech without a new draw",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,0}));CHECK(p.command({HumanCommandKind::propaganda,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(scene.active());bool found=false;Word roll=0;for(const auto& e:p.coordinator()->events())if(e.human_entry&&e.human_entry->tail.speech_roll)roll=e.human_entry->tail.speech_roll;for(const auto& e:scene.events())if(e.region==EventRegion::speech){CHECK(e.actor==0);CHECK(e.speech==reaction_text(p.coordinator()->data().state.identity[0],roll));found=true;}CHECK(found);});
+    group("faster configurable preparation is independent of renderer frame count", [] {
+        CHECK(preparation_height(0) == 0);
+        CHECK(preparation_height(.2) == 8);
+        CHECK(preparation_height(.4) == 16);
+        CHECK(preparation_height(99) == 16);
+        CHECK(preparation_height(.2, .8) == 4);
+        double seconds = 0;
+        for (int i = 0; i < 40; ++i)
+            seconds += .01;
+        CHECK(preparation_height(seconds) == 16);
+    });
+    group("country orbit heading and target flight use original bomber directional cells", [] {
+        CHECK(bomber_heading(0, -1) == 207);
+        CHECK(bomber_heading(1, 0) == 209);
+        CHECK(bomber_heading(0, 1) == 211);
+        CHECK(bomber_heading(-1, 0) == 213);
+        for (std::size_t a = 0; a < 5; ++a) {
+            auto center = action_origin(0, a);
+            auto first = bomber_orbit(a, 0);
+            CHECK(first.x == center.x && first.y == center.y - 28 + (a == 4 ? 6 : 0));
+            auto quarter = bomber_orbit(a, .625);
+            CHECK(quarter.x > first.x && quarter.y > first.y);
+            auto last = bomber_attack(a, 2.8, 222, 140);
+            CHECK(last.x == 222 && last.y == 140);
+            for (int i = 0; i < 100; ++i) {
+                auto p = bomber_orbit(a, i * .1);
+                CHECK(p.x >= 8 && p.x <= 304 && p.y >= 8 && p.y <= 176);
+                CHECK(p.frame >= 207 && p.frame <= 214);
+            }
+        }
+    });
+    group("radio and defector source crops never leak into adjacent cells", [] {
+        for (int i = 0; i < 100; ++i) {
+            auto radio = action_sprite(3, i * .1), walker = action_sprite(8, i * .1);
+            CHECK(radio && radio->width == 16 && radio->height == 21);
+            CHECK(walker && walker->width == 16 && walker->height == 18);
+            CHECK(radio->index >= 10 && radio->index <= 15);
+            CHECK(walker->index >= 240 && walker->index <= 249);
+        }
+        auto x = centered_effect(200, 100, 20);
+        CHECK(x.x == 190 && x.y == 90 && x.w == 20);
+    });
+    group("availability lights match original DIP cells not selected command state", [] {
+        Actor a;
+        auto r = availability(a);
+        CHECK(r.size() == 12);
+        for (auto i : r)
+            CHECK(!i.available);
+        a.missiles[2] = 1;
+        a.warheads[1] = 3;
+        a.bombers[0] = 1;
+        a.defenses[1] = 1;
+        r = availability(a);
+        CHECK(r[4].available && r[4].box.x == 61 && r[4].box.y == 76);
+        CHECK(r[3].available && r[3].box.y == 116);
+        CHECK(r[8].available && r[8].box.x == 256 && r[8].box.y == 61);
+        CHECK(r[11].available && r[11].box.y == 127);
+        a.missiles[2] = 0;
+        CHECK(!availability(a)[4].available);
+        a.missiles[2] = 0xffff;
+        CHECK(availability(a)[4].available);
+    });
+    group("original character identities and supplied speech rolls use no RNG", [] {
+        Rng rng(999);
+        auto seed = rng.seed();
+        CHECK(mood_frame(0, 0) == 2 && mood_frame(0, 100) == 2);
+        CHECK(mood_frame(-2, 0) == 0 && mood_frame(2, 0) == 4);
+        for (Word id = 0; id < 10; ++id)
+            CHECK(!reaction_text(id, 1).empty());
+        CHECK(reaction_text(10, 1).empty() && reaction_text(0, 0).empty());
+        for (std::size_t a = 0; a < 4; ++a) {
+            auto b = bubble_rect(a, 20);
+            CHECK(b.x >= 0 && b.x + b.w <= 320 && b.y + b.h <= 200);
+        }
+        CHECK(rng.seed() == seed);
+    });
+    group("ticker uses bounded private envelope and no gameplay RNG", [] {
+        Rng rng(100);
+        auto state = rng.seed();
+        auto wave = ticker_wave();
+        CHECK(wave.size() == 128);
+        CHECK(wave == ticker_wave());
+        CHECK(wave.back() == 1);
+        CHECK(rng.seed() == state);
+    });
+    group("human production details route once to yellow console AI details stay private", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(scene.events().size() == 6);
+        for (int i = 0; i < 5; ++i) {
+            CHECK(scene.event().region == EventRegion::action);
+            scene.tick(100);
+            scene.presented();
+            CHECK(scene.visible_text().find("MT Warhead") == std::string::npos);
+            CHECK(scene.next());
+        }
+        CHECK(scene.human_console() && scene.event().actor == 4);
+        CHECK(!scene.event().production_lines.empty());
+        auto copy = p.coordinator()->data();
+        scene.tick(100);
+        scene.presented();
+        CHECK(scene.skip());
+        CHECK(same_state(copy.state, p.coordinator()->data().state) &&
+              copy.rng.seed() == p.coordinator()->data().rng.seed());
+    });
+    group("recorded human reaction produces exact target speech without a new draw", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::actor_view, 0}));
+        CHECK(p.command({HumanCommandKind::city_target, 0}));
+        CHECK(p.command({HumanCommandKind::propaganda, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(scene.active());
+        bool found = false;
+        Word roll = 0;
+        for (const auto &e : p.coordinator()->events())
+            if (e.human_entry && e.human_entry->tail.speech_roll)
+                roll = e.human_entry->tail.speech_roll;
+        for (const auto &e : scene.events())
+            if (e.region == EventRegion::speech) {
+                CHECK(e.actor == 0);
+                CHECK(e.speech == reaction_text(p.coordinator()->data().state.identity[0], roll));
+                found = true;
+            }
+        CHECK(found);
+    });
 
- group("bomber attack and defector events retain supported private replay metadata",[]{for(Word action:{Word(5),Word(8)}){State state;for(auto& a:state.actors)a.profile=1;state.actors[4].population[0]=30;state.actors[0].population[2]=20;state.actors[4].action=action;state.actors[4].target_actor=0;state.actors[4].target_city=2;state.actors[4].magnitude=5;auto before=state;auto report=replay_media(state,1);CHECK(report.actions[4].supported&&report.actions[4].action==action);CHECK(same_state(before,state));}});
- group("hidden yellow-console text clock pauses behind action and production",[]{State state;ActionEvent event;auto scene=ActionPresentation::replay_event(event,state);CHECK(!scene.main_text_visible());event.region=EventRegion::human_console;scene=ActionPresentation::replay_event(event,state);CHECK(!scene.main_text_visible());event.region=EventRegion::speech;scene=ActionPresentation::replay_event(event,state);CHECK(scene.main_text_visible());scene.presented();scene.skip();CHECK(scene.main_text_visible());});
- group("committed defector fallback never fabricates amount or invalid target",[]{Actor a;a.action=8;a.target_actor=1;a.target_city=2;auto e=committed_transfer_visual(a);CHECK(e.supported&&e.action==8&&!e.amount_known);CHECK(e.target==1&&e.city==2);a.target_city=5;CHECK(!committed_transfer_visual(a).supported);a.target_city=2;a.action=3;CHECK(!committed_transfer_visual(a).supported);});
- group("long original speech pages fit bubble without clipping or live state writes",[]{ActionEvent event;event.actor=3;event.region=EventRegion::speech;event.speech="A longer original-style test message used only for testing display wrapping and pagination, not original dialogue.";State state;auto scene=ActionPresentation::replay_event(event,state);scene.tick(100);for(auto line:wrap_text(scene.visible_text(),26))CHECK(line.size()<=26);CHECK(wrap_text(scene.visible_text(),26).size()<=2);scene.presented();CHECK(scene.click(1000));CHECK(scene.active());CHECK(scene.snapshot().actors[0].action==0);});
+    group("bomber attack and defector events retain supported private replay metadata", [] {
+        for (Word action : {Word(5), Word(8)}) {
+            State state;
+            for (auto &a : state.actors)
+                a.profile = 1;
+            state.actors[4].population[0] = 30;
+            state.actors[0].population[2] = 20;
+            state.actors[4].action = action;
+            state.actors[4].target_actor = 0;
+            state.actors[4].target_city = 2;
+            state.actors[4].magnitude = 5;
+            auto before = state;
+            auto report = replay_media(state, 1);
+            CHECK(report.actions[4].supported && report.actions[4].action == action);
+            CHECK(same_state(before, state));
+        }
+    });
+    group("hidden yellow-console text clock pauses behind action and production", [] {
+        State state;
+        ActionEvent event;
+        auto scene = ActionPresentation::replay_event(event, state);
+        CHECK(!scene.main_text_visible());
+        event.region = EventRegion::human_console;
+        scene = ActionPresentation::replay_event(event, state);
+        CHECK(!scene.main_text_visible());
+        event.region = EventRegion::speech;
+        scene = ActionPresentation::replay_event(event, state);
+        CHECK(scene.main_text_visible());
+        scene.presented();
+        scene.skip();
+        CHECK(scene.main_text_visible());
+    });
+    group("committed defector fallback never fabricates amount or invalid target", [] {
+        Actor a;
+        a.action = 8;
+        a.target_actor = 1;
+        a.target_city = 2;
+        auto e = committed_transfer_visual(a);
+        CHECK(e.supported && e.action == 8 && !e.amount_known);
+        CHECK(e.target == 1 && e.city == 2);
+        a.target_city = 5;
+        CHECK(!committed_transfer_visual(a).supported);
+        a.target_city = 2;
+        a.action = 3;
+        CHECK(!committed_transfer_visual(a).supported);
+    });
+    group("long original speech pages fit bubble without clipping or live state writes", [] {
+        ActionEvent event;
+        event.actor = 3;
+        event.region = EventRegion::speech;
+        event.speech = "A longer original-style test message used only for testing display "
+                       "wrapping and pagination, not original dialogue.";
+        State state;
+        auto scene = ActionPresentation::replay_event(event, state);
+        scene.tick(100);
+        for (auto line : wrap_text(scene.visible_text(), 26))
+            CHECK(line.size() <= 26);
+        CHECK(wrap_text(scene.visible_text(), 26).size() <= 2);
+        scene.presented();
+        CHECK(scene.click(1000));
+        CHECK(scene.active());
+        CHECK(scene.snapshot().actors[0].action == 0);
+    });
 
- group("four inward selector arrows are centered and pulse without changing city hitboxes",[]{Rect city{100,60,16,16};auto original=city;auto a=selector_pixels(city,0),b=selector_pixels(city,.4);CHECK(a.size()==44&&b.size()==44);CHECK(a[0].x==108&&a[0].y==54);CHECK(b[0].y==57);auto moved=selector_pixels({120,70,16,16},0);for(std::size_t i=0;i<a.size();++i)CHECK(moved[i].x==a[i].x+20&&moved[i].y==a[i].y+10);CHECK(city.x==original.x&&city.y==original.y);auto loop=selector_pixels(city,.8);for(std::size_t i=0;i<a.size();++i)CHECK(a[i].x==loop[i].x&&a[i].y==loop[i].y);});
- group("selector arms fit near viewport edge without shifting city center",[]{for(auto pixel:selector_pixels({106,66,16,16},0,{100,58,124,80}))CHECK(pixel.x>=100&&pixel.x<224&&pixel.y>=58&&pixel.y<138);});
- group("selector is authoritative selected city only and disappears during resolution",[]{Player p;main_screen(p);CHECK(!selector_visible(p.coordinator()->data(),session::Phase::human_selection,0,false));CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,1}));auto& d=p.coordinator()->data();CHECK(selector_visible(d,session::Phase::human_selection,0,false));CHECK(!selector_visible(d,session::Phase::human_selection,1,false));CHECK(!selector_visible(d,session::Phase::ai_planning,0,false));CHECK(!selector_visible(d,session::Phase::human_selection,0,true));CHECK(p.command({HumanCommandKind::city_target,2}));CHECK(d.state.actors[4].target_city==2);CHECK(p.command({HumanCommandKind::production,0}));CHECK(!selector_visible(d,session::Phase::human_selection,0,false));});
- group("preparation and post-attack magnitude extras are absent but original captions survive",[]{for(Word action:{Word(1),Word(2),Word(4),Word(5)}){ActionEvent e;e.action=action;e.caption="Caption with legitimate 20 megaton wording";e.outcome=action==2||action==4?"Weapon prepared":"Nuclear explosion kills 5 million.";e.media.supported=true;e.media.action=action;e.media.magnitude=5;State state;auto scene=ActionPresentation::replay_event(e,state);std::string text;for(std::uint64_t t=1000;scene.active()&&t<10000;t+=200){scene.tick(100);scene.presented();text+=scene.visible_text();CHECK(scene.click(t));}CHECK(!scene.active());CHECK(text.find(e.caption)!=std::string::npos);CHECK(text.find("Weapon prepared")==std::string::npos);CHECK(text.find("megaton payload")==std::string::npos);if(action==1||action==5)CHECK(text.find("kills 5 million")!=std::string::npos);}});
- group("surviving bomber returns to actual origin and reverse direction in all quadrants",[]{MediaEvidence e;e.supported=true;e.action=5;e.effect=6;CHECK(bomber_returns(e));for(std::size_t actor=0;actor<5;++actor)for(auto target:{Rect{20,20,0,0},Rect{300,170,0,0}}){auto home=bomber_orbit(actor,0),arrive=bomber_attack(actor,2.8,target.x,target.y),begin=bomber_return(actor,0,target.x,target.y),end=bomber_return(actor,bomber_return_seconds,target.x,target.y);CHECK(arrive.x==begin.x&&arrive.y==begin.y);CHECK(end.x==home.x&&end.y==home.y);CHECK((begin.frame-arrive.frame+8)%8==4);}e.effect=2;CHECK(!bomber_returns(e));e.effect=13;CHECK(!bomber_returns(e));e.effect=255;CHECK(!bomber_returns(e));});
- group("return phase has no second damage and skip preserves original result",[]{MediaReplay replay;replay.actions[4].supported=true;replay.actions[4].action=5;replay.actions[4].effect=6;replay.before[4].actors[0].population[0]=20;replay.after[4].actors[0].population[0]=11;replay.state=replay.after[4];std::array<std::string,5> names{"A","B","C","D","Human"};auto scene=ActionPresentation::fixture(replay,names);scene.tick(4.001/scene.bomber_clock_rate());CHECK(scene.effect_complete()&&!scene.animation_complete());CHECK(scene.visual_state().actors[0].population[0]==11);scene.tick(1.8);CHECK(scene.animation_complete());CHECK(scene.visual_state().actors[0].population[0]==11);scene.presented();CHECK(scene.skip());CHECK(scene.snapshot().actors[0].population[0]==11);});
- group("defector right-facing source is mirrored only for leftward travel",[]{CHECK(!defector_flip(50,200));CHECK(defector_flip(200,50));CHECK(!defector_flip(50,50));auto r=action_sprite(8,.5);CHECK(r&&r->width==16&&r->height==18&&r->index==244);Rng rng(42);auto seed=rng.seed();for(int i=0;i<1000;++i)CHECK(defector_flip(200,50));CHECK(rng.seed()==seed);});
+    group("four inward selector arrows are centered and pulse without changing city hitboxes", [] {
+        Rect city{100, 60, 16, 16};
+        auto original = city;
+        auto a = selector_pixels(city, 0), b = selector_pixels(city, .4);
+        CHECK(a.size() == 44 && b.size() == 44);
+        CHECK(a[0].x == 108 && a[0].y == 54);
+        CHECK(b[0].y == 57);
+        auto moved = selector_pixels({120, 70, 16, 16}, 0);
+        for (std::size_t i = 0; i < a.size(); ++i)
+            CHECK(moved[i].x == a[i].x + 20 && moved[i].y == a[i].y + 10);
+        CHECK(city.x == original.x && city.y == original.y);
+        auto loop = selector_pixels(city, .8);
+        for (std::size_t i = 0; i < a.size(); ++i)
+            CHECK(a[i].x == loop[i].x && a[i].y == loop[i].y);
+    });
+    group("selector arms fit near viewport edge without shifting city center", [] {
+        for (auto pixel : selector_pixels({106, 66, 16, 16}, 0, {100, 58, 124, 80}))
+            CHECK(pixel.x >= 100 && pixel.x < 224 && pixel.y >= 58 && pixel.y < 138);
+    });
+    group("selector is authoritative selected city only and disappears during resolution", [] {
+        Player p;
+        main_screen(p);
+        CHECK(
+            !selector_visible(p.coordinator()->data(), session::Phase::human_selection, 0, false));
+        CHECK(p.command({HumanCommandKind::actor_view, 0}));
+        CHECK(p.command({HumanCommandKind::city_target, 1}));
+        auto &d = p.coordinator()->data();
+        CHECK(selector_visible(d, session::Phase::human_selection, 0, false));
+        CHECK(!selector_visible(d, session::Phase::human_selection, 1, false));
+        CHECK(!selector_visible(d, session::Phase::ai_planning, 0, false));
+        CHECK(!selector_visible(d, session::Phase::human_selection, 0, true));
+        CHECK(p.command({HumanCommandKind::city_target, 2}));
+        CHECK(d.state.actors[4].target_city == 2);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(!selector_visible(d, session::Phase::human_selection, 0, false));
+    });
+    group("preparation and post-attack magnitude extras are absent but original captions survive",
+          [] {
+              for (Word action : {Word(1), Word(2), Word(4), Word(5)}) {
+                  ActionEvent e;
+                  e.action = action;
+                  e.caption = "Caption with legitimate 20 megaton wording";
+                  e.outcome = action == 2 || action == 4 ? "Weapon prepared"
+                                                         : "Nuclear explosion kills 5 million.";
+                  e.media.supported = true;
+                  e.media.action = action;
+                  e.media.magnitude = 5;
+                  State state;
+                  auto scene = ActionPresentation::replay_event(e, state);
+                  std::string text;
+                  for (std::uint64_t t = 1000; scene.active() && t < 10000; t += 200) {
+                      scene.tick(100);
+                      scene.presented();
+                      text += scene.visible_text();
+                      CHECK(scene.click(t));
+                  }
+                  CHECK(!scene.active());
+                  CHECK(text.find(e.caption) != std::string::npos);
+                  CHECK(text.find("Weapon prepared") == std::string::npos);
+                  CHECK(text.find("megaton payload") == std::string::npos);
+                  if (action == 1 || action == 5)
+                      CHECK(text.find("kills 5 million") != std::string::npos);
+              }
+          });
+    group("surviving bomber returns to actual origin and reverse direction in all quadrants", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 5;
+        e.effect = 6;
+        CHECK(bomber_returns(e));
+        for (std::size_t actor = 0; actor < 5; ++actor)
+            for (auto target : {Rect{20, 20, 0, 0}, Rect{300, 170, 0, 0}}) {
+                auto home = bomber_orbit(actor, 0),
+                     arrive = bomber_attack(actor, 2.8, target.x, target.y),
+                     begin = bomber_return(actor, 0, target.x, target.y),
+                     end = bomber_return(actor, bomber_return_seconds, target.x, target.y);
+                CHECK(arrive.x == begin.x && arrive.y == begin.y);
+                CHECK(end.x == home.x && end.y == home.y);
+                CHECK((begin.frame - arrive.frame + 8) % 8 == 4);
+            }
+        e.effect = 2;
+        CHECK(!bomber_returns(e));
+        e.effect = 13;
+        CHECK(!bomber_returns(e));
+        e.effect = 255;
+        CHECK(!bomber_returns(e));
+    });
+    group("return phase has no second damage and skip preserves original result", [] {
+        MediaReplay replay;
+        replay.actions[4].supported = true;
+        replay.actions[4].action = 5;
+        replay.actions[4].effect = 6;
+        replay.before[4].actors[0].population[0] = 20;
+        replay.after[4].actors[0].population[0] = 11;
+        replay.state = replay.after[4];
+        std::array<std::string, 5> names{"A", "B", "C", "D", "Human"};
+        auto scene = ActionPresentation::fixture(replay, names);
+        scene.tick(4.001 / scene.bomber_clock_rate());
+        CHECK(scene.effect_complete() && !scene.animation_complete());
+        CHECK(scene.visual_state().actors[0].population[0] == 11);
+        scene.tick(1.8);
+        CHECK(scene.animation_complete());
+        CHECK(scene.visual_state().actors[0].population[0] == 11);
+        scene.presented();
+        CHECK(scene.skip());
+        CHECK(scene.snapshot().actors[0].population[0] == 11);
+    });
+    group("defector right-facing source is mirrored only for leftward travel", [] {
+        CHECK(!defector_flip(50, 200));
+        CHECK(defector_flip(200, 50));
+        CHECK(!defector_flip(50, 50));
+        auto r = action_sprite(8, .5);
+        CHECK(r && r->width == 16 && r->height == 18 && r->index == 244);
+        Rng rng(42);
+        auto seed = rng.seed();
+        for (int i = 0; i < 1000; ++i)
+            CHECK(defector_flip(200, 50));
+        CHECK(rng.seed() == seed);
+    });
 
- group("defence setup sound is original bounded prefix not arbitrary impact sound",[]{MediaEvidence e;e.supported=true;e.action=7;auto cue=sound_cue(e);CHECK(cue&&std::string(cue->sample)=="door.snd"&&cue->period==124&&cue->volume==12&&cue->length==8820);e.action=1;e.effect=13;CHECK(!impact_sound(e));e.action=5;e.effect=6;e.loss=5;CHECK(std::string(impact_sound(e)->sample)=="exp");e.supported=false;CHECK(!sound_cue(e));});
- group("viewport-limited selector still moves while selecting edge city",[]{auto a=selector_pixels({106,66,16,16},0,{100,58,124,80}),b=selector_pixels({106,66,16,16},.4,{100,58,124,80});CHECK(a.size()==44&&b.size()==44);CHECK(a[0].y!=b[0].y);for(auto p:a)CHECK(p.x>=100&&p.x<224&&p.y>=58&&p.y<138);for(auto p:b)CHECK(p.x>=100&&p.x<224&&p.y>=58&&p.y<138);});
- group("bomber stays visible through drop returns continuously and then ends",[]{MediaEvidence e;e.supported=true;e.action=5;e.effect=6;for(std::size_t actor=0;actor<5;++actor)for(auto target:{Rect{30,140,0,0},Rect{280,40,0,0}}){auto before=bomber_sequence(actor,2.8-1e-6,target.x,target.y,e),after=bomber_sequence(actor,2.8,target.x,target.y,e);CHECK(before&&after);CHECK(std::abs(before->x-after->x)<.001&&std::abs(before->y-after->y)<.001);CHECK(bomber_sequence(actor,3.2,target.x,target.y,e));CHECK(bomber_sequence(actor,4.0,target.x,target.y,e));CHECK(!bomber_sequence(actor,4.6,target.x,target.y,e));CHECK(!bomber_sequence(actor,20,target.x,target.y,e));}e.effect=13;CHECK(!bomber_sequence(0,2.8,100,100,e));e.effect=2;CHECK(!bomber_sequence(0,2.8,100,100,e));});
- group("normal special events retain exact resolver seed and reach queue without forcing",[]{for(Word time:{Word(0),Word(35)}){Player p;main_screen(p);CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,0}));CHECK(p.command({HumanCommandKind::propaganda,0}));ActionPresentation scene;scene.observe(p);CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(time));scene.observe(p);}CHECK(scene.active()&&p.round()==2&&p.diagnostic().empty());std::uint32_t resolver_seed=0;for(auto& e:p.coordinator()->events())if(e.from==session::Phase::resolver_handoff)resolver_seed=e.seed_after;CHECK(resolver_seed==(time==0?1772930244u:3772854349u));bool found=false;for(auto& e:scene.events())if(e.media.supported&&e.action==(time==0?8:14)){CHECK(!e.caption.empty());found=true;}CHECK(found);}});
- group("flying transfer uses original frame family and delayed original audio",[]{CHECK(action_sprite(14,0)->index==250);CHECK(action_sprite(14,.5)->index==254);CHECK(action_sprite(14,.625)->index==250);MediaEvidence e;e.supported=true;e.action=14;CHECK(!action_sound_ready(e,.6)&&action_sound_ready(e,.7));auto cue=sound_cue(e);CHECK(std::string(cue->sample)=="ooo"&&cue->period==300&&cue->length==8820);});
- group("typewriter head follows revealed characters newline and instant completion",[]{auto a=typewriter_head("A",true),b=typewriter_head("AB",true),c=typewriter_head("AB\nC",true),done=typewriter_head("AB\nC",false);CHECK(a.x==84&&b.x==90);CHECK(c.x==84&&c.y==174);CHECK(done.x==84&&done.y==174);auto idle=typewriter_head("",false);CHECK(idle.x==78&&idle.y==174&&idle.h==16);});
- group("doors auto advance only after endpoint is rendered and reject incidental clicks",[]{State state;state.actors[0].population[0]=20;ActionEvent e;e.caption="Visual transition fixture";auto scene=ActionPresentation::replay_event(e,state);scene.transitions(true);scene.begin_transition();CHECK(scene.transition_active()&&!scene.show_action_map());scene.tick(door_seconds/2);CHECK(std::abs(scene.closed_fraction()-.5)<.001);scene.presented();CHECK(!scene.click(1000));scene.tick(door_seconds);CHECK(scene.closed_fraction()==1);scene.presented();CHECK(!scene.transition_active()&&!scene.rendered());scene.tick(2);scene.presented();CHECK(scene.next());CHECK(scene.door_phase()==DoorPhase::opening);scene.tick(door_seconds);CHECK(scene.closed_fraction()==0);scene.presented();CHECK(!scene.active());CHECK(scene.snapshot().actors[0].population[0]==20);});
- group("skip during door leaves valid open main without changing state or RNG",[]{State state;state.actors[1].population[0]=40;ActionEvent e;e.region=EventRegion::action;auto scene=ActionPresentation::replay_event(e,state);scene.transitions(true);scene.begin_transition();scene.tick(.1);scene.presented();Rng rng(42);auto seed=rng.seed();CHECK(!scene.speech_visible()&&scene.skip());CHECK(!scene.active()&&!scene.transition_active());CHECK(same_state(state,scene.snapshot())&&rng.seed()==seed);CHECK(door_sound().period==415&&door_sound().length==8820);});
+    group("defence setup sound is original bounded prefix not arbitrary impact sound", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 7;
+        auto cue = sound_cue(e);
+        CHECK(cue && std::string(cue->sample) == "door.snd" && cue->period == 124 &&
+              cue->volume == 12 && cue->length == 8820);
+        e.action = 1;
+        e.effect = 13;
+        CHECK(!impact_sound(e));
+        e.action = 5;
+        e.effect = 6;
+        e.loss = 5;
+        CHECK(std::string(impact_sound(e)->sample) == "exp");
+        e.supported = false;
+        CHECK(!sound_cue(e));
+    });
+    group("viewport-limited selector still moves while selecting edge city", [] {
+        auto a = selector_pixels({106, 66, 16, 16}, 0, {100, 58, 124, 80}),
+             b = selector_pixels({106, 66, 16, 16}, .4, {100, 58, 124, 80});
+        CHECK(a.size() == 44 && b.size() == 44);
+        CHECK(a[0].y != b[0].y);
+        for (auto p : a)
+            CHECK(p.x >= 100 && p.x < 224 && p.y >= 58 && p.y < 138);
+        for (auto p : b)
+            CHECK(p.x >= 100 && p.x < 224 && p.y >= 58 && p.y < 138);
+    });
+    group("bomber stays visible through drop returns continuously and then ends", [] {
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 5;
+        e.effect = 6;
+        for (std::size_t actor = 0; actor < 5; ++actor)
+            for (auto target : {Rect{30, 140, 0, 0}, Rect{280, 40, 0, 0}}) {
+                auto before = bomber_sequence(actor, 2.8 - 1e-6, target.x, target.y, e),
+                     after = bomber_sequence(actor, 2.8, target.x, target.y, e);
+                CHECK(before && after);
+                CHECK(std::abs(before->x - after->x) < .001 &&
+                      std::abs(before->y - after->y) < .001);
+                CHECK(bomber_sequence(actor, 3.2, target.x, target.y, e));
+                CHECK(bomber_sequence(actor, 4.0, target.x, target.y, e));
+                CHECK(!bomber_sequence(actor, 4.6, target.x, target.y, e));
+                CHECK(!bomber_sequence(actor, 20, target.x, target.y, e));
+            }
+        e.effect = 13;
+        CHECK(!bomber_sequence(0, 2.8, 100, 100, e));
+        e.effect = 2;
+        CHECK(!bomber_sequence(0, 2.8, 100, 100, e));
+    });
+    group("normal special events retain exact resolver seed and reach queue without forcing", [] {
+        for (Word time : {Word(0), Word(35)}) {
+            Player p;
+            main_screen(p);
+            CHECK(p.command({HumanCommandKind::actor_view, 0}));
+            CHECK(p.command({HumanCommandKind::city_target, 0}));
+            CHECK(p.command({HumanCommandKind::propaganda, 0}));
+            ActionPresentation scene;
+            scene.observe(p);
+            CHECK(p.confirm_banner());
+            for (int i = 0; i < 30 && !scene.active(); ++i) {
+                CHECK(p.advance_turn(time));
+                scene.observe(p);
+            }
+            CHECK(scene.active() && p.round() == 2 && p.diagnostic().empty());
+            std::uint32_t resolver_seed = 0;
+            for (auto &e : p.coordinator()->events())
+                if (e.from == session::Phase::resolver_handoff)
+                    resolver_seed = e.seed_after;
+            CHECK(resolver_seed == (time == 0 ? 1772930244u : 3772854349u));
+            bool found = false;
+            for (auto &e : scene.events())
+                if (e.media.supported && e.action == (time == 0 ? 8 : 14)) {
+                    CHECK(!e.caption.empty());
+                    found = true;
+                }
+            CHECK(found);
+        }
+    });
+    group("flying transfer uses original frame family and delayed original audio", [] {
+        CHECK(action_sprite(14, 0)->index == 250);
+        CHECK(action_sprite(14, .5)->index == 254);
+        CHECK(action_sprite(14, .625)->index == 250);
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 14;
+        CHECK(!action_sound_ready(e, .6) && action_sound_ready(e, .7));
+        auto cue = sound_cue(e);
+        CHECK(std::string(cue->sample) == "ooo" && cue->period == 300 && cue->length == 8820);
+    });
+    group("typewriter head follows revealed characters newline and instant completion", [] {
+        auto a = typewriter_head("A", true), b = typewriter_head("AB", true),
+             c = typewriter_head("AB\nC", true), done = typewriter_head("AB\nC", false);
+        CHECK(a.x == 84 && b.x == 90);
+        CHECK(c.x == 84 && c.y == 174);
+        CHECK(done.x == 84 && done.y == 174);
+        auto idle = typewriter_head("", false);
+        CHECK(idle.x == 78 && idle.y == 174 && idle.h == 16);
+    });
+    group("doors auto advance only after endpoint is rendered and reject incidental clicks", [] {
+        State state;
+        state.actors[0].population[0] = 20;
+        ActionEvent e;
+        e.caption = "Visual transition fixture";
+        auto scene = ActionPresentation::replay_event(e, state);
+        scene.transitions(true);
+        scene.begin_transition();
+        CHECK(scene.transition_active() && !scene.show_action_map());
+        scene.tick(door_seconds / 2);
+        CHECK(std::abs(scene.closed_fraction() - .5) < .001);
+        scene.presented();
+        CHECK(!scene.click(1000));
+        scene.tick(door_seconds);
+        CHECK(scene.closed_fraction() == 1);
+        scene.presented();
+        CHECK(!scene.transition_active() && !scene.rendered());
+        scene.tick(2);
+        scene.presented();
+        CHECK(scene.next());
+        CHECK(scene.door_phase() == DoorPhase::opening);
+        scene.tick(door_seconds);
+        CHECK(scene.closed_fraction() == 0);
+        scene.presented();
+        CHECK(!scene.active());
+        CHECK(scene.snapshot().actors[0].population[0] == 20);
+    });
+    group("skip during door leaves valid open main without changing state or RNG", [] {
+        State state;
+        state.actors[1].population[0] = 40;
+        ActionEvent e;
+        e.region = EventRegion::action;
+        auto scene = ActionPresentation::replay_event(e, state);
+        scene.transitions(true);
+        scene.begin_transition();
+        scene.tick(.1);
+        scene.presented();
+        Rng rng(42);
+        auto seed = rng.seed();
+        CHECK(!scene.speech_visible() && scene.skip());
+        CHECK(!scene.active() && !scene.transition_active());
+        CHECK(same_state(state, scene.snapshot()) && rng.seed() == seed);
+        CHECK(door_sound().period == 415 && door_sound().length == 8820);
+    });
 
- group("human orbit calibration lowers only actor4 and preserves period",[]{for(std::size_t a=0;a<5;++a){auto base=action_origin(0,a);auto first=bomber_orbit(a,0),cycle=bomber_orbit(a,2.5);CHECK(first.y==base.y-28+(a==4?6:0));CHECK(std::abs(first.x-cycle.x)<1e-9&&std::abs(first.y-cycle.y)<1e-9);} });
- group("payload cue is accepted selection only not preparation or duplicate commitment",[]{Player p;main_screen(p);CHECK(p.payload_visual_serial()==0);CHECK(p.command({HumanCommandKind::warhead,1}));CHECK(p.payload_visual_serial()==0);CHECK(p.command({HumanCommandKind::missile,0}));CHECK(p.payload_visual_serial()==0);CHECK(p.confirm_banner());for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i)CHECK(p.advance_turn(123));CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,0}));auto inventory=p.coordinator()->data().state.actors[4].warheads;CHECK(p.command({HumanCommandKind::warhead,1}));CHECK(p.payload_visual_serial()==1);CHECK(p.coordinator()->data().state.actors[4].warheads==inventory);CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.command({HumanCommandKind::warhead,4}));CHECK(p.payload_visual_serial()==1);CHECK(p.confirm_banner());CHECK(p.payload_visual_serial()==1);CHECK(p.coordinator()->data().state.actors[4].warheads[0]==0);});
- group("original hand rises presses withdraws with bounded original masks",[]{CHECK(!finger_pose(-1)&&!finger_pose(0)&&!finger_pose(1.2));auto up=finger_pose(.24),press=finger_pose(.6),down=finger_pose(.96);CHECK(up&&press&&down);CHECK(up->source.x==0&&press->source.x==96&&down->source.x==0);CHECK(press->source.y==32&&press->source.w==96&&press->source.h==64);CHECK(press->destination.x==100&&press->destination.y==73);CHECK(std::abs(up->destination.y-down->destination.y)<=1);});
- group("inspection reads living selected actor action never hidden inventory",[]{State s;for(auto& a:s.actors)a.population[0]=20;for(std::size_t i=0;i<5;++i){s.actors[i].action=2;auto missile=deployed_sprite(s,i,0);CHECK(missile&&missile->atlas==Atlas::big&&missile->source.x==0&&missile->source.y==192);s.actors[i].action=7;auto defense=deployed_sprite(s,i,.1);CHECK(defense&&defense->atlas==Atlas::small);s.actors[i].action=4;CHECK(deployed_sprite(s,i,0));s.actors[i].action=5;CHECK(deployed_sprite(s,i,0));s.actors[i].action=0;s.actors[i].missiles.fill(65535);CHECK(!deployed_sprite(s,i,0));s.actors[i].action=2;s.actors[i].population.fill(0);CHECK(!deployed_sprite(s,i,0));}CHECK(!deployed_sprite(s,5,0));});
- group("source special rectangles and masks stay inside original atlases",[]{for(Word action:{9,11,12,13,14,15,16})for(int frame=0;frame<31;++frame){auto sprites=special_sprites(action,4,frame*.1,90,100,30);CHECK(!sprites.empty());for(auto sprite:sprites){CHECK(sprite.atlas==Atlas::small||sprite.atlas==Atlas::big);CHECK(sprite.source.x>=0&&sprite.source.y>=0&&sprite.source.x+sprite.source.w<=320&&sprite.source.y+sprite.source.h<=272);CHECK(sprite.source.w==sprite.destination.w&&sprite.source.h==sprite.destination.h);}}CHECK(special_sprites(10,4,1,80,100).empty());CHECK(special_sprites(9,4,7,80,100).empty());});
- group("seed29 actual human AI rounds continue past former bomber planner softlock",[]{Player p(29);main_screen(p);unsigned turns=0;while(!p.ended()&&p.round()<25&&turns++<2000){if(p.coordinator()->phase()==session::Phase::human_selection){CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());}else CHECK(p.advance_turn(123));CHECK(p.diagnostic().empty());}CHECK(p.ended()||p.round()>=25);});
- group("committed display quantities stay fixed during reservation and commit then publish after resolution",[]{Player p;main_screen(p);auto old=p.display_state();CHECK(p.command({HumanCommandKind::production,0}));CHECK(same_state(p.display_state(),old)||p.display_state().actors[4].population==old.actors[4].population);CHECK(p.confirm_banner());for(unsigned i=0;i<20&&p.coordinator()->phase()!=session::Phase::human_selection&&!p.ended();++i){auto phase=p.coordinator()->phase();if(phase==session::Phase::ai_planning||phase==session::Phase::resolver_handoff){auto shown=p.display_state();for(unsigned a=0;a<5;++a){CHECK(shown.actors[a].population==old.actors[a].population);CHECK(shown.actors[a].warheads==old.actors[a].warheads);CHECK(shown.actors[a].defenses==old.actors[a].defenses);}}CHECK(p.advance_turn(123));}auto shown=p.display_state();for(unsigned a=0;a<5;++a){CHECK(shown.actors[a].population==p.coordinator()->data().state.actors[a].population);CHECK(shown.actors[a].warheads==p.coordinator()->data().state.actors[a].warheads);}ActionPresentation inactive;CHECK(&inactive.interface_state(shown)==&shown);});
- group("delivery reservations cannot leak through display quantities",[]{auto d=endgame_fixture(true,3);d.state.actors[4].missiles.fill(5);d.state.actors[4].warheads.fill(5);d.state.actors[4].defenses.fill(5);auto p=Player::developer_session(d);while(p.coordinator()->phase()!=session::Phase::human_selection)CHECK(p.advance_turn(123));auto before=p.display_state().actors[4];CHECK(p.command({HumanCommandKind::missile,0}));CHECK(p.confirm_banner());CHECK(p.display_state().actors[4].missiles==before.missiles);CHECK(p.display_state().actors[4].defenses==before.defenses);});
- group("every pending round HUD quantity remains committed and releases after presentation",[]{Player p;
-main_screen(p);
-ActionPresentation scene;
-scene.observe(p);
-auto committed=p.display_state();
-CHECK(p.command({HumanCommandKind::production,0}));
-CHECK(p.confirm_banner());
-scene.observe(p);
-for(unsigned n=0;
-n<30&&!scene.active()&&!p.ended();
-++n){auto shown=scene.interface_state(p.display_state());
-for(unsigned a=0;
-a<5;
-++a){CHECK(shown.actors[a].population==committed.actors[a].population);
-CHECK(shown.actors[a].missiles==committed.actors[a].missiles);
-CHECK(shown.actors[a].warheads==committed.actors[a].warheads);
-CHECK(shown.actors[a].bombers==committed.actors[a].bombers);
-CHECK(shown.actors[a].defenses==committed.actors[a].defenses);
-}CHECK(p.advance_turn(123));
-scene.observe(p);
-}CHECK(scene.active());
-for(unsigned n=0;
-n<10000&&scene.active();
-++n){scene.tick(.2);
-scene.presented();
-if(scene.active()&&scene.animation_complete())scene.next();
-}CHECK(!scene.active());
-auto live=p.display_state();
-CHECK(same_state(scene.interface_state(live),live));
-});
+    group("human orbit calibration lowers only actor4 and preserves period", [] {
+        for (std::size_t a = 0; a < 5; ++a) {
+            auto base = action_origin(0, a);
+            auto first = bomber_orbit(a, 0), cycle = bomber_orbit(a, 2.5);
+            CHECK(first.y == base.y - 28 + (a == 4 ? 6 : 0));
+            CHECK(std::abs(first.x - cycle.x) < 1e-9 && std::abs(first.y - cycle.y) < 1e-9);
+        }
+    });
+    group("payload cue is accepted selection only not preparation or duplicate commitment", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.payload_visual_serial() == 0);
+        CHECK(p.command({HumanCommandKind::warhead, 1}));
+        CHECK(p.payload_visual_serial() == 0);
+        CHECK(p.command({HumanCommandKind::missile, 0}));
+        CHECK(p.payload_visual_serial() == 0);
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection; ++i)
+            CHECK(p.advance_turn(123));
+        CHECK(p.command({HumanCommandKind::actor_view, 0}));
+        CHECK(p.command({HumanCommandKind::city_target, 0}));
+        auto inventory = p.coordinator()->data().state.actors[4].warheads;
+        CHECK(p.command({HumanCommandKind::warhead, 1}));
+        CHECK(p.payload_visual_serial() == 1);
+        CHECK(p.coordinator()->data().state.actors[4].warheads == inventory);
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(p.command({HumanCommandKind::warhead, 4}));
+        CHECK(p.payload_visual_serial() == 1);
+        CHECK(p.confirm_banner());
+        CHECK(p.payload_visual_serial() == 1);
+        CHECK(p.coordinator()->data().state.actors[4].warheads[0] == 0);
+    });
+    group("original hand rises presses withdraws with bounded original masks", [] {
+        CHECK(!finger_pose(-1) && !finger_pose(0) && !finger_pose(1.2));
+        auto up = finger_pose(.24), press = finger_pose(.6), down = finger_pose(.96);
+        CHECK(up && press && down);
+        CHECK(up->source.x == 0 && press->source.x == 96 && down->source.x == 0);
+        CHECK(press->source.y == 32 && press->source.w == 96 && press->source.h == 64);
+        CHECK(press->destination.x == 100 && press->destination.y == 73);
+        CHECK(std::abs(up->destination.y - down->destination.y) <= 1);
+    });
+    group("inspection reads living selected actor action never hidden inventory", [] {
+        State s;
+        for (auto &a : s.actors)
+            a.population[0] = 20;
+        for (std::size_t i = 0; i < 5; ++i) {
+            s.actors[i].action = 2;
+            auto missile = deployed_sprite(s, i, 0);
+            CHECK(missile && missile->atlas == Atlas::big && missile->source.x == 0 &&
+                  missile->source.y == 192);
+            s.actors[i].action = 7;
+            auto defense = deployed_sprite(s, i, .1);
+            CHECK(defense && defense->atlas == Atlas::small);
+            s.actors[i].action = 4;
+            CHECK(deployed_sprite(s, i, 0));
+            s.actors[i].action = 5;
+            CHECK(deployed_sprite(s, i, 0));
+            s.actors[i].action = 0;
+            s.actors[i].missiles.fill(65535);
+            CHECK(!deployed_sprite(s, i, 0));
+            s.actors[i].action = 2;
+            s.actors[i].population.fill(0);
+            CHECK(!deployed_sprite(s, i, 0));
+        }
+        CHECK(!deployed_sprite(s, 5, 0));
+    });
+    group("source special rectangles and masks stay inside original atlases", [] {
+        for (Word action : {9, 11, 12, 13, 14, 15, 16})
+            for (int frame = 0; frame < 31; ++frame) {
+                auto sprites = special_sprites(action, 4, frame * .1, 90, 100, 30);
+                CHECK(!sprites.empty());
+                for (auto sprite : sprites) {
+                    CHECK(sprite.atlas == Atlas::small || sprite.atlas == Atlas::big);
+                    CHECK(sprite.source.x >= 0 && sprite.source.y >= 0 &&
+                          sprite.source.x + sprite.source.w <= 320 &&
+                          sprite.source.y + sprite.source.h <= 272);
+                    CHECK(sprite.source.w == sprite.destination.w &&
+                          sprite.source.h == sprite.destination.h);
+                }
+            }
+        CHECK(special_sprites(10, 4, 1, 80, 100).empty());
+        CHECK(special_sprites(9, 4, 7, 80, 100).empty());
+    });
+    group("seed29 actual human AI rounds continue past former bomber planner softlock", [] {
+        Player p(29);
+        main_screen(p);
+        unsigned turns = 0;
+        while (!p.ended() && p.round() < 25 && turns++ < 2000) {
+            if (p.coordinator()->phase() == session::Phase::human_selection) {
+                CHECK(p.command({HumanCommandKind::production, 0}));
+                CHECK(p.confirm_banner());
+            } else
+                CHECK(p.advance_turn(123));
+            CHECK(p.diagnostic().empty());
+        }
+        CHECK(p.ended() || p.round() >= 25);
+    });
+    group("committed display quantities stay fixed during reservation and commit then publish "
+          "after resolution",
+          [] {
+              Player p;
+              main_screen(p);
+              auto old = p.display_state();
+              CHECK(p.command({HumanCommandKind::production, 0}));
+              CHECK(same_state(p.display_state(), old) ||
+                    p.display_state().actors[4].population == old.actors[4].population);
+              CHECK(p.confirm_banner());
+              for (unsigned i = 0;
+                   i < 20 && p.coordinator()->phase() != session::Phase::human_selection &&
+                   !p.ended();
+                   ++i) {
+                  auto phase = p.coordinator()->phase();
+                  if (phase == session::Phase::ai_planning ||
+                      phase == session::Phase::resolver_handoff) {
+                      auto shown = p.display_state();
+                      for (unsigned a = 0; a < 5; ++a) {
+                          CHECK(shown.actors[a].population == old.actors[a].population);
+                          CHECK(shown.actors[a].warheads == old.actors[a].warheads);
+                          CHECK(shown.actors[a].defenses == old.actors[a].defenses);
+                      }
+                  }
+                  CHECK(p.advance_turn(123));
+              }
+              auto shown = p.display_state();
+              for (unsigned a = 0; a < 5; ++a) {
+                  CHECK(shown.actors[a].population ==
+                        p.coordinator()->data().state.actors[a].population);
+                  CHECK(shown.actors[a].warheads ==
+                        p.coordinator()->data().state.actors[a].warheads);
+              }
+              ActionPresentation inactive;
+              CHECK(&inactive.interface_state(shown) == &shown);
+          });
+    group("delivery reservations cannot leak through display quantities", [] {
+        auto d = endgame_fixture(true, 3);
+        d.state.actors[4].missiles.fill(5);
+        d.state.actors[4].warheads.fill(5);
+        d.state.actors[4].defenses.fill(5);
+        auto p = Player::developer_session(d);
+        while (p.coordinator()->phase() != session::Phase::human_selection)
+            CHECK(p.advance_turn(123));
+        auto before = p.display_state().actors[4];
+        CHECK(p.command({HumanCommandKind::missile, 0}));
+        CHECK(p.confirm_banner());
+        CHECK(p.display_state().actors[4].missiles == before.missiles);
+        CHECK(p.display_state().actors[4].defenses == before.defenses);
+    });
+    group("every pending round HUD quantity remains committed and releases after presentation", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        auto committed = p.display_state();
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.confirm_banner());
+        scene.observe(p);
+        for (unsigned n = 0; n < 30 && !scene.active() && !p.ended(); ++n) {
+            auto shown = scene.interface_state(p.display_state());
+            for (unsigned a = 0; a < 5; ++a) {
+                CHECK(shown.actors[a].population == committed.actors[a].population);
+                CHECK(shown.actors[a].missiles == committed.actors[a].missiles);
+                CHECK(shown.actors[a].warheads == committed.actors[a].warheads);
+                CHECK(shown.actors[a].bombers == committed.actors[a].bombers);
+                CHECK(shown.actors[a].defenses == committed.actors[a].defenses);
+            }
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(scene.active());
+        for (unsigned n = 0; n < 10000 && scene.active(); ++n) {
+            scene.tick(.2);
+            scene.presented();
+            if (scene.active() && scene.animation_complete())
+                scene.next();
+        }
+        CHECK(!scene.active());
+        auto live = p.display_state();
+        CHECK(same_state(scene.interface_state(live), live));
+    });
 
- group("missile mounting centers are independent of city positions",[]{const int x[]{65,52,268,278,151},y[]{49,153,56,151,102};for(unsigned i=0;i<5;++i){auto o=missile_launch_origin(i);CHECK(o.x==x[i]&&o.y==y[i]);auto p=flight_pose(0,o.x,o.y,170,100);CHECK(p.x==o.x&&p.y==o.y);auto end=flight_pose(1,o.x,o.y,170,100);CHECK(end.x==170&&end.y==100);}});
- group("rising city uses attached original missile exhaust, not alien craft",[]{for(double t:{0.,.125,.5,1.,1.9,2.5}){auto v=special_sprites(11,4,t,80,100,30);CHECK(v.size()==2&&v[0].atlas==Atlas::small&&v[1].atlas==Atlas::big);CHECK(v[1].source.x==0&&v[1].source.y==208&&v[1].source.w==16&&v[1].source.h==16);CHECK(v[1].destination.x==v[0].destination.x&&v[1].destination.y==v[0].destination.y+16);CHECK(v[1].flip==(int(t*8)%2!=0));}CHECK(special_sprites(11,4,3.1,80,100).empty());auto alien=special_sprites(16,4,1,80,100);CHECK(alien.size()==1&&alien[0].atlas==Atlas::small&&alien[0].source.y==210);});
- group("special projectile and weight arrive at recorded target without game writes",[]{for(Word a:{9,12,13,14}){auto sprites=special_sprites(a,4,a==9?4:2,40,120);auto end=sprites.back();CHECK(end.destination.x==40&&end.destination.y==120);}auto cow=special_sprites(13,4,1,40,120);CHECK(cow[0].source.x==64&&cow[0].source.y==224&&cow[0].source.w==32);CHECK(cow[1].source.y==192&&cow[1].flip);auto human=special_sprites(14,4,1,240,120);CHECK(!human[1].flip&&human[1].source.x<240);auto stork=special_sprites(9,4,.1,40,120);CHECK(stork[0].source.y==49&&!stork[0].flip);auto ufo=special_sprites(16,4,2,40,120);CHECK(ufo[0].source.y==210&&ufo[0].source.h==10);auto radiation=special_sprites(15,2,1,40,120);CHECK(radiation[0].destination.x==260&&radiation[0].destination.y==55);});
- group("special metadata follows effect context and actual population deltas",[]{for(Word action:{9,11,12,13,14,15,16}){State s;for(auto& a:s.actors){a.profile=1;for(int c=0;c<5;++c)a.population[c]=Word(20+c*10);}s.actors[4].action=action;s.actors[4].target_actor=0;s.actors[4].target_city=1;s.actors[4].magnitude=5;auto original=s;auto r=replay_media(s,123);auto e=r.actions[4];CHECK(same_state(s,original)&&e.supported&&e.action==action&&e.population_known);CHECK(e.target<5&&e.city<5);std::int32_t delta=0;for(int c=0;c<5;++c)delta+=signed_word(r.after[4].actors[e.target].population[c])-signed_word(r.before[4].actors[e.target].population[c]);CHECK(delta==e.population_delta);if(action==9||action==14||action==16)CHECK(delta>0);else CHECK(delta<0);if(action==9||action==11||action==12||action==15||action==16)CHECK(e.target==4);if(action==16)CHECK(e.city==4&&e.population_before==60&&delta==60);}});
- group("special sounds retain source rates bounded lengths and arrival gates",[]{MediaEvidence e;e.supported=true;for(Word a:{9,11,12,13,14,15,16}){e.action=a;CHECK(sound_cue(e));SoundGate gate;CHECK(gate.claim(a)&&!gate.claim(a));}e.action=12;auto weight=sound_cue(e);CHECK(std::string(weight->sample)=="16ton"&&weight->period==715&&weight->length==5405);CHECK(!action_sound_ready(e,1.9)&&action_sound_ready(e,2));e.action=16;CHECK(sound_cue(e)->period==300);e.action=15;CHECK(sound_cue(e)->period==1299);});
- group("all new animation replay is presentation only including skip",[]{Player p;main_screen(p);auto before=p.coordinator()->data();for(Word a:{9,11,12,13,14,15,16}){ActionEvent e;e.actor=4;e.action=a;e.caption="Presentation only";auto scene=ActionPresentation::replay_event(e,before.state);scene.tick(1);scene.presented();for(int i=0;i<100;++i)special_sprites(a,4,i*.01,100,90);CHECK(scene.skip());CHECK(same_state(scene.snapshot(),before.state));}CHECK(same_state(before.state,p.coordinator()->data().state)&&before.rng.seed()==p.coordinator()->data().rng.seed());});
+    group("missile mounting centers are independent of city positions", [] {
+        const int x[]{65, 52, 268, 278, 151}, y[]{49, 153, 56, 151, 102};
+        for (unsigned i = 0; i < 5; ++i) {
+            auto o = missile_launch_origin(i);
+            CHECK(o.x == x[i] && o.y == y[i]);
+            auto p = flight_pose(0, o.x, o.y, 170, 100);
+            CHECK(p.x == o.x && p.y == o.y);
+            auto end = flight_pose(1, o.x, o.y, 170, 100);
+            CHECK(end.x == 170 && end.y == 100);
+        }
+    });
+    group("rising city uses attached original missile exhaust, not alien craft", [] {
+        for (double t : {0., .125, .5, 1., 1.9, 2.5}) {
+            auto v = special_sprites(11, 4, t, 80, 100, 30);
+            CHECK(v.size() == 2 && v[0].atlas == Atlas::small && v[1].atlas == Atlas::big);
+            CHECK(v[1].source.x == 0 && v[1].source.y == 208 && v[1].source.w == 16 &&
+                  v[1].source.h == 16);
+            CHECK(v[1].destination.x == v[0].destination.x &&
+                  v[1].destination.y == v[0].destination.y + 16);
+            CHECK(v[1].flip == (int(t * 8) % 2 != 0));
+        }
+        CHECK(special_sprites(11, 4, 3.1, 80, 100).empty());
+        auto alien = special_sprites(16, 4, 1, 80, 100);
+        CHECK(alien.size() == 1 && alien[0].atlas == Atlas::small && alien[0].source.y == 210);
+    });
+    group("special projectile and weight arrive at recorded target without game writes", [] {
+        for (Word a : {9, 12, 13, 14}) {
+            auto sprites = special_sprites(a, 4, a == 9 ? 4 : 2, 40, 120);
+            auto end = sprites.back();
+            CHECK(end.destination.x == 40 && end.destination.y == 120);
+        }
+        auto cow = special_sprites(13, 4, 1, 40, 120);
+        CHECK(cow[0].source.x == 64 && cow[0].source.y == 224 && cow[0].source.w == 32);
+        CHECK(cow[1].source.y == 192 && cow[1].flip);
+        auto human = special_sprites(14, 4, 1, 240, 120);
+        CHECK(!human[1].flip && human[1].source.x < 240);
+        auto stork = special_sprites(9, 4, .1, 40, 120);
+        CHECK(stork[0].source.y == 49 && !stork[0].flip);
+        auto ufo = special_sprites(16, 4, 2, 40, 120);
+        CHECK(ufo[0].source.y == 210 && ufo[0].source.h == 10);
+        auto radiation = special_sprites(15, 2, 1, 40, 120);
+        CHECK(radiation[0].destination.x == 260 && radiation[0].destination.y == 55);
+    });
+    group("special metadata follows effect context and actual population deltas", [] {
+        for (Word action : {9, 11, 12, 13, 14, 15, 16}) {
+            State s;
+            for (auto &a : s.actors) {
+                a.profile = 1;
+                for (int c = 0; c < 5; ++c)
+                    a.population[c] = Word(20 + c * 10);
+            }
+            s.actors[4].action = action;
+            s.actors[4].target_actor = 0;
+            s.actors[4].target_city = 1;
+            s.actors[4].magnitude = 5;
+            auto original = s;
+            auto r = replay_media(s, 123);
+            auto e = r.actions[4];
+            CHECK(same_state(s, original) && e.supported && e.action == action &&
+                  e.population_known);
+            CHECK(e.target < 5 && e.city < 5);
+            std::int32_t delta = 0;
+            for (int c = 0; c < 5; ++c)
+                delta += signed_word(r.after[4].actors[e.target].population[c]) -
+                         signed_word(r.before[4].actors[e.target].population[c]);
+            CHECK(delta == e.population_delta);
+            if (action == 9 || action == 14 || action == 16)
+                CHECK(delta > 0);
+            else
+                CHECK(delta < 0);
+            if (action == 9 || action == 11 || action == 12 || action == 15 || action == 16)
+                CHECK(e.target == 4);
+            if (action == 16)
+                CHECK(e.city == 4 && e.population_before == 60 && delta == 60);
+        }
+    });
+    group("special sounds retain source rates bounded lengths and arrival gates", [] {
+        MediaEvidence e;
+        e.supported = true;
+        for (Word a : {9, 11, 12, 13, 14, 15, 16}) {
+            e.action = a;
+            CHECK(sound_cue(e));
+            SoundGate gate;
+            CHECK(gate.claim(a) && !gate.claim(a));
+        }
+        e.action = 12;
+        auto weight = sound_cue(e);
+        CHECK(std::string(weight->sample) == "16ton" && weight->period == 715 &&
+              weight->length == 5405);
+        CHECK(!action_sound_ready(e, 1.9) && action_sound_ready(e, 2));
+        e.action = 16;
+        CHECK(sound_cue(e)->period == 300);
+        e.action = 15;
+        CHECK(sound_cue(e)->period == 1299);
+    });
+    group("all new animation replay is presentation only including skip", [] {
+        Player p;
+        main_screen(p);
+        auto before = p.coordinator()->data();
+        for (Word a : {9, 11, 12, 13, 14, 15, 16}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = a;
+            e.caption = "Presentation only";
+            auto scene = ActionPresentation::replay_event(e, before.state);
+            scene.tick(1);
+            scene.presented();
+            for (int i = 0; i < 100; ++i)
+                special_sprites(a, 4, i * .01, 100, 90);
+            CHECK(scene.skip());
+            CHECK(same_state(scene.snapshot(), before.state));
+        }
+        CHECK(same_state(before.state, p.coordinator()->data().state) &&
+              before.rng.seed() == p.coordinator()->data().rng.seed());
+    });
 
- group("normal generated specials retain resolved identities and reach original art handlers",[]{for(auto pair:std::array<std::pair<Word,Word>,8>{{{0,9},{19,13},{35,14},{50,12},{76,15},{59,16},{51,11},{37,86}}}){Player p;main_screen(p);CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.command({HumanCommandKind::city_target,0}));CHECK(p.command({HumanCommandKind::propaganda,0}));ActionPresentation scene;scene.observe(p);CHECK(p.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(p.advance_turn(pair.first));scene.observe(p);}bool found=false;for(auto& e:scene.events())if(e.action==pair.second&&e.media.supported){found=true;CHECK((e.action==86||special_art(e.action))&&e.media.population_known&&e.target<5&&e.city<5);CHECK(e.media.result_recorded&&e.outcome==special_event_result(e.media,e.media.result_variant,e.media.result_amount,e.name,p.coordinator()->data().names[e.target]).value_or(std::string{}));auto target=scene.snapshot().actors[e.target];CHECK(e.action==86?!earthquake_sprites(1,target.city_x[e.city],target.city_y[e.city],e.media.population_before).empty():!special_sprites(e.action,e.actor,1,target.city_x[e.city],target.city_y[e.city],e.media.population_before).empty());}CHECK(found&&p.round()==2&&p.diagnostic().empty());}});
+    group("normal generated specials retain resolved identities and reach original art handlers",
+          [] {
+              for (auto pair : std::array<std::pair<Word, Word>, 8>{{{0, 9},
+                                                                     {19, 13},
+                                                                     {35, 14},
+                                                                     {50, 12},
+                                                                     {76, 15},
+                                                                     {59, 16},
+                                                                     {51, 11},
+                                                                     {37, 86}}}) {
+                  Player p;
+                  main_screen(p);
+                  CHECK(p.command({HumanCommandKind::actor_view, 0}));
+                  CHECK(p.command({HumanCommandKind::city_target, 0}));
+                  CHECK(p.command({HumanCommandKind::propaganda, 0}));
+                  ActionPresentation scene;
+                  scene.observe(p);
+                  CHECK(p.confirm_banner());
+                  for (int i = 0; i < 30 && !scene.active(); ++i) {
+                      CHECK(p.advance_turn(pair.first));
+                      scene.observe(p);
+                  }
+                  bool found = false;
+                  for (auto &e : scene.events())
+                      if (e.action == pair.second && e.media.supported) {
+                          found = true;
+                          CHECK((e.action == 86 || special_art(e.action)) &&
+                                e.media.population_known && e.target < 5 && e.city < 5);
+                          CHECK(e.media.result_recorded &&
+                                e.outcome ==
+                                    special_event_result(e.media, e.media.result_variant,
+                                                         e.media.result_amount, e.name,
+                                                         p.coordinator()->data().names[e.target])
+                                        .value_or(std::string{}));
+                          auto target = scene.snapshot().actors[e.target];
+                          CHECK(e.action == 86
+                                    ? !earthquake_sprites(1, target.city_x[e.city],
+                                                          target.city_y[e.city],
+                                                          e.media.population_before)
+                                           .empty()
+                                    : !special_sprites(e.action, e.actor, 1, target.city_x[e.city],
+                                                       target.city_y[e.city],
+                                                       e.media.population_before)
+                                           .empty());
+                      }
+                  CHECK(found && p.round() == 2 && p.diagnostic().empty());
+              }
+          });
 
- group("stork moves at half previous speed with attached bundle and unchanged other events",[]{SpecialTiming old;old.stork_speed=1;for(double t:{0.,.3,.7,1.4,2.5}){auto slow=special_sprites(9,4,2*t,80,100),fast=special_sprites(9,4,t,80,100,1,old);CHECK(slow.size()==fast.size());for(std::size_t i=0;i<slow.size();++i){CHECK(slow[i].destination.x==fast[i].destination.x&&slow[i].destination.y==fast[i].destination.y&&slow[i].flip==fast[i].flip);}}auto attached=special_sprites(9,4,1.2,80,100),released=special_sprites(9,4,1.5,80,100);CHECK(attached[1].destination.x==attached[0].destination.x+6);CHECK(released[1].destination.x==80);CHECK(!special_sprites(9,4,5.9,80,100).empty());CHECK(special_sprites(9,4,6.1,80,100).empty());auto a=special_sprites(13,4,1,80,100),b=special_sprites(13,4,1,80,100,1,old);CHECK(a.back().destination.x==b.back().destination.x&&a.back().destination.y==b.back().destination.y);});
- group("silo and selection bomber use full atlas original frames and masks",[]{auto silo=selection_background(2),runway=selection_background(4);CHECK(silo.x==192&&silo.y==111&&runway.y==31&&runway.w==124&&runway.h==80);auto first=selection_sprites(2,0),opened=selection_sprites(2,1),smoke=selection_sprites(2,1.2);CHECK(first[0].source.x==0&&first[0].source.y==96&&first[0].source.w==64);CHECK(opened[0].source.x==128&&opened[0].source.y==112);CHECK(smoke.size()==2&&smoke[1].source.x==64&&smoke[1].source.y==128);CHECK(first[0].atlas==Atlas::large);auto entry=selection_sprites(4,0),turn=selection_sprites(4,1.5),depart=selection_sprites(4,2.5);CHECK(entry[0].destination.x==160&&entry[0].destination.y==139);CHECK(turn[0].destination.x==92&&turn[0].destination.y==71);CHECK(depart[0].destination.x>92);CHECK(selection_sprites(4,3).empty());});
- group("accepted selection cues never commit inventory and switching view clears cue",[]{Player p;main_screen(p);auto missiles=p.coordinator()->data().state.actors[4].missiles;CHECK(p.command({HumanCommandKind::missile,1}));CHECK(p.selection_visual_action()==2&&p.selection_visual_serial()==1);CHECK(p.coordinator()->data().state.actors[4].missiles==missiles);CHECK(p.command({HumanCommandKind::actor_view,0}));CHECK(p.selection_visual_action()==0);auto serial=p.selection_visual_serial();CHECK(p.command({HumanCommandKind::missile,4}));CHECK(p.selection_visual_serial()==serial&&p.selection_visual_action()==0);session::Data d(1,true);initialize_state(d.state,0,d.rng);d.state.actors[4].bombers[0]=1;auto bomber=Player::developer_session(d);CHECK(bomber.advance_turn(1));auto before=bomber.coordinator()->data().state.actors[4].bombers;CHECK(bomber.command({HumanCommandKind::bomber,1}));CHECK(bomber.selection_visual_action()==4&&bomber.selection_visual_serial()==1);CHECK(bomber.coordinator()->data().state.actors[4].bombers==before);});
- group("action line is instant single-line with full text and separate typewriter",[]{ActionEvent e;e.caption="Entire bottom message\nwith original words";auto scene=ActionPresentation::replay_event(e,State{});scene.tick(0);CHECK(scene.text_complete());CHECK(scene.visible_text()=="Entire bottom message with original words");CHECK(action_glyph_scale(100)<1&&action_glyph_scale(20)==1);e.region=EventRegion::human_console;e.production_heading="Human text still types";auto console=ActionPresentation::replay_event(e,State{});console.typing_speed(1);console.tick(.1);CHECK(!console.text_complete()&&console.visible_text().empty());});
- group("missile and bomber automatically reveal result and keep it until ordinary click",[]{for(Word action:{1,5}){ActionEvent e;e.action=action;e.caption="Attack announced";e.outcome="Original attack result";e.media.supported=true;e.media.action=action;e.media.effect=6;auto scene=ActionPresentation::replay_event(e,State{});scene.tick(.1);CHECK(scene.visible_text()==e.caption);scene.presented();scene.tick(action==1?3.9:4.5);CHECK(scene.automatic_result()&&scene.visible_text()==e.outcome);CHECK(scene.active()&&!scene.rendered());scene.presented();scene.tick(10);CHECK(scene.active()&&scene.visible_text()==e.outcome);scene.presented();CHECK(scene.click(1000));CHECK(!scene.active());}});
- group("default clock policy is single configured PAL-clock value not sample Hz",[]{CHECK(DEFAULT_AUDIO_CLOCK==3546895);CHECK(DEFAULT_AUDIO_CLOCK/715>4900&&DEFAULT_AUDIO_CLOCK/715<5000);CHECK(DEFAULT_STORK_SPEED==.5);});
+    group("stork moves at half previous speed with attached bundle and unchanged other events", [] {
+        SpecialTiming old;
+        old.stork_speed = 1;
+        for (double t : {0., .3, .7, 1.4, 2.5}) {
+            auto slow = special_sprites(9, 4, 2 * t, 80, 100),
+                 fast = special_sprites(9, 4, t, 80, 100, 1, old);
+            CHECK(slow.size() == fast.size());
+            for (std::size_t i = 0; i < slow.size(); ++i) {
+                CHECK(slow[i].destination.x == fast[i].destination.x &&
+                      slow[i].destination.y == fast[i].destination.y &&
+                      slow[i].flip == fast[i].flip);
+            }
+        }
+        auto attached = special_sprites(9, 4, 1.2, 80, 100),
+             released = special_sprites(9, 4, 1.5, 80, 100);
+        CHECK(attached[1].destination.x == attached[0].destination.x + 6);
+        CHECK(released[1].destination.x == 80);
+        CHECK(!special_sprites(9, 4, 5.9, 80, 100).empty());
+        CHECK(special_sprites(9, 4, 6.1, 80, 100).empty());
+        auto a = special_sprites(13, 4, 1, 80, 100), b = special_sprites(13, 4, 1, 80, 100, 1, old);
+        CHECK(a.back().destination.x == b.back().destination.x &&
+              a.back().destination.y == b.back().destination.y);
+    });
+    group("silo and selection bomber use full atlas original frames and masks", [] {
+        auto silo = selection_background(2), runway = selection_background(4);
+        CHECK(silo.x == 192 && silo.y == 111 && runway.y == 31 && runway.w == 124 &&
+              runway.h == 80);
+        auto first = selection_sprites(2, 0), opened = selection_sprites(2, 1),
+             smoke = selection_sprites(2, 1.2);
+        CHECK(first[0].source.x == 0 && first[0].source.y == 96 && first[0].source.w == 64);
+        CHECK(opened[0].source.x == 128 && opened[0].source.y == 112);
+        CHECK(smoke.size() == 2 && smoke[1].source.x == 64 && smoke[1].source.y == 128);
+        CHECK(first[0].atlas == Atlas::large);
+        auto entry = selection_sprites(4, 0), turn = selection_sprites(4, 1.5),
+             depart = selection_sprites(4, 2.5);
+        CHECK(entry[0].destination.x == 160 && entry[0].destination.y == 139);
+        CHECK(turn[0].destination.x == 92 && turn[0].destination.y == 71);
+        CHECK(depart[0].destination.x > 92);
+        CHECK(selection_sprites(4, 3).empty());
+    });
+    group("accepted selection cues never commit inventory and switching view clears cue", [] {
+        Player p;
+        main_screen(p);
+        auto missiles = p.coordinator()->data().state.actors[4].missiles;
+        CHECK(p.command({HumanCommandKind::missile, 1}));
+        CHECK(p.selection_visual_action() == 2 && p.selection_visual_serial() == 1);
+        CHECK(p.coordinator()->data().state.actors[4].missiles == missiles);
+        CHECK(p.command({HumanCommandKind::actor_view, 0}));
+        CHECK(p.selection_visual_action() == 0);
+        auto serial = p.selection_visual_serial();
+        CHECK(p.command({HumanCommandKind::missile, 4}));
+        CHECK(p.selection_visual_serial() == serial && p.selection_visual_action() == 0);
+        session::Data d(1, true);
+        initialize_state(d.state, 0, d.rng);
+        d.state.actors[4].bombers[0] = 1;
+        auto bomber = Player::developer_session(d);
+        CHECK(bomber.advance_turn(1));
+        auto before = bomber.coordinator()->data().state.actors[4].bombers;
+        CHECK(bomber.command({HumanCommandKind::bomber, 1}));
+        CHECK(bomber.selection_visual_action() == 4 && bomber.selection_visual_serial() == 1);
+        CHECK(bomber.coordinator()->data().state.actors[4].bombers == before);
+    });
+    group("action line is instant single-line with full text and separate typewriter", [] {
+        ActionEvent e;
+        e.caption = "Entire bottom message\nwith original words";
+        auto scene = ActionPresentation::replay_event(e, State{});
+        scene.tick(0);
+        CHECK(scene.text_complete());
+        CHECK(scene.visible_text() == "Entire bottom message with original words");
+        CHECK(action_glyph_scale(100) < 1 && action_glyph_scale(20) == 1);
+        e.region = EventRegion::human_console;
+        e.production_heading = "Human text still types";
+        auto console = ActionPresentation::replay_event(e, State{});
+        console.typing_speed(1);
+        console.tick(.1);
+        CHECK(!console.text_complete() && console.visible_text().empty());
+    });
+    group("missile and bomber automatically reveal result and keep it until ordinary click", [] {
+        for (Word action : {1, 5}) {
+            ActionEvent e;
+            e.action = action;
+            e.caption = "Attack announced";
+            e.outcome = "Original attack result";
+            e.media.supported = true;
+            e.media.action = action;
+            e.media.effect = 6;
+            auto scene = ActionPresentation::replay_event(e, State{});
+            scene.tick(.1);
+            CHECK(scene.visible_text() == e.caption);
+            scene.presented();
+            scene.tick(action == 1 ? 3.9 : 4.5);
+            CHECK(scene.automatic_result() && scene.visible_text() == e.outcome);
+            CHECK(scene.active() && !scene.rendered());
+            scene.presented();
+            scene.tick(10);
+            CHECK(scene.active() && scene.visible_text() == e.outcome);
+            scene.presented();
+            CHECK(scene.click(1000));
+            CHECK(!scene.active());
+        }
+    });
+    group("default clock policy is single configured PAL-clock value not sample Hz", [] {
+        CHECK(DEFAULT_AUDIO_CLOCK == 3546895);
+        CHECK(DEFAULT_AUDIO_CLOCK / 715 > 4900 && DEFAULT_AUDIO_CLOCK / 715 < 5000);
+        CHECK(DEFAULT_STORK_SPEED == .5);
+    });
 
- group("human death and AI-only scenes autoplay without a human console to real ending",[]{for(int mode=0;mode<3;++mode){bool human=mode==2;auto p=Player::developer_session(endgame_fixture(human,mode==1?1:3));ActionPresentation scene;scene.transitions(true);unsigned ticks=0,inputs=0,scenes=0;bool dead=!human;std::uint64_t last_serial=0;for(;ticks<15000&&(!p.ended()||scene.active());++ticks){if(!scene.active()){if(p.coordinator()->phase()==session::Phase::human_selection){CHECK(p.human_alive()&&!dead);++inputs;CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());}if(!p.ended())CHECK(p.advance_turn(Word(p.round()*37+1)));scene.observe(p);}if(!p.human_alive())dead=true;if(dead){CHECK(p.coordinator()->phase()!=session::Phase::human_selection);CHECK(!scene.human_console());}if(scene.active()){if(scene.serial()!=last_serial){last_serial=scene.serial();++scenes;for(auto& e:scene.events()){CHECK(e.region!=EventRegion::human_console||p.human_alive());CHECK(e.caption.find("not dispatched")==std::string::npos&&e.caption.find("No active action")==std::string::npos);} }auto data=p.coordinator()->data();scene.tick(.1);scene.presented();CHECK(same_state(data.state,p.coordinator()->data().state)&&data.rng.seed()==p.coordinator()->data().rng.seed());if(!scene.autoplay()&&!scene.transition_active()&&scene.animation_complete()){scene.presented();scene.next();}}}CHECK(ticks<15000&&p.ended()&&!p.human_alive());CHECK(inputs==(human?1u:0u));CHECK(living_actors(p.coordinator()->data().state)==(mode==1?1u:0u));CHECK(p.coordinator()->data().rng.seed()==(human?4091754757u:mode==1?727447730u:218270086u));CHECK(scenes==(human?3u:1u));}});
+    group("human death and AI-only scenes autoplay without a human console to real ending", [] {
+        for (int mode = 0; mode < 3; ++mode) {
+            bool human = mode == 2;
+            auto p = Player::developer_session(endgame_fixture(human, mode == 1 ? 1 : 3));
+            ActionPresentation scene;
+            scene.transitions(true);
+            unsigned ticks = 0, inputs = 0, scenes = 0;
+            bool dead = !human;
+            std::uint64_t last_serial = 0;
+            for (; ticks < 15000 && (!p.ended() || scene.active()); ++ticks) {
+                if (!scene.active()) {
+                    if (p.coordinator()->phase() == session::Phase::human_selection) {
+                        CHECK(p.human_alive() && !dead);
+                        ++inputs;
+                        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+                    }
+                    if (!p.ended())
+                        CHECK(p.advance_turn(Word(p.round() * 37 + 1)));
+                    scene.observe(p);
+                }
+                if (!p.human_alive())
+                    dead = true;
+                if (dead) {
+                    CHECK(p.coordinator()->phase() != session::Phase::human_selection);
+                    CHECK(!scene.human_console());
+                }
+                if (scene.active()) {
+                    if (scene.serial() != last_serial) {
+                        last_serial = scene.serial();
+                        ++scenes;
+                        for (auto &e : scene.events()) {
+                            CHECK(e.region != EventRegion::human_console || p.human_alive());
+                            CHECK(e.caption.find("not dispatched") == std::string::npos &&
+                                  e.caption.find("No active action") == std::string::npos);
+                        }
+                    }
+                    auto data = p.coordinator()->data();
+                    scene.tick(.1);
+                    scene.presented();
+                    CHECK(same_state(data.state, p.coordinator()->data().state) &&
+                          data.rng.seed() == p.coordinator()->data().rng.seed());
+                    if (!scene.autoplay() && !scene.transition_active() &&
+                        scene.animation_complete()) {
+                        scene.presented();
+                        scene.next();
+                    }
+                }
+            }
+            CHECK(ticks < 15000 && p.ended() && !p.human_alive());
+            CHECK(inputs == (human ? 1u : 0u));
+            CHECK(living_actors(p.coordinator()->data().state) == (mode == 1 ? 1u : 0u));
+            CHECK(p.coordinator()->data().rng.seed() == (human       ? 4091754757u
+                                                         : mode == 1 ? 727447730u
+                                                                     : 218270086u));
+            CHECK(scenes == (human ? 3u : 1u));
+        }
+    });
 
- group("session presentation cannot freeze AI plans before resolver and survivor boundary",[]{auto p=Player::developer_session(endgame_fixture(true));ActionPresentation scene;CHECK(p.advance_turn(1));scene.observe(p);CHECK(!scene.active());CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());CHECK(p.advance_turn(75));scene.observe(p);CHECK(p.coordinator()->phase()==session::Phase::attitudes&&!scene.active());for(int i=0;i<20&&!scene.active();++i){CHECK(p.advance_turn(Word(p.round()*37+1)));scene.observe(p);}CHECK(scene.active()&&!p.human_alive()&&scene.autoplay());CHECK(!populated_cities(scene.snapshot().actors[4]));for(auto& e:scene.events())CHECK(e.region!=EventRegion::human_console);});
+    group("session presentation cannot freeze AI plans before resolver and survivor boundary", [] {
+        auto p = Player::developer_session(endgame_fixture(true));
+        ActionPresentation scene;
+        CHECK(p.advance_turn(1));
+        scene.observe(p);
+        CHECK(!scene.active());
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        CHECK(p.advance_turn(75));
+        scene.observe(p);
+        CHECK(p.coordinator()->phase() == session::Phase::attitudes && !scene.active());
+        for (int i = 0; i < 20 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(Word(p.round() * 37 + 1)));
+            scene.observe(p);
+        }
+        CHECK(scene.active() && !p.human_alive() && scene.autoplay());
+        CHECK(!populated_cities(scene.snapshot().actors[4]));
+        for (auto &e : scene.events())
+            CHECK(e.region != EventRegion::human_console);
+    });
 
- group("doors belong only to human entry exit and obsolete starts cannot replay",[]{State s;ActionEvent e;e.caption="Action";auto scene=ActionPresentation::replay_event(e,s);scene.transitions(true);scene.begin_transition();CHECK(scene.door_owner()==DoorOwner::human_exit&&scene.scene_id()==SceneId::human_exit&&!scene.show_action_map());for(int i=0;i<10;++i)CHECK(!scene.click(1000+i));scene.tick(door_seconds);scene.presented();CHECK(scene.scene_id()==SceneId::action&&!scene.door_visible());scene.begin_transition();CHECK(!scene.transition_active());scene.tick(2);scene.presented();CHECK(scene.next());CHECK(scene.door_owner()==DoorOwner::human_entry);scene.constrain_door_owner(false);CHECK(!scene.active()&&!scene.door_visible());scene.begin_transition();CHECK(!scene.transition_active());auto other=ActionPresentation::replay_event(e,s);other.transitions(true);other.constrain_door_owner(false);other.begin_transition();CHECK(!other.door_visible()&&other.show_action_map());e.region=EventRegion::speech;auto speech=ActionPresentation::replay_event(e,s);speech.transitions(true);speech.begin_transition();CHECK(!speech.transition_active());});
- group("AI-only presentation has no human shutters including skips and repeated starts",[]{auto p=Player::developer_session(endgame_fixture());ActionPresentation scene;scene.transitions(true);for(int step=0;step<1000&&(!p.ended()||scene.active());++step){if(!scene.active()&&!p.ended()){CHECK(p.advance_turn(Word(p.round()*37+1)));scene.observe(p);}scene.constrain_door_owner(p.human_alive());scene.begin_transition();CHECK(!scene.door_visible()&&!scene.transition_active());if(scene.active()){scene.tick(.5);scene.presented();}}CHECK(p.ended());CHECK(p.coordinator()->data().rng.seed()==218270086u);});
- group("original signed city sprite mapping covers every 16 bit population",[]{for(unsigned raw=0;raw<65536;++raw)CHECK(city_frame(Word(raw))==original_city_icon(Word(raw)));CHECK(city_frame(0x8000)==150&&city_frame(0xffff)==150);CHECK(city_frame(59)==224&&city_frame(60)==151);});
- group("closing doors retain pre-resolver cities and action snapshots advance without rewinding",[]{Player p;
-main_screen(p);
-ActionPresentation scene;scene.transitions(true);scene.observe(p);
-for(int round=0;
-round<4;
-++round){
-scene.observe(p);auto committed_before=p.display_state();
-CHECK(p.command({HumanCommandKind::production,0}));
-CHECK(p.confirm_banner());
-for(int step=0;
-step<30&&!scene.active();
-++step){CHECK(p.advance_turn(123));
-scene.observe(p);
-}CHECK(scene.active()&&scene.door_visible());
-State before;
-bool found=false;
-for(auto& e:p.coordinator()->events())if(e.to==session::Phase::resolver_handoff){before=e.state_after;
-found=true;
-}CHECK(found);
-for(int a=0;
-a<5;
-++a)CHECK(scene.transition_state().actors[a].population==committed_before.actors[a].population);
-scene.tick(door_seconds);
-scene.presented();
-State last=before;
-auto live=p.coordinator()->data();
-while(scene.active()){if(scene.transition_active()){CHECK(!scene.show_action_map());
-scene.tick(door_seconds);
-scene.presented();
-continue;
-}if(scene.event().region==EventRegion::action){for(int a=0;
-a<5;
-++a)CHECK(scene.visual_state().actors[a].population==last.actors[a].population);
-scene.tick(10);
-last=scene.visual_state();
-for(auto& actor:last.actors)for(auto pop:actor.population)CHECK(city_frame(pop)==original_city_icon(pop));
-}scene.presented();
-scene.next();
-}for(int a=0;
-a<5;
-++a)CHECK(last.actors[a].population==live.state.actors[a].population);
-CHECK(same_state(live.state,p.coordinator()->data().state)&&live.rng.seed()==p.coordinator()->data().rng.seed());
-}});
+    group("doors belong only to human entry exit and obsolete starts cannot replay", [] {
+        State s;
+        ActionEvent e;
+        e.caption = "Action";
+        auto scene = ActionPresentation::replay_event(e, s);
+        scene.transitions(true);
+        scene.begin_transition();
+        CHECK(scene.door_owner() == DoorOwner::human_exit &&
+              scene.scene_id() == SceneId::human_exit && !scene.show_action_map());
+        for (int i = 0; i < 10; ++i)
+            CHECK(!scene.click(1000 + i));
+        scene.tick(door_seconds);
+        scene.presented();
+        CHECK(scene.scene_id() == SceneId::action && !scene.door_visible());
+        scene.begin_transition();
+        CHECK(!scene.transition_active());
+        scene.tick(2);
+        scene.presented();
+        CHECK(scene.next());
+        CHECK(scene.door_owner() == DoorOwner::human_entry);
+        scene.constrain_door_owner(false);
+        CHECK(!scene.active() && !scene.door_visible());
+        scene.begin_transition();
+        CHECK(!scene.transition_active());
+        auto other = ActionPresentation::replay_event(e, s);
+        other.transitions(true);
+        other.constrain_door_owner(false);
+        other.begin_transition();
+        CHECK(!other.door_visible() && other.show_action_map());
+        e.region = EventRegion::speech;
+        auto speech = ActionPresentation::replay_event(e, s);
+        speech.transitions(true);
+        speech.begin_transition();
+        CHECK(!speech.transition_active());
+    });
+    group("AI-only presentation has no human shutters including skips and repeated starts", [] {
+        auto p = Player::developer_session(endgame_fixture());
+        ActionPresentation scene;
+        scene.transitions(true);
+        for (int step = 0; step < 1000 && (!p.ended() || scene.active()); ++step) {
+            if (!scene.active() && !p.ended()) {
+                CHECK(p.advance_turn(Word(p.round() * 37 + 1)));
+                scene.observe(p);
+            }
+            scene.constrain_door_owner(p.human_alive());
+            scene.begin_transition();
+            CHECK(!scene.door_visible() && !scene.transition_active());
+            if (scene.active()) {
+                scene.tick(.5);
+                scene.presented();
+            }
+        }
+        CHECK(p.ended());
+        CHECK(p.coordinator()->data().rng.seed() == 218270086u);
+    });
+    group("original signed city sprite mapping covers every 16 bit population", [] {
+        for (unsigned raw = 0; raw < 65536; ++raw)
+            CHECK(city_frame(Word(raw)) == original_city_icon(Word(raw)));
+        CHECK(city_frame(0x8000) == 150 && city_frame(0xffff) == 150);
+        CHECK(city_frame(59) == 224 && city_frame(60) == 151);
+    });
+    group("closing doors retain pre-resolver cities and action snapshots advance without rewinding",
+          [] {
+              Player p;
+              main_screen(p);
+              ActionPresentation scene;
+              scene.transitions(true);
+              scene.observe(p);
+              for (int round = 0; round < 4; ++round) {
+                  scene.observe(p);
+                  auto committed_before = p.display_state();
+                  CHECK(p.command({HumanCommandKind::production, 0}));
+                  CHECK(p.confirm_banner());
+                  for (int step = 0; step < 30 && !scene.active(); ++step) {
+                      CHECK(p.advance_turn(123));
+                      scene.observe(p);
+                  }
+                  CHECK(scene.active() && scene.door_visible());
+                  State before;
+                  bool found = false;
+                  for (auto &e : p.coordinator()->events())
+                      if (e.to == session::Phase::resolver_handoff) {
+                          before = e.state_after;
+                          found = true;
+                      }
+                  CHECK(found);
+                  for (int a = 0; a < 5; ++a)
+                      CHECK(scene.transition_state().actors[a].population ==
+                            committed_before.actors[a].population);
+                  scene.tick(door_seconds);
+                  scene.presented();
+                  State last = before;
+                  auto live = p.coordinator()->data();
+                  while (scene.active()) {
+                      if (scene.transition_active()) {
+                          CHECK(!scene.show_action_map());
+                          scene.tick(door_seconds);
+                          scene.presented();
+                          continue;
+                      }
+                      if (scene.event().region == EventRegion::action) {
+                          for (int a = 0; a < 5; ++a)
+                              CHECK(scene.visual_state().actors[a].population ==
+                                    last.actors[a].population);
+                          scene.tick(10);
+                          last = scene.visual_state();
+                          for (auto &actor : last.actors)
+                              for (auto pop : actor.population)
+                                  CHECK(city_frame(pop) == original_city_icon(pop));
+                      }
+                      scene.presented();
+                      scene.next();
+                  }
+                  for (int a = 0; a < 5; ++a)
+                      CHECK(last.actors[a].population == live.state.actors[a].population);
+                  CHECK(same_state(live.state, p.coordinator()->data().state) &&
+                        live.rng.seed() == p.coordinator()->data().rng.seed());
+              }
+          });
 
- group("view switching keeps stable city ownership and population while deriving sprites",[]{Player p;main_screen(p);auto before=p.coordinator()->data().state;for(Word a:{0,1,2,3,4,3,0}){CHECK(p.command({HumanCommandKind::actor_view,a}));for(int actor=0;actor<5;++actor){CHECK(p.coordinator()->data().state.actors[actor].population==before.actors[actor].population);for(int city=0;city<5;++city){auto r=p.city_rect(actor,city);CHECK(r.w==16&&r.h==16);CHECK(city_frame(before.actors[actor].population[city])==original_city_icon(before.actors[actor].population[city]));}}}});
+    group("view switching keeps stable city ownership and population while deriving sprites", [] {
+        Player p;
+        main_screen(p);
+        auto before = p.coordinator()->data().state;
+        for (Word a : {0, 1, 2, 3, 4, 3, 0}) {
+            CHECK(p.command({HumanCommandKind::actor_view, a}));
+            for (int actor = 0; actor < 5; ++actor) {
+                CHECK(p.coordinator()->data().state.actors[actor].population ==
+                      before.actors[actor].population);
+                for (int city = 0; city < 5; ++city) {
+                    auto r = p.city_rect(actor, city);
+                    CHECK(r.w == 16 && r.h == 16);
+                    CHECK(city_frame(before.actors[actor].population[city]) ==
+                          original_city_icon(before.actors[actor].population[city]));
+                }
+            }
+        }
+    });
 
- group("new session invalidates old shutters and attachment cannot replay old rounds",[]{ActionPresentation scene;scene.transitions(true);Player first;main_screen(first);scene.observe(first);CHECK(first.command({HumanCommandKind::production,0})&&first.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(first.advance_turn(123));scene.observe(first);}CHECK(scene.door_visible());auto old=scene.serial();Player title;scene.observe(title);CHECK(!scene.active()&&!scene.door_visible());main_screen(title);scene.observe(title);CHECK(!scene.active());scene.begin_transition(old);CHECK(!scene.door_visible());CHECK(title.command({HumanCommandKind::production,0})&&title.confirm_banner());for(int i=0;i<30&&!scene.active();++i){CHECK(title.advance_turn(123));scene.observe(title);}CHECK(scene.serial()>old&&scene.door_visible());scene.presented();CHECK(scene.skip());ActionPresentation fresh;fresh.transitions(true);fresh.observe(title);CHECK(!fresh.active());});
+    group("new session invalidates old shutters and attachment cannot replay old rounds", [] {
+        ActionPresentation scene;
+        scene.transitions(true);
+        Player first;
+        main_screen(first);
+        scene.observe(first);
+        CHECK(first.command({HumanCommandKind::production, 0}) && first.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(first.advance_turn(123));
+            scene.observe(first);
+        }
+        CHECK(scene.door_visible());
+        auto old = scene.serial();
+        Player title;
+        scene.observe(title);
+        CHECK(!scene.active() && !scene.door_visible());
+        main_screen(title);
+        scene.observe(title);
+        CHECK(!scene.active());
+        scene.begin_transition(old);
+        CHECK(!scene.door_visible());
+        CHECK(title.command({HumanCommandKind::production, 0}) && title.confirm_banner());
+        for (int i = 0; i < 30 && !scene.active(); ++i) {
+            CHECK(title.advance_turn(123));
+            scene.observe(title);
+        }
+        CHECK(scene.serial() > old && scene.door_visible());
+        scene.presented();
+        CHECK(scene.skip());
+        ActionPresentation fresh;
+        fresh.transitions(true);
+        fresh.observe(title);
+        CHECK(!fresh.active());
+    });
 
- group("live resolver populations commit once while pending viewport stays pre-round",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());for(int i=0;i<10&&p.coordinator()->phase()!=session::Phase::resolver_handoff;++i){CHECK(p.advance_turn(123));scene.observe(p);}CHECK(p.coordinator()->phase()==session::Phase::resolver_handoff);auto before=p.display_state();CHECK(p.advance_turn(123));scene.observe(p);CHECK(!scene.active());auto live=p.coordinator()->data();bool changed=false;for(int a=0;a<5;++a){CHECK(scene.interface_state(live.state).actors[a].population==before.actors[a].population);if(before.actors[a].population!=live.state.actors[a].population)changed=true;}CHECK(changed);for(int i=0;i<100;++i)for(int a=0;a<5;++a)for(auto population:scene.interface_state(live.state).actors[a].population)CHECK(city_frame(population)==original_city_icon(population));CHECK(same_state(live.state,p.coordinator()->data().state)&&live.rng.seed()==p.coordinator()->data().rng.seed());});
+    group("live resolver populations commit once while pending viewport stays pre-round", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        for (int i = 0; i < 10 && p.coordinator()->phase() != session::Phase::resolver_handoff;
+             ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        CHECK(p.coordinator()->phase() == session::Phase::resolver_handoff);
+        auto before = p.display_state();
+        CHECK(p.advance_turn(123));
+        scene.observe(p);
+        CHECK(!scene.active());
+        auto live = p.coordinator()->data();
+        bool changed = false;
+        for (int a = 0; a < 5; ++a) {
+            CHECK(scene.interface_state(live.state).actors[a].population ==
+                  before.actors[a].population);
+            if (before.actors[a].population != live.state.actors[a].population)
+                changed = true;
+        }
+        CHECK(changed);
+        for (int i = 0; i < 100; ++i)
+            for (int a = 0; a < 5; ++a)
+                for (auto population : scene.interface_state(live.state).actors[a].population)
+                    CHECK(city_frame(population) == original_city_icon(population));
+        CHECK(same_state(live.state, p.coordinator()->data().state) &&
+              live.rng.seed() == p.coordinator()->data().rng.seed());
+    });
 
- group("initial scores and human declarations produce neutral faces and235 for all AI",[]{Player p;main_screen(p);for(std::size_t a=0;a<4;++a){auto pose=portrait_mood(p.coordinator()->data().state,a,0);CHECK(pose.raw_bucket==0&&pose.display_bucket==0&&pose.base_frame==2&&pose.frame==2);CHECK(pose.indicator&&*pose.indicator==235);CHECK(pose.animation==FaceState::neutral_static);}});
- group("five exact score buckets and profile4 display inversion never alter scores",[]{State s;for(auto& a:s.actors)a.population[0]=20;const int scores[]{-32768,-18001,-18000,-9001,-9000,0,9000,9001,18000,18001,32767};const int buckets[]{-2,-2,-1,-1,0,0,0,1,1,2,2};for(int profile=0;profile<5;++profile)for(int j=0;j<11;++j){s.actors[0].profile=Word(profile);s.actors[0].scores[4]=Word(scores[j]);auto before=s;auto p=portrait_mood(s,0,0);CHECK(p.raw_bucket==buckets[j]);CHECK(p.display_bucket==(profile==4?-buckets[j]:buckets[j]));CHECK(p.frame==2+p.display_bucket&&p.base_frame==p.frame);CHECK(same_state(before,s));}});
- group("mood envelopes remain on correct neutral half and speaking cannot overwrite mood",[]{for(int bucket=-2;bucket<=2;++bucket){bool base=false,neutral=false;for(int t=0;t<1000;++t){int frame=mood_frame(bucket,t*.01);CHECK(frame>=std::min(2,2+bucket)&&frame<=std::max(2,2+bucket));base|=frame==2+bucket;neutral|=frame==2;}CHECK(base&&neutral);}State s;s.actors[0].population[0]=20;s.actors[0].scores[4]=Word(-20000);for(int t=0;t<100;++t){auto normal=portrait_mood(s,0,t*.01),speech=portrait_mood(s,0,t*.01,true),after=portrait_mood(s,0,t*.01,false);CHECK(normal.frame==speech.frame&&speech.frame==after.frame);CHECK(speech.speaking&&!after.speaking);}});
- group("identity source rectangles remain original32 pixel crops for every mood",[]{State s;s.actors[0].population[0]=20;for(Word id=0;id<10;++id)for(int bucket=-2;bucket<=2;++bucket){s.identity[0]=id;s.actors[0].profile=Word(player_assets::profiles[id]);s.actors[0].scores[4]=Word(bucket*10000);auto pose=portrait_mood(s,0,0);CHECK(pose.source.x==int(id%2)*160+pose.frame*32&&pose.source.y==int(id/2)*32);CHECK(pose.source.w==32&&pose.source.h==32&&pose.source.x+32<=320&&pose.source.y+32<=160);}});
- group("per actor mood clocks independent and reset on identity or true mood change only",[]{State s;for(auto& a:s.actors)a.population[0]=20;s.actors[0].scores[4]=20000;s.actors[1].scores[4]=Word(-20000);MoodClocks clocks;CHECK(clocks.pose(s,0,0).base_frame==4&&clocks.pose(s,1,0).base_frame==0);auto a=clocks.pose(s,0,1.2);s.actors[1].scores[4]=12000;CHECK(clocks.pose(s,0,1.2).frame==a.frame);CHECK(clocks.pose(s,1,1.2).frame==3);s.actors[0].scores[4]=0;CHECK(clocks.pose(s,0,5).frame==2&&clocks.pose(s,0,100).frame==2);s.actors[0].population={};auto dead=clocks.pose(s,0,101);CHECK(dead.animation==FaceState::eliminated&&!dead.indicator);});
- group("original emoji left press cycle changes only chosen human byte no RNG or turn",[]{for(Word actor=0;actor<4;++actor){Player p;main_screen(p);auto baseline=p.coordinator()->data();auto welcome=p.messages();const int sequence[]{-1,-2,2,1,0};for(int value:sequence){auto expected=p.coordinator()->data().state;cycle_human_classification(expected,actor);CHECK(p.click(actor<2?45:296,actor%2?154:5));const auto& actual=p.coordinator()->data();CHECK(same_state(expected,actual.state)&&actual.rng.seed()==baseline.rng.seed());CHECK(signed_byte(actual.state.actors[4].classifications[actor])==value);CHECK(*mood_indicator(actual.state,actor)==235+value);CHECK(actual.human.selection.pending_action==baseline.human.selection.pending_action&&p.coordinator()->phase()==session::Phase::human_selection);CHECK(p.messages()==welcome);}CHECK(same_state(baseline.state,p.coordinator()->data().state));}});
- group("mood controls preserve selected weapon console and inventory",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::missile,1}));auto before=p.coordinator()->data();auto messages=p.messages();auto serial=p.selection_visual_serial();CHECK(p.click(45,5));CHECK(p.selection_visual_action()==2&&p.selection_visual_serial()==serial);CHECK(p.messages()==messages&&p.coordinator()->data().rng.seed()==before.rng.seed());CHECK(p.coordinator()->data().state.actors[4].missiles==before.state.actors[4].missiles&&p.coordinator()->data().human.selection.pending_action==2);});
- group("classification response occurs after original planning with unchanged AI and RNG",[]{Player p;main_screen(p);CHECK(p.click(45,5));auto before=p.coordinator()->data();CHECK(before.state.actors[0].scores[4]==0);CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());auto expected=p.coordinator()->data();ai_turn(expected.state,expected.rng);CHECK(p.advance_turn(123));CHECK(same_state(expected.state,p.coordinator()->data().state)&&expected.rng.seed()==p.coordinator()->data().rng.seed());auto score_before=p.coordinator()->data();update_attitudes(expected.state);CHECK(p.advance_turn(123));CHECK(same_state(expected.state,p.coordinator()->data().state)&&expected.rng.seed()==p.coordinator()->data().rng.seed());CHECK(p.coordinator()->data().state.actors[4].classifications[0]==255);CHECK(score_before.rng.seed()==p.coordinator()->data().rng.seed());});
- group("view selection does not rewrite human indicator context or portrait source score",[]{Player p;main_screen(p);CHECK(p.click(45,5));for(Word view:{0,1,2,3,4}){CHECK(p.command({HumanCommandKind::actor_view,view}));auto data=p.coordinator()->data();CHECK(*mood_indicator(data.state,0)==234);auto pose=portrait_mood(data.state,0,0);CHECK(pose.score==data.state.actors[0].scores[4]&&pose.raw_bucket==signed_word(relationship_bucket(pose.score)));CHECK(same_state(data.state,p.coordinator()->data().state)&&data.rng.seed()==p.coordinator()->data().rng.seed());}});
- group("mood limits and eliminated actors do not invent portrait or indicator state",[]{State s;s.actors[0].population[0]=10;s.actors[4].classifications[0]=253;CHECK(!mood_indicator(s,0));s.actors[4].classifications[0]=254;CHECK(*mood_indicator(s,0)==233);s.actors[4].classifications[0]=2;CHECK(*mood_indicator(s,0)==237);s.actors[0].population={};CHECK(!mood_indicator(s,0)&&portrait_mood(s,0,0).animation==FaceState::eliminated);});
+    group("initial scores and human declarations produce neutral faces and235 for all AI", [] {
+        Player p;
+        main_screen(p);
+        for (std::size_t a = 0; a < 4; ++a) {
+            auto pose = portrait_mood(p.coordinator()->data().state, a, 0);
+            CHECK(pose.raw_bucket == 0 && pose.display_bucket == 0 && pose.base_frame == 2 &&
+                  pose.frame == 2);
+            CHECK(pose.indicator && *pose.indicator == 235);
+            CHECK(pose.animation == FaceState::neutral_static);
+        }
+    });
+    group("five exact score buckets and profile4 display inversion never alter scores", [] {
+        State s;
+        for (auto &a : s.actors)
+            a.population[0] = 20;
+        const int scores[]{-32768, -18001, -18000, -9001, -9000, 0,
+                           9000,   9001,   18000,  18001, 32767};
+        const int buckets[]{-2, -2, -1, -1, 0, 0, 0, 1, 1, 2, 2};
+        for (int profile = 0; profile < 5; ++profile)
+            for (int j = 0; j < 11; ++j) {
+                s.actors[0].profile = Word(profile);
+                s.actors[0].scores[4] = Word(scores[j]);
+                auto before = s;
+                auto p = portrait_mood(s, 0, 0);
+                CHECK(p.raw_bucket == buckets[j]);
+                CHECK(p.display_bucket == (profile == 4 ? -buckets[j] : buckets[j]));
+                CHECK(p.frame == 2 + p.display_bucket && p.base_frame == p.frame);
+                CHECK(same_state(before, s));
+            }
+    });
+    group("mood envelopes remain on correct neutral half and speaking cannot overwrite mood", [] {
+        for (int bucket = -2; bucket <= 2; ++bucket) {
+            bool base = false, neutral = false;
+            for (int t = 0; t < 1000; ++t) {
+                int frame = mood_frame(bucket, t * .01);
+                CHECK(frame >= std::min(2, 2 + bucket) && frame <= std::max(2, 2 + bucket));
+                base |= frame == 2 + bucket;
+                neutral |= frame == 2;
+            }
+            CHECK(base && neutral);
+        }
+        State s;
+        s.actors[0].population[0] = 20;
+        s.actors[0].scores[4] = Word(-20000);
+        for (int t = 0; t < 100; ++t) {
+            auto normal = portrait_mood(s, 0, t * .01), speech = portrait_mood(s, 0, t * .01, true),
+                 after = portrait_mood(s, 0, t * .01, false);
+            CHECK(normal.frame == speech.frame && speech.frame == after.frame);
+            CHECK(speech.speaking && !after.speaking);
+        }
+    });
+    group("identity source rectangles remain original32 pixel crops for every mood", [] {
+        State s;
+        s.actors[0].population[0] = 20;
+        for (Word id = 0; id < 10; ++id)
+            for (int bucket = -2; bucket <= 2; ++bucket) {
+                s.identity[0] = id;
+                s.actors[0].profile = Word(player_assets::profiles[id]);
+                s.actors[0].scores[4] = Word(bucket * 10000);
+                auto pose = portrait_mood(s, 0, 0);
+                CHECK(pose.source.x == int(id % 2) * 160 + pose.frame * 32 &&
+                      pose.source.y == int(id / 2) * 32);
+                CHECK(pose.source.w == 32 && pose.source.h == 32 && pose.source.x + 32 <= 320 &&
+                      pose.source.y + 32 <= 160);
+            }
+    });
+    group("per actor mood clocks independent and reset on identity or true mood change only", [] {
+        State s;
+        for (auto &a : s.actors)
+            a.population[0] = 20;
+        s.actors[0].scores[4] = 20000;
+        s.actors[1].scores[4] = Word(-20000);
+        MoodClocks clocks;
+        CHECK(clocks.pose(s, 0, 0).base_frame == 4 && clocks.pose(s, 1, 0).base_frame == 0);
+        auto a = clocks.pose(s, 0, 1.2);
+        s.actors[1].scores[4] = 12000;
+        CHECK(clocks.pose(s, 0, 1.2).frame == a.frame);
+        CHECK(clocks.pose(s, 1, 1.2).frame == 3);
+        s.actors[0].scores[4] = 0;
+        CHECK(clocks.pose(s, 0, 5).frame == 2 && clocks.pose(s, 0, 100).frame == 2);
+        s.actors[0].population = {};
+        auto dead = clocks.pose(s, 0, 101);
+        CHECK(dead.animation == FaceState::eliminated && !dead.indicator);
+    });
+    group("original emoji left press cycle changes only chosen human byte no RNG or turn", [] {
+        for (Word actor = 0; actor < 4; ++actor) {
+            Player p;
+            main_screen(p);
+            auto baseline = p.coordinator()->data();
+            auto welcome = p.messages();
+            const int sequence[]{-1, -2, 2, 1, 0};
+            for (int value : sequence) {
+                auto expected = p.coordinator()->data().state;
+                cycle_human_classification(expected, actor);
+                CHECK(p.click(actor < 2 ? 45 : 296, actor % 2 ? 154 : 5));
+                const auto &actual = p.coordinator()->data();
+                CHECK(same_state(expected, actual.state) &&
+                      actual.rng.seed() == baseline.rng.seed());
+                CHECK(signed_byte(actual.state.actors[4].classifications[actor]) == value);
+                CHECK(*mood_indicator(actual.state, actor) == 235 + value);
+                CHECK(actual.human.selection.pending_action ==
+                          baseline.human.selection.pending_action &&
+                      p.coordinator()->phase() == session::Phase::human_selection);
+                CHECK(p.messages() == welcome);
+            }
+            CHECK(same_state(baseline.state, p.coordinator()->data().state));
+        }
+    });
+    group("mood controls preserve selected weapon console and inventory", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::missile, 1}));
+        auto before = p.coordinator()->data();
+        auto messages = p.messages();
+        auto serial = p.selection_visual_serial();
+        CHECK(p.click(45, 5));
+        CHECK(p.selection_visual_action() == 2 && p.selection_visual_serial() == serial);
+        CHECK(p.messages() == messages && p.coordinator()->data().rng.seed() == before.rng.seed());
+        CHECK(p.coordinator()->data().state.actors[4].missiles == before.state.actors[4].missiles &&
+              p.coordinator()->data().human.selection.pending_action == 2);
+    });
+    group("classification response occurs after original planning with unchanged AI and RNG", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.click(45, 5));
+        auto before = p.coordinator()->data();
+        CHECK(before.state.actors[0].scores[4] == 0);
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        auto expected = p.coordinator()->data();
+        ai_turn(expected.state, expected.rng);
+        CHECK(p.advance_turn(123));
+        CHECK(same_state(expected.state, p.coordinator()->data().state) &&
+              expected.rng.seed() == p.coordinator()->data().rng.seed());
+        auto score_before = p.coordinator()->data();
+        update_attitudes(expected.state);
+        CHECK(p.advance_turn(123));
+        CHECK(same_state(expected.state, p.coordinator()->data().state) &&
+              expected.rng.seed() == p.coordinator()->data().rng.seed());
+        CHECK(p.coordinator()->data().state.actors[4].classifications[0] == 255);
+        CHECK(score_before.rng.seed() == p.coordinator()->data().rng.seed());
+    });
+    group("view selection does not rewrite human indicator context or portrait source score", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.click(45, 5));
+        for (Word view : {0, 1, 2, 3, 4}) {
+            CHECK(p.command({HumanCommandKind::actor_view, view}));
+            auto data = p.coordinator()->data();
+            CHECK(*mood_indicator(data.state, 0) == 234);
+            auto pose = portrait_mood(data.state, 0, 0);
+            CHECK(pose.score == data.state.actors[0].scores[4] &&
+                  pose.raw_bucket == signed_word(relationship_bucket(pose.score)));
+            CHECK(same_state(data.state, p.coordinator()->data().state) &&
+                  data.rng.seed() == p.coordinator()->data().rng.seed());
+        }
+    });
+    group("mood limits and eliminated actors do not invent portrait or indicator state", [] {
+        State s;
+        s.actors[0].population[0] = 10;
+        s.actors[4].classifications[0] = 253;
+        CHECK(!mood_indicator(s, 0));
+        s.actors[4].classifications[0] = 254;
+        CHECK(*mood_indicator(s, 0) == 233);
+        s.actors[4].classifications[0] = 2;
+        CHECK(*mood_indicator(s, 0) == 237);
+        s.actors[0].population = {};
+        CHECK(!mood_indicator(s, 0) && portrait_mood(s, 0, 0).animation == FaceState::eliminated);
+    });
 
- group("verified damage and production relationship events update pose not human intent",[]{State s;for(auto& a:s.actors)a.population[0]=20;s.actors[0].profile=1;CHECK(portrait_mood(s,0,0).base_frame==2);apply_relationship_event(s,4,0,0,10);CHECK(signed_word(s.actors[0].scores[4])==11000&&portrait_mood(s,0,0).base_frame==3);CHECK(*mood_indicator(s,0)==235);apply_relationship_event(s,4,5,4,0);CHECK(signed_word(s.actors[0].scores[4])==7000&&portrait_mood(s,0,0).base_frame==2);CHECK(*mood_indicator(s,0)==235);s.actors[0].scores[4]=Word(-10000);apply_relationship_event(s,4,0,0,1);CHECK(signed_word(s.actors[0].scores[4])==10000&&portrait_mood(s,0,0).base_frame==3);});
- group("new game resets scores and declarations while profile identity mapping persists",[]{State s;for(int i=0;i<4;++i){s.actors[i].profile=Word(player_assets::profiles[i]);s.identity[i]=Word(i);s.actors[i].scores[4]=20000;s.actors[4].classifications[i]=2;}auto ids=s.identity;Rng rng(123);initialize_state(s,0,rng);CHECK(s.identity==ids);for(int i=0;i<4;++i){CHECK(portrait_mood(s,i,0).frame==2&&*mood_indicator(s,i)==235);CHECK(s.actors[i].profile==player_assets::profiles[i]);}});
+    group("verified damage and production relationship events update pose not human intent", [] {
+        State s;
+        for (auto &a : s.actors)
+            a.population[0] = 20;
+        s.actors[0].profile = 1;
+        CHECK(portrait_mood(s, 0, 0).base_frame == 2);
+        apply_relationship_event(s, 4, 0, 0, 10);
+        CHECK(signed_word(s.actors[0].scores[4]) == 11000 &&
+              portrait_mood(s, 0, 0).base_frame == 3);
+        CHECK(*mood_indicator(s, 0) == 235);
+        apply_relationship_event(s, 4, 5, 4, 0);
+        CHECK(signed_word(s.actors[0].scores[4]) == 7000 && portrait_mood(s, 0, 0).base_frame == 2);
+        CHECK(*mood_indicator(s, 0) == 235);
+        s.actors[0].scores[4] = Word(-10000);
+        apply_relationship_event(s, 4, 0, 0, 1);
+        CHECK(signed_word(s.actors[0].scores[4]) == 10000 &&
+              portrait_mood(s, 0, 0).base_frame == 3);
+    });
+    group("new game resets scores and declarations while profile identity mapping persists", [] {
+        State s;
+        for (int i = 0; i < 4; ++i) {
+            s.actors[i].profile = Word(player_assets::profiles[i]);
+            s.identity[i] = Word(i);
+            s.actors[i].scores[4] = 20000;
+            s.actors[4].classifications[i] = 2;
+        }
+        auto ids = s.identity;
+        Rng rng(123);
+        initialize_state(s, 0, rng);
+        CHECK(s.identity == ids);
+        for (int i = 0; i < 4; ++i) {
+            CHECK(portrait_mood(s, i, 0).frame == 2 && *mood_indicator(s, i) == 235);
+            CHECK(s.actors[i].profile == player_assets::profiles[i]);
+        }
+    });
 
- group("selection smiling frames stay neutral to happy without touching game RNG",[]{Player p;auto seed=p.selection().rng.seed();for(Word id=0;id<10;++id){auto face=selection_face_rect(id),panel=portrait_rect(id);CHECK(face.x==panel.x+13&&face.y==panel.y+5&&face.w==32&&face.h==32);std::set<Word> frames;for(int i=0;i<60;++i)frames.insert(smiling_selection_frame(id,i*.05));CHECK(frames==std::set<Word>({0,1,2}));}CHECK(p.selection().rng.seed()==seed);});
- group("title picker selection remains immediate with no shutter owner",[]{Player p;CHECK(p.screen()==Screen::title);CHECK(!target_shutter_owner(p.screen(),true,false,session::Phase::human_selection,false));p.enter_selection();for(Word id:{Word(0),Word(0),Word(0),Word(4),Word(2),Word(7)}){auto r=portrait_rect(id);auto count=p.bleep_serial();CHECK(p.click(r.x+20,r.y+15));CHECK(p.bleep_serial()==count+1);CHECK(!target_shutter_owner(p.screen(),true,false,session::Phase::human_selection,false));}CHECK(p.selection().count==4);CHECK(p.click(110,20)&&p.screen()==Screen::main);CHECK(target_shutter_owner(p.screen(),true,false,p.coordinator()->phase(),false));});
- group("successful character and emoji changes emit one UI bleep cue only",[]{Player p;p.enter_selection();auto r=portrait_rect(0);CHECK(p.click(r.x+20,r.y+10));CHECK(p.bleep_serial()==1&&p.bleep_period()==1200);CHECK(p.click(r.x+20,r.y+10));CHECK(p.bleep_serial()==2&&p.bleep_period()==1700);CHECK(!p.click(80,180)&&p.bleep_serial()==2);main_screen(p);auto seed=p.coordinator()->data().rng.seed();auto before=p.bleep_serial();for(int i=0;i<5;++i)CHECK(p.command({HumanCommandKind::classification,0}));CHECK(p.bleep_serial()==before+5&&p.bleep_period()==700);CHECK(p.coordinator()->data().rng.seed()==seed);CHECK(p.coordinator()->data().state.actors[4].classifications[0]==0);});
- group("powered ascent ends at apex without changing missile trajectory",[]{CHECK(missile_exhaust(0)&&missile_exhaust(.459));CHECK(!missile_exhaust(.5)&&!missile_exhaust(.9)&&!missile_exhaust(1));auto apex=flight_pose(.5,20,150,250,100);CHECK(apex.y<100);CHECK(flight_pose(1,20,150,250,100).x==250&&flight_pose(1,20,150,250,100).y==100);});
- group("defence original announcement restored without type/deployed outcome",[]{State state;MediaEvidence e;e.supported=true;e.action=7;e.magnitude=1;ActionEvent event;event.action=7;event.media=e;event.caption="Gorbachef deploys a defense system.";event.outcome="Defense active";auto scene=ActionPresentation::replay_event(event,state);scene.tick(.5);CHECK(scene.visible_text()==event.caption);CHECK(scene.active()&&defence_animation_active(e,.5));CHECK(!defence_animation_active(e,2));e.action=1;e.effect=13;CHECK(!defence_animation_active(e,2.7)&&defence_animation_active(e,2.8)&&!defence_animation_active(e,4));CHECK(!combat_caption(e).empty());e.effect=6;CHECK(!defence_animation_active(e,3));});
- group("original highscore source format preserves ten rows and rejects bad saves",[]{std::vector<unsigned char> bytes(player_assets::highscores.begin(),player_assets::highscores.end());auto table=EndgamePresentation::parse(bytes);CHECK(table&&(*table)[0].numbers.score==203&&(*table)[0].numbers.population==128&&(*table)[0].numbers.cities==4);CHECK((*table)[9].numbers.score==161);bytes.pop_back();CHECK(!EndgamePresentation::parse(bytes));});
- group("terminal winner Hall inserts exactly once after presentation with no game changes",[]{auto data=endgame_fixture(false,1);data.state.actors[0].population[0]=500;auto p=Player::developer_session(data);for(int i=0;i<30&&!p.ended();++i)CHECK(p.advance_turn(37));CHECK(p.ended());auto before=p.coordinator()->data().state;auto seed=p.coordinator()->data().rng.seed();EndgamePresentation ending;CHECK(!ending.begin(p,true));CHECK(ending.begin(p,false));CHECK(ending.winner()==0&&ending.rank()&&ending.saved());auto expected=end_game_score(before.actors[0]);CHECK(ending.score().score==expected.score);CHECK(ending.rows()[*ending.rank()].name=="Ron");CHECK(!ending.begin(p,false));ending.tick(5);CHECK(ending.hall()&&!ending.editing());CHECK(same_state(before,p.coordinator()->data().state)&&seed==p.coordinator()->data().rng.seed());});
- group("human winner name input is bounded while all-dead never inserts",[]{auto data=endgame_fixture(true,0);data.state.actors[4].population[0]=500;auto p=Player::developer_session(data);CHECK(p.advance_turn(1));CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());for(int i=0;i<30&&!p.ended();++i)CHECK(p.advance_turn(37));CHECK(p.ended());EndgamePresentation ending;CHECK(ending.begin(p,false)&&ending.winner()==4&&ending.editing());ending.tick(1);CHECK(!ending.restart_ready());ending.input("ABCDEFGHIJKLM");CHECK(ending.rows()[*ending.rank()].name=="ABCDEFGHIJ");ending.backspace();ending.input("Z");ending.finish_name();CHECK(ending.saved()&&!ending.editing()&&ending.rows()[*ending.rank()].name=="ABCDEFGHIZ");CHECK(ending.restart_ready());auto none=Player::developer_session(endgame_fixture(false,0));for(int i=0;i<30&&!none.ended();++i)CHECK(none.advance_turn(37));EndgamePresentation empty;CHECK(empty.begin(none,false)&&empty.winner()==-1&&!empty.rank()&&!empty.saved());empty.tick(1);CHECK(empty.restart_ready());});
+    group("selection smiling frames stay neutral to happy without touching game RNG", [] {
+        Player p;
+        auto seed = p.selection().rng.seed();
+        for (Word id = 0; id < 10; ++id) {
+            auto face = selection_face_rect(id), panel = portrait_rect(id);
+            CHECK(face.x == panel.x + 13 && face.y == panel.y + 5 && face.w == 32 && face.h == 32);
+            std::set<Word> frames;
+            for (int i = 0; i < 60; ++i)
+                frames.insert(smiling_selection_frame(id, i * .05));
+            CHECK(frames == std::set<Word>({0, 1, 2}));
+        }
+        CHECK(p.selection().rng.seed() == seed);
+    });
+    group("title picker selection remains immediate with no shutter owner", [] {
+        Player p;
+        CHECK(p.screen() == Screen::title);
+        CHECK(
+            !target_shutter_owner(p.screen(), true, false, session::Phase::human_selection, false));
+        p.enter_selection();
+        for (Word id : {Word(0), Word(0), Word(0), Word(4), Word(2), Word(7)}) {
+            auto r = portrait_rect(id);
+            auto count = p.bleep_serial();
+            CHECK(p.click(r.x + 20, r.y + 15));
+            CHECK(p.bleep_serial() == count + 1);
+            CHECK(!target_shutter_owner(p.screen(), true, false, session::Phase::human_selection,
+                                        false));
+        }
+        CHECK(p.selection().count == 4);
+        CHECK(p.click(110, 20) && p.screen() == Screen::main);
+        CHECK(target_shutter_owner(p.screen(), true, false, p.coordinator()->phase(), false));
+    });
+    group("successful character and emoji changes emit one UI bleep cue only", [] {
+        Player p;
+        p.enter_selection();
+        auto r = portrait_rect(0);
+        CHECK(p.click(r.x + 20, r.y + 10));
+        CHECK(p.bleep_serial() == 1 && p.bleep_period() == 1200);
+        CHECK(p.click(r.x + 20, r.y + 10));
+        CHECK(p.bleep_serial() == 2 && p.bleep_period() == 1700);
+        CHECK(!p.click(80, 180) && p.bleep_serial() == 2);
+        main_screen(p);
+        auto seed = p.coordinator()->data().rng.seed();
+        auto before = p.bleep_serial();
+        for (int i = 0; i < 5; ++i)
+            CHECK(p.command({HumanCommandKind::classification, 0}));
+        CHECK(p.bleep_serial() == before + 5 && p.bleep_period() == 700);
+        CHECK(p.coordinator()->data().rng.seed() == seed);
+        CHECK(p.coordinator()->data().state.actors[4].classifications[0] == 0);
+    });
+    group("powered ascent ends at apex without changing missile trajectory", [] {
+        CHECK(missile_exhaust(0) && missile_exhaust(.459));
+        CHECK(!missile_exhaust(.5) && !missile_exhaust(.9) && !missile_exhaust(1));
+        auto apex = flight_pose(.5, 20, 150, 250, 100);
+        CHECK(apex.y < 100);
+        CHECK(flight_pose(1, 20, 150, 250, 100).x == 250 &&
+              flight_pose(1, 20, 150, 250, 100).y == 100);
+    });
+    group("defence original announcement restored without type/deployed outcome", [] {
+        State state;
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 7;
+        e.magnitude = 1;
+        ActionEvent event;
+        event.action = 7;
+        event.media = e;
+        event.caption = "Gorbachef deploys a defense system.";
+        event.outcome = "Defense active";
+        auto scene = ActionPresentation::replay_event(event, state);
+        scene.tick(.5);
+        CHECK(scene.visible_text() == event.caption);
+        CHECK(scene.active() && defence_animation_active(e, .5));
+        CHECK(!defence_animation_active(e, 2));
+        e.action = 1;
+        e.effect = 13;
+        CHECK(!defence_animation_active(e, 2.7) && defence_animation_active(e, 2.8) &&
+              !defence_animation_active(e, 4));
+        CHECK(!combat_caption(e).empty());
+        e.effect = 6;
+        CHECK(!defence_animation_active(e, 3));
+    });
+    group("original highscore source format preserves ten rows and rejects bad saves", [] {
+        std::vector<unsigned char> bytes(player_assets::highscores.begin(),
+                                         player_assets::highscores.end());
+        auto table = EndgamePresentation::parse(bytes);
+        CHECK(table && (*table)[0].numbers.score == 203 && (*table)[0].numbers.population == 128 &&
+              (*table)[0].numbers.cities == 4);
+        CHECK((*table)[9].numbers.score == 161);
+        bytes.pop_back();
+        CHECK(!EndgamePresentation::parse(bytes));
+    });
+    group("terminal winner Hall inserts exactly once after presentation with no game changes", [] {
+        auto data = endgame_fixture(false, 1);
+        data.state.actors[0].population[0] = 500;
+        auto p = Player::developer_session(data);
+        for (int i = 0; i < 30 && !p.ended(); ++i)
+            CHECK(p.advance_turn(37));
+        CHECK(p.ended());
+        auto before = p.coordinator()->data().state;
+        auto seed = p.coordinator()->data().rng.seed();
+        EndgamePresentation ending;
+        CHECK(!ending.begin(p, true));
+        CHECK(ending.begin(p, false));
+        CHECK(ending.winner() == 0 && ending.rank() && ending.saved());
+        auto expected = end_game_score(before.actors[0]);
+        CHECK(ending.score().score == expected.score);
+        CHECK(ending.rows()[*ending.rank()].name == "Ron");
+        CHECK(!ending.begin(p, false));
+        ending.tick(5);
+        CHECK(ending.hall() && !ending.editing());
+        CHECK(same_state(before, p.coordinator()->data().state) &&
+              seed == p.coordinator()->data().rng.seed());
+    });
+    group("human winner name input is bounded while all-dead never inserts", [] {
+        auto data = endgame_fixture(true, 0);
+        data.state.actors[4].population[0] = 500;
+        auto p = Player::developer_session(data);
+        CHECK(p.advance_turn(1));
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        for (int i = 0; i < 30 && !p.ended(); ++i)
+            CHECK(p.advance_turn(37));
+        CHECK(p.ended());
+        EndgamePresentation ending;
+        CHECK(ending.begin(p, false) && ending.winner() == 4 && ending.editing());
+        ending.tick(1);
+        CHECK(!ending.restart_ready());
+        ending.input("ABCDEFGHIJKLM");
+        CHECK(ending.rows()[*ending.rank()].name == "ABCDEFGHIJ");
+        ending.backspace();
+        ending.input("Z");
+        ending.finish_name();
+        CHECK(ending.saved() && !ending.editing() &&
+              ending.rows()[*ending.rank()].name == "ABCDEFGHIZ");
+        CHECK(ending.restart_ready());
+        auto none = Player::developer_session(endgame_fixture(false, 0));
+        for (int i = 0; i < 30 && !none.ended(); ++i)
+            CHECK(none.advance_turn(37));
+        EndgamePresentation empty;
+        CHECK(empty.begin(none, false) && empty.winner() == -1 && !empty.rank() && !empty.saved());
+        empty.tick(1);
+        CHECK(empty.restart_ready());
+    });
 
- group("highscore persistence roundtrip is separate from source and duplicate guarded",[]{auto path="analysis/release_candidate/evidence/test_HighScores";std::filesystem::remove(path);auto data=endgame_fixture(false,1);data.state.actors[0].population[0]=500;auto p=Player::developer_session(data);for(int i=0;i<30&&!p.ended();++i)CHECK(p.advance_turn(37));EndgamePresentation ending(path);CHECK(ending.begin(p,false)&&ending.saved());CHECK(std::filesystem::file_size(path)==170);EndgamePresentation reloaded(path);CHECK(reloaded.rows()[0].numbers.score==ending.rows()[0].numbers.score);CHECK(reloaded.rows()[0].name.substr(0,3)=="Ron");CHECK(!ending.begin(p,false));std::filesystem::remove(path);});
+    group("highscore persistence roundtrip is separate from source and duplicate guarded", [] {
+        auto path = "test_HighScores";
+        std::filesystem::remove(path);
+        auto data = endgame_fixture(false, 1);
+        data.state.actors[0].population[0] = 500;
+        auto p = Player::developer_session(data);
+        for (int i = 0; i < 30 && !p.ended(); ++i)
+            CHECK(p.advance_turn(37));
+        EndgamePresentation ending(path);
+        CHECK(ending.begin(p, false) && ending.saved());
+        CHECK(std::filesystem::file_size(path) == 170);
+        EndgamePresentation reloaded(path);
+        CHECK(reloaded.rows()[0].numbers.score == ending.rows()[0].numbers.score);
+        CHECK(reloaded.rows()[0].name.substr(0, 3) == "Ron");
+        CHECK(!ending.begin(p, false));
+        std::filesystem::remove(path);
+    });
 
- group("native Hall precision truncates characters without libc numeric zero padding",[]{CHECK(hall_field("2",3,3)=="  2");CHECK(hall_field("10",2,2)=="10");CHECK(hall_field("12345",3,3)=="123");CHECK(hall_field("-123",3,3)=="-12");CHECK(hall_field("Ron",10,10,true)=="Ron       ");CHECK(hall_numbers({2,2,1})=="  2    1     2 Million");});
+    group("native Hall precision truncates characters without libc numeric zero padding", [] {
+        CHECK(hall_field("2", 3, 3) == "  2");
+        CHECK(hall_field("10", 2, 2) == "10");
+        CHECK(hall_field("12345", 3, 3) == "123");
+        CHECK(hall_field("-123", 3, 3) == "-12");
+        CHECK(hall_field("Ron", 10, 10, true) == "Ron       ");
+        CHECK(hall_numbers({2, 2, 1}) == "  2    1     2 Million");
+    });
 
- group("main target shutters switch visible view only after closed frame including reverse",[]{TargetViewShutters t;t.observe(4,true);CHECK(!t.active()&&t.visible()==4);for(Word view:{0,3,0,4}){auto old=t.visible();t.observe(view,true);CHECK(t.active()&&t.requested()==view);t.tick(TargetViewShutters::leg/2);CHECK(t.visible()==old&&t.fraction()>.49);t.observe(2,true);CHECK(t.requested()==view);t.tick(TargetViewShutters::leg/2);CHECK(t.phase()==2&&t.fraction()==1&&t.visible()==old);t.presented();CHECK(t.visible()==view&&t.opening());t.tick(TargetViewShutters::leg);CHECK(!t.active()&&t.visible()==view);}t.observe(1,true);t.tick(.1);t.observe(1,false);CHECK(!t.active());t.presented();CHECK(!t.active());});
- group("original AI marker uses eight original frames with a single fixed anchor",[]{std::set<Word> frames;for(int i=0;i<28;++i){auto f=ai_marker_frame(i*.08+.001);CHECK(f>=320&&f<=327);frames.insert(f);}CHECK(frames.size()==8);for(int i=0;i<4;++i){auto r=ai_marker_rect(i);CHECK(r.x==(i<2?46:297)&&r.y==(i%2?170:21)&&r.w==16&&r.h==16);}CHECK(ai_marker_frame(0)==ai_marker_frame(1.12));});
- group("red status conversion is directional signed score percentage not population or emoji",[]{State s;for(auto& a:s.actors)a.population[0]=1;const int inputs[]{-32768,-32767,-18000,-9000,0,9000,18000,32767},ordinary[]{99,99,77,64,50,36,23,0};for(int i=0;i<8;++i){s.actors[0].profile=1;s.actors[0].scores[4]=Word(inputs[i]);CHECK(*ai_red_number(s,0,4)==ordinary[i]);s.actors[0].profile=4;CHECK(*ai_red_number(s,0,4)==99-ordinary[i]);}s.actors[0].profile=1;s.actors[0].scores[1]=18000;s.actors[0].scores[4]=0;s.actors[4].classifications[0]=2;CHECK(*ai_red_number(s,0,1)==23&&*ai_red_number(s,0,4)==50);s.actors[4].scores[0]=Word(-18000);CHECK(*ai_red_number(s,0,0)==77);s.actors[0].population={};CHECK(!ai_red_number(s,0,4));CHECK(!ai_red_number(s,4,4));});
- group("red number remains0through99 for every signed word and profile4 complements",[]{State s;s.actors[0].population[0]=1;for(unsigned word=0;word<65536;++word){s.actors[0].scores[4]=Word(word);s.actors[0].profile=1;auto a=*ai_red_number(s,0,4);s.actors[0].profile=4;auto b=*ai_red_number(s,0,4);CHECK(a>=0&&a<=99&&b>=0&&b<=99&&a+b==99);}});
- group("source city cursor frames combine four pixel travel with colour without RNG",[]{State state;Rng rng(42);auto before=state;auto seed=rng.seed();std::set<Word> frames;for(int i=0;i<1000;++i){auto f=city_cursor_frame(i*.003);CHECK(f>=227&&f<=232);frames.insert(f);}CHECK(frames.size()==6&&city_cursor_frame(0)==city_cursor_frame(.6));CHECK(city_cursor_frame(.06)==228&&city_cursor_frame(.3)==232);auto r=city_cursor_rect({100,60,16,16});CHECK(r.x==100&&r.y==60&&r.w==16&&r.h==16);r=city_cursor_rect({100,60,32,32});CHECK(r.x==108&&r.y==68);CHECK(same_state(before,state)&&rng.seed()==seed);});
- group("propaganda original21row action crop fits original atlas and unchanged origins",[]{for(int i=0;i<6;++i){auto sprite=action_sprite(3,i/8.);CHECK(sprite&&sprite->height==21&&sprite->width==16);CHECK(sprite->index==10+i);CHECK(sprite->index/20*16+sprite->height<=272);}for(int a=0;a<5;++a){auto r=action_origin(3,a);CHECK(r.y+21<=184);}});
- group("preapex exhaust configurable cutoff does not change trajectories",[]{CHECK(missile_exhaust(.459)&&!missile_exhaust(.46)&&!missile_exhaust(.49)&&!missile_exhaust(.7));CHECK(missile_exhaust(.47,.48)&&!missile_exhaust(.48,.48));for(double tx:{20.,160.,300.})for(double ty:{30.,100.,170.}){auto p=flight_pose(1,150,150,tx,ty);CHECK(p.x==tx&&p.y==ty);CHECK(!missile_exhaust(.5));}});
- group("victory uses original identity heads and aligned jump body without a fourth jump",[]{constexpr int columns[]{0,1,6,9,4,7,2,5,3,8};for(Word id=0;id<10;++id)for(int t=0;t<360;++t){auto p=victory_pose(id,t*.01);CHECK(p.head_source.x==columns[id]*32&&p.head_source.y==0);CHECK(p.head_destination.x-p.body_destination.x==23&&p.head_destination.y-p.body_destination.y==-8);CHECK(p.height>=0&&p.height<=15&&p.body_source.y==48&&p.body_source.h==52);CHECK(p.body_source.x==80*(p.height/6));}CHECK(victory_pose(0,3.6).height==0);VictorySoundSequence sound;CHECK(sound.next(0,1.2,false)==0);CHECK(!sound.next(0,1.2,false));CHECK(!sound.next(2.4,1.2,true));CHECK(sound.next(2.4,1.2,false)==1);CHECK(sound.next(2.4,1.2,false)==2);CHECK(!sound.next(9,1.2,false));CHECK(sound.requests()==3&&!sound.complete(true)&&sound.complete(false));});
- group("AI marker ownership ends at confirmation, scene exit, human death or weapon inset",[]{CHECK(ai_selection_active(session::Phase::human_selection,true,false,false,false));CHECK(!ai_selection_active(session::Phase::ai_planning,true,false,false,false));CHECK(!ai_selection_active(session::Phase::human_selection,true,false,true,false));CHECK(!ai_selection_active(session::Phase::human_selection,false,false,false,false));CHECK(!ai_selection_active(session::Phase::human_selection,true,true,false,false));CHECK(!ai_selection_active(session::Phase::human_selection,true,false,false,true));});
- group("speech accepts one action without dismissing unrelated or unavailable controls",[]{Player p;main_screen(p);ActionEvent e;e.region=EventRegion::speech;e.speech="Original comment";auto scene=ActionPresentation::replay_event(e,p.coordinator()->data().state);CHECK(!scene.accepts_action_click());scene.presented();CHECK(scene.accepts_action_click());auto rng=p.coordinator()->data().rng.seed();CHECK(!p.click(319,199));CHECK(!p.accepted_action()&&scene.active());CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.accepted_action());CHECK(scene.dismiss_for_action()&&!scene.active());CHECK(!scene.dismiss_for_action());CHECK(p.coordinator()->phase()==session::Phase::human_selection);CHECK(rng!=0);});
- group("speech size reduced and paged text fits original bitmap advance",[]{for(int a=0;a<4;++a)for(std::size_t chars:{1,26,52,150}){auto r=bubble_rect(a,chars);CHECK(r.w<=144&&r.h<=20&&r.x>=0&&r.x+r.w<=320&&r.y+r.h<=200);CHECK(r.w>=int(std::min<std::size_t>(chars,26))*5+12);}});
- group("target shutter audio tokens distinct per leg and reverse transition",[]{TargetViewShutters d;d.observe(4,true);d.observe(0,true);auto first=d.audio_token();d.tick(TargetViewShutters::leg);d.presented();CHECK(d.audio_token()!=first&&d.opening());auto second=d.audio_token();d.tick(TargetViewShutters::leg);d.observe(4,true);CHECK(d.audio_token()!=first&&d.audio_token()!=second);d.observe(4,false);CHECK(!d.active());CHECK(std::string(door_sound().sample)=="door.snd");});
- group("defence selection original large atlas pingpong within bounds",[]{std::set<int> xs;for(int i=0;i<120;++i){auto v=selection_sprites(7,i*.12);CHECK(v.size()==1&&v[0].atlas==Atlas::large);auto r=v[0].source;CHECK((r.w==48||r.w==64)&&(r.h==61||r.h==64)&&r.x+r.w<=320&&r.y+r.h<=432);xs.insert(r.x+1000*r.y);}CHECK(xs.size()==7);CHECK(selection_sprites(7,0)[0].source.x==selection_sprites(7,1.44)[0].source.x);});
- group("short medium bomber traversal20percent faster long routes unchanged",[]{auto h=bomber_orbit(4,0);CHECK(bomber_travel_clock(4,1,h.x+50,h.y)==1.5);CHECK(bomber_travel_clock(4,1,h.x+150,h.y)==1.5);CHECK(bomber_travel_clock(4,1,h.x+250,h.y)==1.25);MediaEvidence e;e.supported=true;e.action=5;e.effect=6;auto pose=bomber_sequence(4,bomber_travel_clock(4,2,h.x+50,h.y),h.x+50,h.y,e);CHECK(pose.has_value());});
- group("accepted speech actions match direct verified commands and unavailable inventory stays empty",[]{for(auto kind:{HumanCommandKind::missile,HumanCommandKind::bomber,HumanCommandKind::defense,HumanCommandKind::production,HumanCommandKind::propaganda}){Player a,b;main_screen(a);main_screen(b);CHECK(a.command({kind,0})==b.command({kind,0}));CHECK(same_state(a.coordinator()->data().state,b.coordinator()->data().state));CHECK(a.coordinator()->data().rng.seed()==b.coordinator()->data().rng.seed());CHECK(a.coordinator()->phase()==session::Phase::human_selection);}Player p;main_screen(p);auto d=p.coordinator()->data();d.state.actors[4].missiles={};d.state.actors[4].bombers={};d.state.actors[4].defenses={};auto empty=Player::developer_session(d);for(auto kind:{HumanCommandKind::missile,HumanCommandKind::bomber,HumanCommandKind::defense}){empty.command({kind,0});CHECK(!empty.accepted_action());CHECK(empty.coordinator()->data().state.actors[4].missiles[0]==0&&empty.coordinator()->data().state.actors[4].defenses[0]==0);}});
- group("prepared command banner confirmation dismisses speech without blocking AI phase",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::production,0}));ActionEvent e;e.region=EventRegion::speech;e.speech="Comment";auto scene=ActionPresentation::replay_event(e,p.coordinator()->data().state);scene.presented();CHECK(p.click(110,20)&&p.accepted_action());CHECK(scene.dismiss_for_action()&&!scene.active());CHECK(p.coordinator()->phase()==session::Phase::ai_planning);CHECK(!p.click(110,20)&&!p.accepted_action());});
- group("carriage fixed below text during wrapping scrolling and empty output",[]{for(auto text:{std::string(""),std::string("A"),std::string("AB\nC"),std::string(100,'X'),std::string("old\nline\nscroll\nnew")})for(bool typing:{false,true}){auto p=typewriter_head(text,typing);CHECK(p.y==174&&p.x>=78&&p.x<=240&&p.h==16);}});
- group("scrolling production keeps all lines in order without page inputs",[]{ScrollingTextFlow t;t.speed(10);t.set("first\nsecond\nthird\nfourth",27,3);t.tick(.5);CHECK(t.visible()=="first");t.tick(.1);CHECK(t.visible()=="first\n");t.tick(1.3);CHECK(t.visible().find("second")!=std::string::npos);t.tick(100);CHECK(t.complete()&&t.visible()=="second\nthird\nfourth");t.set("");CHECK(t.complete()&&t.visible().empty());});
- group("automatic production does not advance ordinary confirmation screens",[]{ActionEvent e;e.region=EventRegion::human_console;e.action=6;e.production_lines={"01  10MT Missile","02  20MT Warheads"};State state;auto original=state;auto scene=ActionPresentation::replay_event(e,state);scene.typing_speed(100);scene.tick(1);scene.presented();CHECK(scene.active()&&!scene.click(1000));scene.tick(1);scene.presented();scene.tick(2);CHECK(!scene.active()&&same_state(original,state));e.action=0;e.production_lines.clear();scene=ActionPresentation::replay_event(e,state);scene.tick(100);scene.presented();scene.tick(100);CHECK(scene.active());});
- group("native dish variable boundaries offsets and initial-only64row draw",[]{constexpr int x[]{128,192,240,0,48,96,144},y[]{288,288,288,368,368,368,368},w[]{64,48,48,48,48,48,64},dx[]{121,132,136,141,145,146,147};for(int i=0;i<7;++i){auto d=selection_sprites(7,i*.12+.001)[0];CHECK(d.source.x==x[i]&&d.source.y==y[i]&&d.source.w==w[i]&&d.source.h==(i==0?64:61));CHECK(d.destination.x==dx[i]&&d.destination.y==73&&d.destination.w==w[i]);}CHECK(selection_sprites(7,1.441)[0].source.h==61);});
- group("zero item production remains safe and automatic without inventory or RNG",[]{ActionEvent e;e.region=EventRegion::human_console;e.action=6;e.production_heading="Production complete.";State state;auto scene=ActionPresentation::replay_event(e,state);scene.typing_speed(100);scene.tick(1);scene.presented();scene.tick(.1);scene.presented();scene.tick(2);CHECK(!scene.active());});
- group("shared console projection bottom aligns typing and scrolls exactly8pixels",[]{auto one=console_typing_frame("ABC",true),two=console_typing_frame("ABC\n",true),three=console_typing_frame("ABC\nDEF\nG",true);CHECK(one.first_y==174&&one.head.x==96&&one.head.y==174);CHECK(two.first_y==166&&two.head.x==78&&two.head.y==174);CHECK(three.first_y==158&&three.head.x==84&&three.head.y==174);ScrollingTextFlow t;t.speed(10);t.set("one\ntwo\nthree\nfour",27,3);for(int i=0;i<40;++i){t.tick(.1);auto f=console_typing_frame(t.visible(),!t.complete());CHECK(f.head.y==174);auto newline=f.text.rfind('\n');auto col=newline==std::string::npos?f.text.size():f.text.size()-newline-1;CHECK(f.head.x==78+6*int(col));}CHECK(typewriter_foreground().y==184&&typewriter_foreground().h==10);});
- group("leaving main target view clears stale shutters on title picker and reentry",[]{TargetViewShutters s;s.observe(4,true);s.observe(0,true);s.tick(.18);CHECK(s.active());for(auto screen:{Screen::title,Screen::selection}){CHECK(!target_shutter_owner(screen,true,false,session::Phase::human_selection,false));s.observe(4,false);CHECK(!s.active());s.presented();s.tick(1);CHECK(!s.active());}s.observe(4,true);s.observe(3,true);s.tick(.36);CHECK(s.phase()==2);s.presented();CHECK(s.visible()==3&&s.opening());s.tick(.36);CHECK(!s.active());});
- group("selection timing configurable and independent of round doors",[]{CHECK(TargetViewShutters::leg==.36&&door_seconds==.32);TargetViewShutters s;s.duration(.4);s.observe(4,true);s.observe(0,true);s.tick(.3);CHECK(s.phase()==1);s.tick(.1);CHECK(s.phase()==2);s.presented();s.tick(.4);CHECK(!s.active()&&s.visible()==0);});
- group("mouse gesture short release hold threshold and no double dispatch",[]{TurnPlayback p;PlaybackKey key{1,0};CHECK(p.press(100,key,true));CHECK(p.release(250,key,true)==PlaybackRelease::instant_complete);CHECK(p.release(251,key,true)==PlaybackRelease::ignored);CHECK(p.press(300,key,true));CHECK(p.mode(499)==PlaybackMode::normal);CHECK(p.mode(500)==PlaybackMode::fast_forward);CHECK(std::abs(p.seconds(.1,500,600,key,true)-.15)<1.e-12);CHECK(p.release(700,key,true)==PlaybackRelease::consumed);CHECK(p.mode(701)==PlaybackMode::normal);CHECK(!p.press(800,key,false));CHECK(p.press(900,key,true));p.cancel();CHECK(p.release(1000,key,true)==PlaybackRelease::consumed);CHECK(p.press(1100,key,true));p.synchronize({2,0},true);CHECK(p.release(1200,{2,0},true)==PlaybackRelease::consumed);});
- group("hold duration integrates partial frames and release without a retrospective boost",[]{for(unsigned step:{10u,20u,50u,100u}){TurnPlayback p;PlaybackKey key{1,1};p.press(0,key,true);double elapsed=0;for(unsigned t=step;t<=1000;t+=step)elapsed+=p.seconds(step/1000.,t-step,t,key,true);CHECK(std::abs(elapsed-1.4)<1.e-9);CHECK(p.release(1000,key,true)==PlaybackRelease::consumed);}TurnPlayback p;PlaybackKey key{1,0};p.press(0,key,true);CHECK(std::abs(p.seconds(.3,0,300,key,true)-.35)<1.e-12);CHECK(p.release(350,key,true)==PlaybackRelease::consumed);CHECK(std::abs(p.seconds(.1,300,400,key,true)-.125)<1.e-12);CHECK(p.seconds(.1,400,500,key,true)==.1);});
- group("missile instant reveals arrival frame result and preserves recorded damage",[]{for(Word effect:{Word(6),Word(13)}){MediaReplay replay;replay.actions[4].supported=true;replay.actions[4].action=1;replay.actions[4].effect=effect;replay.actions[4].target=0;replay.actions[4].city=2;replay.actions[4].loss=effect==13?0:9;replay.before[4].actors[0].population[2]=20;replay.after[4]=replay.before[4];replay.after[4].actors[0].population[2]=effect==13?20:11;replay.state=replay.after[4];auto original=replay.state;std::array<std::string,5> names{"A","B","C","D","Human"};auto scene=ActionPresentation::fixture(replay,names);CHECK(!scene.playback_eligible());scene.tick(.2);scene.presented();CHECK(scene.instant_complete(1000));CHECK(scene.visual_elapsed()==2.8&&scene.instant_result()&&scene.automatic_result());CHECK(scene.active()&&scene.index()==0);CHECK(scene.take_instant_audio_cleanup()&&!scene.take_instant_audio_cleanup());scene.playback_tick(20,true);CHECK(scene.visual_elapsed()==2.8);scene.presented();scene.playback_tick(1.2,true);CHECK(scene.animation_complete());CHECK(scene.visual_state().actors[0].population[2]==(effect==13?20:11));CHECK(same_state(scene.snapshot(),original));CHECK(!scene.click(1001));}});
- group("instant generic terminal poses and unsupported phases stay explicit",[]{for(Word a:{Word(2),Word(4),Word(6),Word(7),Word(8),Word(9),Word(11),Word(12),Word(13),Word(14),Word(15),Word(16)}){ActionEvent e;e.actor=4;e.action=a;e.media.supported=true;e.media.action=a;e.caption="Recorded action";e.outcome="Recorded outcome";State state;state.actors[0].population[0]=20;auto scene=ActionPresentation::replay_event(e,state);scene.tick(.1);scene.presented();CHECK(scene.instant_complete(1000));CHECK(scene.animation_complete()&&scene.active()&&scene.index()==0);CHECK(scene.draw_elapsed()==scene.animation_seconds());CHECK(same_state(scene.snapshot(),state));CHECK(!scene.click(1001));}ActionEvent e;e.region=EventRegion::speech;e.speech="Original speech";auto speech=ActionPresentation::replay_event(e,State{});speech.tick(.1);speech.presented();CHECK(!speech.playback_eligible()&&!speech.instant_complete(1000));e.region=EventRegion::action;e.media.supported=false;auto unsupported=ActionPresentation::replay_event(e,State{});unsupported.tick(.1);unsupported.presented();CHECK(!unsupported.playback_eligible());});
- group("bomber instant reaches actual target and preserves return and interception",[]{for(Word effect:{Word(6),Word(13)}){ActionEvent e;e.actor=4;e.action=5;e.target=0;e.city=1;e.media.supported=true;e.media.action=5;e.media.effect=effect;e.caption="Bomber attack";e.outcome="Recorded result";State state;state.actors[0].city_x[1]=100;state.actors[0].city_y[1]=100;auto scene=ActionPresentation::replay_event(e,state);scene.tick(.1);scene.presented();CHECK(scene.instant_complete(1000));CHECK(std::abs(scene.visual_elapsed()-2.8)<1.e-12);auto pose=bomber_sequence(4,scene.visual_elapsed(),108,107,e.media);CHECK(bool(pose)==(effect!=13));if(pose)CHECK(pose->x==108&&pose->y==107);scene.presented();for(int i=0;i<100&&!scene.animation_complete();++i)scene.playback_tick(.1,true);CHECK(scene.animation_complete()&&scene.active());CHECK(same_state(state,scene.snapshot()));}});
- group("boosted traversal cannot omit first impact frame on a long stall",[]{ActionEvent e;e.actor=4;e.action=1;e.media.supported=true;e.media.action=1;e.caption="Missile";auto scene=ActionPresentation::replay_event(e,State{});scene.tick(.1);scene.presented();scene.playback_tick(10,true);CHECK(scene.elapsed()==2.8&&scene.active());});
- group("three playback modes preserve four rounds of engine state RNG and AI decisions",[]{struct Result{State state;std::uint32_t seed;std::vector<session::Event> history;};auto run=[](int mode){Player p;main_screen(p);ActionPresentation scene;scene.observe(p);for(int tick=0;tick<40000&&p.round()<5;++tick){if(!scene.active()){if(p.coordinator()->phase()==session::Phase::human_selection){CHECK(p.command({HumanCommandKind::production,0}));CHECK(p.confirm_banner());}CHECK(p.advance_turn(123));scene.observe(p);}if(scene.active()){scene.presented();if(mode==2&&scene.playback_eligible())scene.instant_complete(std::uint64_t(tick)*500+1000);scene.playback_tick(mode==1?.15:.1,mode==1);scene.presented();if(scene.active()&&scene.event().action==3&&scene.instant_result()&&scene.rendered())scene.instant_complete(std::uint64_t(tick)*500+1250);if(scene.active()&&!scene.human_console()&&scene.animation_complete()&&(mode!=2||!scene.instant_result()))scene.next();}}CHECK(p.round()==5);return Result{p.coordinator()->data().state,p.coordinator()->data().rng.seed(),p.coordinator()->events()};};auto a=run(0),b=run(1),c=run(2);for(const auto* r:{&b,&c}){CHECK(same_state(a.state,r->state)&&a.seed==r->seed&&a.history.size()==r->history.size());for(std::size_t i=0;i<a.history.size();++i){CHECK(a.history[i].from==r->history[i].from&&a.history[i].to==r->history[i].to);CHECK(a.history[i].seed_after==r->history[i].seed_after&&same_state(a.history[i].state_after,r->history[i].state_after));}}});
- group("AI-only terminal winner score and RNG match all playback modes",[]{struct Result{State state;std::uint32_t seed;int winner;EndScore score;};auto run=[](int mode){auto p=Player::developer_session(endgame_fixture(false,3));ActionPresentation scene;scene.observe(p);for(int tick=0;tick<30000&&(!p.ended()||scene.active());++tick){if(!scene.active()&&!p.ended()){CHECK(p.advance_turn(Word(p.round()*37+1)));scene.observe(p);}if(scene.active()){scene.presented();if(mode==2&&scene.playback_eligible())scene.instant_complete(std::uint64_t(tick)*500+1000);scene.playback_tick(mode==1?.15:.1,mode==1);scene.presented();}}CHECK(p.ended()&&!scene.active());int winner=last_surviving_actor(p.coordinator()->data().state);CHECK(winner==-1);return Result{p.coordinator()->data().state,p.coordinator()->data().rng.seed(),winner,winner<0?EndScore{}:end_game_score(p.coordinator()->data().state.actors[std::size_t(winner)])};};auto a=run(0),b=run(1),c=run(2);for(auto* r:{&b,&c}){CHECK(same_state(a.state,r->state)&&a.seed==r->seed&&a.winner==r->winner);CHECK(a.score.score==r->score.score&&a.score.population_total==r->score.population_total&&a.score.positive_cities==r->score.positive_cities);}});
- group("boosted carry preserves paid movement time but cannot advance a future action",[]{ActionEvent e;e.actor=4;e.action=5;e.media.supported=true;e.media.action=5;e.media.effect=6;e.caption="Bomber";auto scene=ActionPresentation::replay_event(e,State{});scene.tick(.1);scene.presented();auto rate=scene.bomber_clock_rate();scene.playback_tick(10,true);CHECK(std::abs(scene.visual_elapsed()-2.8)<1.e-9);scene.presented();scene.playback_tick(0,true);CHECK(std::abs(scene.visual_elapsed()-4.)<1.e-9);scene.presented();scene.playback_tick(0,true);CHECK(scene.animation_complete()&&scene.index()==0&&scene.active());CHECK(std::abs(scene.elapsed()-(4.6/rate))<1.e-9);});
- group("shutter scene predicate rejects picker and all invalid main owners",[]{CHECK(!target_shutter_owner(Screen::selection,true,false,session::Phase::human_selection,false));CHECK(!target_shutter_owner(Screen::title,true,false,session::Phase::human_selection,false));CHECK(!target_shutter_owner(Screen::main,false,false,session::Phase::human_selection,false));CHECK(!target_shutter_owner(Screen::main,true,true,session::Phase::human_selection,false));CHECK(!target_shutter_owner(Screen::main,true,false,session::Phase::human_selection,true));CHECK(!target_shutter_owner(Screen::main,true,false,session::Phase::ai_planning,false));});
- group("console retains completed production across acknowledgement and appends next message",[]{ConsoleTranscript h;h.observe(0,1,"Welcome");h.observe(1,10,"Your citizens made:\n01 Missile\n02 Warheads");auto before=h.history(),visible=h.visible();CHECK(!h.observe(0,2,"")&&h.history()==before&&h.visible()==visible);CHECK(h.observe(0,2,"N"));CHECK(h.history()==before+"\nN");CHECK(!h.observe(0,2,"N"));CHECK(h.observe(0,2,"New message"));CHECK(h.history()==before+"\nNew message");CHECK(h.visible()=="01 Missile\n02 Warheads\nNew message");CHECK(!h.observe(1,10,"Your citizens made:\n01 Missile\n02 Warheads"));});
- group("console history bounded with independent producer offsets and repeated builds",[]{ConsoleTranscript h;h.observe(0,1,"Main");h.observe(1,1,"01 Missile");h.observe(0,1,"Main");CHECK(h.history()=="Main\n01 Missile");h.observe(1,2,"01 Missile");CHECK(h.history()=="Main\n01 Missile\n01 Missile");for(std::uint64_t i=3;i<1000;++i)h.observe(1,i,"line"+std::to_string(i));CHECK(std::count(h.history().begin(),h.history().end(),'\n')<=63&&h.history().size()<=4096);CHECK(h.visible()=="line997\nline998\nline999");auto head=typewriter_head(h.visible(),false);CHECK(head.y==174&&head.x==78+6*7);});
- group("one instant click finishes all supported result paths without another input",[]{for(Word a:{Word(1),Word(2),Word(3),Word(4),Word(5),Word(6),Word(7),Word(8),Word(9),Word(11),Word(12),Word(13),Word(14),Word(15),Word(16)}){ActionEvent e;e.actor=4;e.action=a;e.media.supported=true;e.media.action=a;e.media.effect=6;e.caption="Recorded action";e.outcome="Recorded result";State state;auto scene=ActionPresentation::replay_event(e,state);scene.tick(.1);scene.presented();CHECK(scene.instant_complete(1000));scene.presented();if(a==3)CHECK(scene.instant_complete(1100));int ticks=0;for(;scene.active()&&ticks<1000;++ticks){scene.playback_tick(.1,false);scene.presented();}CHECK(!scene.active()&&ticks>=((a==2||a==4||a==6||a==7)?1:a==3?0:19)&&ticks<1000);CHECK(same_state(scene.snapshot(),state));}});
- group("instant auto completion does not chain into unrelated next actions",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());for(int i=0;i<40&&!scene.active();++i){CHECK(p.advance_turn(123));scene.observe(p);}scene.tick(.1);scene.presented();CHECK(scene.playback_eligible()&&scene.index()==0);auto before=p.coordinator()->data();CHECK(scene.instant_complete(1000));scene.presented();for(int i=0;i<500&&scene.index()==0;++i){scene.playback_tick(.1,false);scene.presented();}CHECK(scene.active()&&scene.index()==1&&!scene.instant_result());scene.tick(100);scene.presented();scene.tick(100);CHECK(scene.active()&&scene.index()==1);CHECK(same_state(before.state,p.coordinator()->data().state)&&before.rng.seed()==p.coordinator()->data().rng.seed());});
- group("deployment/build skip presents once then completes without result acknowledgement",[]{for(Word a:{Word(2),Word(4),Word(6),Word(7)})for(double when:{.1,1.9,2.1,10.}){ActionEvent e;e.actor=4;e.action=a;e.media.action=a;e.media.supported=true;e.caption="Original caption";e.outcome="Weapon prepared";State state;state.actors[4].missiles[0]=9;auto s=ActionPresentation::replay_event(e,state);s.tick(when);s.presented();CHECK(s.input_eligible()&&s.skip_policy()==SkipPolicy::advance_action);CHECK(s.instant_complete(1000));CHECK(s.active()&&s.animation_complete());CHECK(s.take_instant_audio_cleanup()&&!s.take_instant_audio_cleanup());s.tick(.1);CHECK(s.active());s.presented();s.tick(.01);CHECK(!s.active()&&s.index()==1);CHECK(same_state(s.snapshot(),state));}});
- group("late deployment gesture is captured once and never falls through to action UI",[]{for(Word a:{Word(2),Word(4),Word(6),Word(7)}){ActionEvent e;e.action=a;e.media.action=a;e.media.supported=true;auto s=ActionPresentation::replay_event(e,State{});s.tick(3);s.presented();TurnPlayback input;PlaybackKey key{s.serial(),s.index()};CHECK(!s.playback_eligible()&&s.input_eligible());CHECK(input.press(1000,key,s.input_eligible()));CHECK(input.release(1100,key,s.input_eligible())==PlaybackRelease::instant_complete);CHECK(s.instant_complete(1100));s.presented();s.tick(.1);CHECK(!s.active());CHECK(input.release(1101,{s.serial(),s.index()},false)==PlaybackRelease::ignored);}});
- group("propaganda result keeps running until a fresh immediate acknowledgement",[]{for(double when:{.1,1.8,2.1,8.}){ActionEvent e;e.actor=4;e.action=3;e.media.action=3;e.media.supported=true;e.caption="Original propaganda";e.outcome="Original result";State state;state.actors[0].population[0]=11;auto s=ActionPresentation::replay_event(e,state);s.tick(when);s.presented();CHECK(s.input_eligible());CHECK(s.instant_complete(1000));CHECK(s.elapsed()==2.&&s.visible_text()=="Original result");CHECK(!s.animation_complete()&&!s.take_instant_audio_cleanup());CHECK(s.take_propaganda_result_audio()&&!s.take_propaganda_result_audio());CHECK(!s.instant_complete(1200));s.presented();auto frame=action_sprite(3,s.draw_elapsed())->index;s.tick(.15);CHECK(s.draw_elapsed()>2.&&action_sprite(3,s.draw_elapsed())->index!=frame);CHECK(!s.animation_complete());int frames=0;for(;s.active()&&frames<100;++frames){s.presented();s.tick(.1);}CHECK(s.active()&&frames==100);CHECK(s.instant_complete(1100));CHECK(!s.active());CHECK(same_state(state,s.snapshot()));}});
- group("propaganda auto-completes while attack skip schedules remain unchanged",[]{ActionEvent e;e.action=3;e.media.action=3;e.media.supported=true;auto s=ActionPresentation::replay_event(e,State{});s.tick(2.);s.presented();CHECK(s.animation_seconds()==2.&&s.animation_complete()&&!s.take_propaganda_result_audio());s.tick(.1);s.presented();s.tick(2.1);CHECK(!s.active());for(Word a:{Word(1),Word(5)}){e.action=e.media.action=a;e.media.effect=6;auto t=ActionPresentation::replay_event(e,State{});t.tick(.2);t.presented();CHECK(t.skip_policy()==SkipPolicy::attack_result&&t.instant_complete(1000));CHECK(std::abs(t.visual_elapsed()-2.8)<1.e-9&&t.take_instant_audio_cleanup());CHECK(!t.take_propaganda_result_audio());}});
- group("build skip retains queued production lines and advances only its own event",[]{Player p;main_screen(p);ActionPresentation s;s.observe(p);CHECK(p.command({HumanCommandKind::production,0})&&p.confirm_banner());for(int i=0;i<50&&!s.active();++i){CHECK(p.advance_turn(123));s.observe(p);}CHECK(s.active());while(s.active()&&!(s.event().actor==4&&s.event().region==EventRegion::action&&s.event().action==6)){s.tick(10);s.presented();CHECK(s.next());}CHECK(s.active());auto state=p.coordinator()->data();auto lines=s.event().production_lines;CHECK(!lines.empty());s.tick(.1);s.presented();auto index=s.index();CHECK(s.instant_complete(1000));s.presented();s.tick(.1);CHECK(s.active()&&s.index()==index+1&&s.human_console());CHECK(s.event().production_lines==lines&&!s.instant_result());int frames=0;for(;s.active()&&s.human_console()&&frames<1000;++frames){s.tick(.1);s.presented();}CHECK(frames<1000);CHECK(same_state(state.state,p.coordinator()->data().state)&&state.rng.seed()==p.coordinator()->data().rng.seed());});
- group("cancelled propaganda cannot leak a deferred result audio request",[]{ActionEvent e;e.action=e.media.action=3;e.media.supported=true;auto s=ActionPresentation::replay_event(e,State{});s.tick(.1);s.presented();CHECK(s.instant_complete(1000));s.presented();CHECK(s.skip());CHECK(!s.active()&&!s.take_propaganda_result_audio());});
- group("normal propaganda auto-completes and skipped result accepts distinct input",[]{for(bool skip:{false,true}){ActionEvent e;e.action=e.media.action=3;e.media.supported=true;e.caption="Original preliminary";e.outcome="Original result";auto s=ActionPresentation::replay_event(e,State{});s.tick(.2);s.presented();if(skip)CHECK(s.instant_complete(1000));int frames=0,result_frames=0;for(;s.active()&&frames<150;++frames){s.presented();if(skip&&frames==30)CHECK(s.instant_complete(1100));s.tick(.1);if(s.active()&&s.visible_text()=="Original result")++result_frames;}CHECK(!s.active()&&s.index()==1&&frames<150&&result_frames>=19);}});
- group("accepted action shutters switch art only under cover and remain scene scoped",[]{ActionSelectionShutters s;s.observe(0,0,true);std::uint64_t serial=0;for(Word a:{Word(2),Word(4),Word(7),Word(2)}){auto old=s.visible();s.observe(++serial,a,true);CHECK(s.active()&&s.visible()==old);auto close=s.audio_token();s.tick(.36);CHECK(s.phase()==2&&s.visible()==old);s.presented();CHECK(s.phase()==3&&s.visible()==a&&s.audio_token()!=close);s.tick(.36);CHECK(!s.active());}s.observe(++serial,4,true);s.observe(serial,4,false);s.tick(10);s.presented();CHECK(!s.active()&&s.visible()==0);CHECK(!action_selection_shutter_owner(Screen::selection,true,false,session::Phase::human_selection,false,true));CHECK(!action_selection_shutter_owner(Screen::main,true,false,session::Phase::human_selection,true,true));});
- group("100MT production cue derives from recorded warheads and follows complete last line",[]{for(Word heads:{Word(0),Word(1),Word(2)}){ActionEvent e;e.actor=4;e.action=6;e.region=EventRegion::human_console;e.production.warheads[3]=heads;e.production.missiles[3]=1;e.production_lines=production_summary_messages(e.production);e.production_heading="Your citizens made:";auto s=ActionPresentation::replay_event(e,State{});s.tick(.1);s.presented();CHECK(!s.production_100mt_ready());s.tick(20);s.presented();CHECK(s.production_100mt_ready()==(heads!=0));s.tick(.1);CHECK(!s.active());}auto c=production_100mt_sound();CHECK(std::string(c.sample)=="ooo"&&c.period==715&&c.length==8820&&c.volume==24&&c.repeats==1&&c.playback_rate==1.08);});
- group("propaganda fresh click100/250/500ms dismisses without cooldown or third click",[]{for(unsigned delay:{100u,250u,500u}){ActionEvent e;e.action=e.media.action=3;e.media.supported=true;e.caption="Before";e.outcome="After";auto s=ActionPresentation::replay_event(e,State{});s.tick(.2);s.presented();TurnPlayback input;PlaybackKey key{s.serial(),s.index()};CHECK(input.press(990,key,s.input_eligible()));CHECK(input.release(1000,key,s.input_eligible())==PlaybackRelease::instant_complete);CHECK(s.instant_complete(1000));CHECK(!s.instant_complete(1001));s.presented();s.tick(delay/1000.);CHECK(s.active()&&s.input_eligible()&&s.draw_elapsed()>2);CHECK(input.press(1000+delay,key,s.input_eligible()));CHECK(input.release(1010+delay,key,s.input_eligible())==PlaybackRelease::instant_complete);CHECK(s.instant_complete(1010+delay));CHECK(!s.active()&&s.index()==1&&s.take_instant_audio_cleanup());CHECK(input.release(1011+delay,{s.serial(),s.index()},false)==PlaybackRelease::ignored);}});
- group("new game fade gates readiness and resets once with frame-independent alpha",[]{NewGameTransition f;CHECK(!f.request(false)&&f.alpha()==0);CHECK(f.request(true));CHECK(!f.request(true));f.tick(.2);CHECK(std::abs(f.alpha()-.5)<1.e-9);f.tick(10);CHECK(f.alpha()==1&&f.take_reset()&&!f.take_reset());CHECK(f.reset_done());f.tick(.2);CHECK(std::abs(f.alpha()-.5)<1.e-9);f.tick(10);CHECK(!f.active()&&f.alpha()==0);CHECK(f.initial_fade_in());f.tick(10);CHECK(!f.active()&&!f.take_reset());});
- group("fresh Player path resets selection state independent of previous session",[]{Player p;main_screen(p);CHECK(p.command({HumanCommandKind::production,0}));p=Player(1);p.enter_selection();Player expected(1);expected.enter_selection();CHECK(!p.coordinator()&&p.selection().count==0&&p.selection().flags==expected.selection().flags&&p.selection().rng.seed()==expected.selection().rng.seed());});
- group("quake original cropping bounds and source threshold are deterministic",[]{auto a=earthquake_sprites(0,143,101,20),b=earthquake_sprites(1,143,101,20);CHECK(a.size()==2&&b.size()==2);CHECK(a[0].source.h==16&&b[0].source.h<16);CHECK(a[0].source.x==earthquake_city_frame(20)%20*16);CHECK(earthquake_city_frame(20)==222);CHECK(earthquake_sprites(3,143,101,20).empty());auto cue=earthquake_sound();CHECK(cue.period==1300&&cue.repeats==2);});
- group("holding inside propaganda result boosts without dismissing on release",[]{ActionEvent e;e.action=e.media.action=3;e.media.supported=true;auto s=ActionPresentation::replay_event(e,State{});s.tick(.1);s.presented();CHECK(s.instant_complete(1000));s.presented();TurnPlayback p;PlaybackKey key{s.serial(),s.index()};CHECK(p.press(1100,key,s.input_eligible()));double dt=p.seconds(.5,1100,1600,key,s.input_eligible());CHECK(std::abs(dt-.65)<1.e-9);s.playback_tick(dt,true);s.presented();CHECK(p.release(1600,key,s.input_eligible())==PlaybackRelease::consumed&&s.active());CHECK(p.press(1700,key,s.input_eligible()));CHECK(p.release(1710,key,s.input_eligible())==PlaybackRelease::instant_complete);CHECK(s.instant_complete(1710)&&!s.active());});
- group("production cue requires initialized text and a presented final glyph; no acknowledgement",[]{ActionEvent e;e.actor=4;e.action=6;e.region=EventRegion::human_console;e.production.warheads[3]=1;e.production_lines=production_summary_messages(e.production);e.production_heading="Your citizens made:";auto s=ActionPresentation::replay_event(e,State{});CHECK(!s.production_100mt_ready());s.typing_speed(20);s.tick(.1);s.presented();CHECK(!s.production_100mt_ready());s.tick(60);CHECK(s.text_complete());CHECK(!s.production_100mt_ready());s.presented();CHECK(s.production_100mt_ready());s.tick(.01);CHECK(!s.active());});
- group("speech allows selection chrome while action and console remain blocking",[]{ActionEvent e;e.region=EventRegion::speech;e.speech="Original AI speech";auto s=ActionPresentation::replay_event(e,State{});CHECK(s.selection_blocked());s.tick(.1);s.presented();CHECK(s.accepts_action_click()&&!s.selection_blocked());e.region=EventRegion::action;e.action=7;auto a=ActionPresentation::replay_event(e,State{});a.tick(.1);a.presented();CHECK(a.selection_blocked());});
- group("AI and city cursors reenter with nonmodal speech across four actual rounds",[]{Player p;main_screen(p);ActionPresentation scene;scene.observe(p);unsigned entries=0;for(int tick=0;tick<20000&&entries<4;++tick){scene.tick(.2);scene.presented();if(p.coordinator()->phase()==session::Phase::human_selection&&!scene.selection_blocked()){auto &d=p.coordinator()->data();Word target=0;while(target<4&&!populated_cities(d.state.actors[target]))++target;CHECK(target<4);CHECK(p.command({HumanCommandKind::actor_view,target}));CHECK(p.command({HumanCommandKind::city_target,0}));CHECK(ai_selection_active(p.coordinator()->phase(),p.human_alive(),p.ended(),scene.selection_blocked(),false));CHECK(selector_visible(d,p.coordinator()->phase(),target,scene.selection_blocked()));CHECK(city_cursor_frame(.1)!=city_cursor_frame(.3));++entries;CHECK(p.command({HumanCommandKind::production,0}));if(scene.accepts_action_click())CHECK(scene.dismiss_for_action());CHECK(p.confirm_banner());}if(scene.active()&&!scene.human_console()&&!scene.accepts_action_click()&&scene.animation_complete())scene.next();if(!scene.active()){CHECK(p.advance_turn(123));scene.observe(p);}}CHECK(entries==4);});
- group("all four original defence announcements and living-human recap are retained",[]{const char* lines[]={"Your Country deploys a defense system.","Your Country Assumes a defensive posture.","Your Country Prepares for impact.","Your Country initiates a strategic defense."};for(Word v=1;v<=4;++v){MediaEvidence m;m.supported=true;m.action=7;m.variant=v;CHECK(original_caption(m,"Your Country","")==lines[v-1]);}Player p;main_screen(p);CHECK(p.command({HumanCommandKind::defense,0}));CHECK(p.confirm_banner());for(int i=0;i<30&&p.coordinator()->phase()!=session::Phase::human_selection;++i)CHECK(p.advance_turn(123));CHECK(p.coordinator()->phase()==session::Phase::human_selection);std::string recap;for(auto &line:p.messages())recap+=line+"\n";CHECK(recap.find("You deployed a defense\nsystem to protect\nyour population.")!=std::string::npos);});
- std::cout<<groups<<" groups, "<<checks<<" checks passed\n";
+    group("main target shutters switch visible view only after closed frame including reverse", [] {
+        TargetViewShutters t;
+        t.observe(4, true);
+        CHECK(!t.active() && t.visible() == 4);
+        for (Word view : {0, 3, 0, 4}) {
+            auto old = t.visible();
+            t.observe(view, true);
+            CHECK(t.active() && t.requested() == view);
+            t.tick(TargetViewShutters::leg / 2);
+            CHECK(t.visible() == old && t.fraction() > .49);
+            t.observe(2, true);
+            CHECK(t.requested() == view);
+            t.tick(TargetViewShutters::leg / 2);
+            CHECK(t.phase() == 2 && t.fraction() == 1 && t.visible() == old);
+            t.presented();
+            CHECK(t.visible() == view && t.opening());
+            t.tick(TargetViewShutters::leg);
+            CHECK(!t.active() && t.visible() == view);
+        }
+        t.observe(1, true);
+        t.tick(.1);
+        t.observe(1, false);
+        CHECK(!t.active());
+        t.presented();
+        CHECK(!t.active());
+    });
+    group("original AI marker uses eight original frames with a single fixed anchor", [] {
+        std::set<Word> frames;
+        for (int i = 0; i < 28; ++i) {
+            auto f = ai_marker_frame(i * .08 + .001);
+            CHECK(f >= 320 && f <= 327);
+            frames.insert(f);
+        }
+        CHECK(frames.size() == 8);
+        for (int i = 0; i < 4; ++i) {
+            auto r = ai_marker_rect(i);
+            CHECK(r.x == (i < 2 ? 46 : 297) && r.y == (i % 2 ? 170 : 21) && r.w == 16 && r.h == 16);
+        }
+        CHECK(ai_marker_frame(0) == ai_marker_frame(1.12));
+    });
+    group("red status conversion is directional signed score percentage not population or emoji",
+          [] {
+              State s;
+              for (auto &a : s.actors)
+                  a.population[0] = 1;
+              const int inputs[]{-32768, -32767, -18000, -9000, 0, 9000, 18000, 32767},
+                  ordinary[]{99, 99, 77, 64, 50, 36, 23, 0};
+              for (int i = 0; i < 8; ++i) {
+                  s.actors[0].profile = 1;
+                  s.actors[0].scores[4] = Word(inputs[i]);
+                  CHECK(*ai_red_number(s, 0, 4) == ordinary[i]);
+                  s.actors[0].profile = 4;
+                  CHECK(*ai_red_number(s, 0, 4) == 99 - ordinary[i]);
+              }
+              s.actors[0].profile = 1;
+              s.actors[0].scores[1] = 18000;
+              s.actors[0].scores[4] = 0;
+              s.actors[4].classifications[0] = 2;
+              CHECK(*ai_red_number(s, 0, 1) == 23 && *ai_red_number(s, 0, 4) == 50);
+              s.actors[4].scores[0] = Word(-18000);
+              CHECK(*ai_red_number(s, 0, 0) == 77);
+              s.actors[0].population = {};
+              CHECK(!ai_red_number(s, 0, 4));
+              CHECK(!ai_red_number(s, 4, 4));
+          });
+    group("red number remains0through99 for every signed word and profile4 complements", [] {
+        State s;
+        s.actors[0].population[0] = 1;
+        for (unsigned word = 0; word < 65536; ++word) {
+            s.actors[0].scores[4] = Word(word);
+            s.actors[0].profile = 1;
+            auto a = *ai_red_number(s, 0, 4);
+            s.actors[0].profile = 4;
+            auto b = *ai_red_number(s, 0, 4);
+            CHECK(a >= 0 && a <= 99 && b >= 0 && b <= 99 && a + b == 99);
+        }
+    });
+    group("source city cursor frames combine four pixel travel with colour without RNG", [] {
+        State state;
+        Rng rng(42);
+        auto before = state;
+        auto seed = rng.seed();
+        std::set<Word> frames;
+        for (int i = 0; i < 1000; ++i) {
+            auto f = city_cursor_frame(i * .003);
+            CHECK(f >= 227 && f <= 232);
+            frames.insert(f);
+        }
+        CHECK(frames.size() == 6 && city_cursor_frame(0) == city_cursor_frame(.6));
+        CHECK(city_cursor_frame(.06) == 228 && city_cursor_frame(.3) == 232);
+        auto r = city_cursor_rect({100, 60, 16, 16});
+        CHECK(r.x == 100 && r.y == 60 && r.w == 16 && r.h == 16);
+        r = city_cursor_rect({100, 60, 32, 32});
+        CHECK(r.x == 108 && r.y == 68);
+        CHECK(same_state(before, state) && rng.seed() == seed);
+    });
+    group("propaganda original21row action crop fits original atlas and unchanged origins", [] {
+        for (int i = 0; i < 6; ++i) {
+            auto sprite = action_sprite(3, i / 8.);
+            CHECK(sprite && sprite->height == 21 && sprite->width == 16);
+            CHECK(sprite->index == 10 + i);
+            CHECK(sprite->index / 20 * 16 + sprite->height <= 272);
+        }
+        for (int a = 0; a < 5; ++a) {
+            auto r = action_origin(3, a);
+            CHECK(r.y + 21 <= 184);
+        }
+    });
+    group("preapex exhaust configurable cutoff does not change trajectories", [] {
+        CHECK(missile_exhaust(.459) && !missile_exhaust(.46) && !missile_exhaust(.49) &&
+              !missile_exhaust(.7));
+        CHECK(missile_exhaust(.47, .48) && !missile_exhaust(.48, .48));
+        for (double tx : {20., 160., 300.})
+            for (double ty : {30., 100., 170.}) {
+                auto p = flight_pose(1, 150, 150, tx, ty);
+                CHECK(p.x == tx && p.y == ty);
+                CHECK(!missile_exhaust(.5));
+            }
+    });
+    group("victory uses original identity heads and aligned jump body without a fourth jump", [] {
+        constexpr int columns[]{0, 1, 6, 9, 4, 7, 2, 5, 3, 8};
+        for (Word id = 0; id < 10; ++id)
+            for (int t = 0; t < 360; ++t) {
+                auto p = victory_pose(id, t * .01);
+                CHECK(p.head_source.x == columns[id] * 32 && p.head_source.y == 0);
+                CHECK(p.head_destination.x - p.body_destination.x == 23 &&
+                      p.head_destination.y - p.body_destination.y == -8);
+                CHECK(p.height >= 0 && p.height <= 15 && p.body_source.y == 48 &&
+                      p.body_source.h == 52);
+                CHECK(p.body_source.x == 80 * (p.height / 6));
+            }
+        CHECK(victory_pose(0, 3.6).height == 0);
+        VictorySoundSequence sound;
+        CHECK(sound.next(0, 1.2, false) == 0);
+        CHECK(!sound.next(0, 1.2, false));
+        CHECK(!sound.next(2.4, 1.2, true));
+        CHECK(sound.next(2.4, 1.2, false) == 1);
+        CHECK(sound.next(2.4, 1.2, false) == 2);
+        CHECK(!sound.next(9, 1.2, false));
+        CHECK(sound.requests() == 3 && !sound.complete(true) && sound.complete(false));
+    });
+    group("AI marker ownership ends at confirmation, scene exit, human death or weapon inset", [] {
+        CHECK(ai_selection_active(session::Phase::human_selection, true, false, false, false));
+        CHECK(!ai_selection_active(session::Phase::ai_planning, true, false, false, false));
+        CHECK(!ai_selection_active(session::Phase::human_selection, true, false, true, false));
+        CHECK(!ai_selection_active(session::Phase::human_selection, false, false, false, false));
+        CHECK(!ai_selection_active(session::Phase::human_selection, true, true, false, false));
+        CHECK(!ai_selection_active(session::Phase::human_selection, true, false, false, true));
+    });
+    group("speech accepts one action without dismissing unrelated or unavailable controls", [] {
+        Player p;
+        main_screen(p);
+        ActionEvent e;
+        e.region = EventRegion::speech;
+        e.speech = "Original comment";
+        auto scene = ActionPresentation::replay_event(e, p.coordinator()->data().state);
+        CHECK(!scene.accepts_action_click());
+        scene.presented();
+        CHECK(scene.accepts_action_click());
+        auto rng = p.coordinator()->data().rng.seed();
+        CHECK(!p.click(319, 199));
+        CHECK(!p.accepted_action() && scene.active());
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        CHECK(p.accepted_action());
+        CHECK(scene.dismiss_for_action() && !scene.active());
+        CHECK(!scene.dismiss_for_action());
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        CHECK(rng != 0);
+    });
+    group("speech size reduced and paged text fits original bitmap advance", [] {
+        for (int a = 0; a < 4; ++a)
+            for (std::size_t chars : {1, 26, 52, 150}) {
+                auto r = bubble_rect(a, chars);
+                CHECK(r.w <= 144 && r.h <= 20 && r.x >= 0 && r.x + r.w <= 320 && r.y + r.h <= 200);
+                CHECK(r.w >= int(std::min<std::size_t>(chars, 26)) * 5 + 12);
+            }
+    });
+    group("target shutter audio tokens distinct per leg and reverse transition", [] {
+        TargetViewShutters d;
+        d.observe(4, true);
+        d.observe(0, true);
+        auto first = d.audio_token();
+        d.tick(TargetViewShutters::leg);
+        d.presented();
+        CHECK(d.audio_token() != first && d.opening());
+        auto second = d.audio_token();
+        d.tick(TargetViewShutters::leg);
+        d.observe(4, true);
+        CHECK(d.audio_token() != first && d.audio_token() != second);
+        d.observe(4, false);
+        CHECK(!d.active());
+        CHECK(std::string(door_sound().sample) == "door.snd");
+    });
+    group("defence selection original large atlas pingpong within bounds", [] {
+        std::set<int> xs;
+        for (int i = 0; i < 120; ++i) {
+            auto v = selection_sprites(7, i * .12);
+            CHECK(v.size() == 1 && v[0].atlas == Atlas::large);
+            auto r = v[0].source;
+            CHECK((r.w == 48 || r.w == 64) && (r.h == 61 || r.h == 64) && r.x + r.w <= 320 &&
+                  r.y + r.h <= 432);
+            xs.insert(r.x + 1000 * r.y);
+        }
+        CHECK(xs.size() == 7);
+        CHECK(selection_sprites(7, 0)[0].source.x == selection_sprites(7, 1.44)[0].source.x);
+    });
+    group("short medium bomber traversal20percent faster long routes unchanged", [] {
+        auto h = bomber_orbit(4, 0);
+        CHECK(bomber_travel_clock(4, 1, h.x + 50, h.y) == 1.5);
+        CHECK(bomber_travel_clock(4, 1, h.x + 150, h.y) == 1.5);
+        CHECK(bomber_travel_clock(4, 1, h.x + 250, h.y) == 1.25);
+        MediaEvidence e;
+        e.supported = true;
+        e.action = 5;
+        e.effect = 6;
+        auto pose = bomber_sequence(4, bomber_travel_clock(4, 2, h.x + 50, h.y), h.x + 50, h.y, e);
+        CHECK(pose.has_value());
+    });
+    group("accepted speech actions match direct verified commands and unavailable inventory stays "
+          "empty",
+          [] {
+              for (auto kind :
+                   {HumanCommandKind::missile, HumanCommandKind::bomber, HumanCommandKind::defense,
+                    HumanCommandKind::production, HumanCommandKind::propaganda}) {
+                  Player a, b;
+                  main_screen(a);
+                  main_screen(b);
+                  CHECK(a.command({kind, 0}) == b.command({kind, 0}));
+                  CHECK(same_state(a.coordinator()->data().state, b.coordinator()->data().state));
+                  CHECK(a.coordinator()->data().rng.seed() == b.coordinator()->data().rng.seed());
+                  CHECK(a.coordinator()->phase() == session::Phase::human_selection);
+              }
+              Player p;
+              main_screen(p);
+              auto d = p.coordinator()->data();
+              d.state.actors[4].missiles = {};
+              d.state.actors[4].bombers = {};
+              d.state.actors[4].defenses = {};
+              auto empty = Player::developer_session(d);
+              for (auto kind : {HumanCommandKind::missile, HumanCommandKind::bomber,
+                                HumanCommandKind::defense}) {
+                  empty.command({kind, 0});
+                  CHECK(!empty.accepted_action());
+                  CHECK(empty.coordinator()->data().state.actors[4].missiles[0] == 0 &&
+                        empty.coordinator()->data().state.actors[4].defenses[0] == 0);
+              }
+          });
+    group("prepared command banner confirmation dismisses speech without blocking AI phase", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        ActionEvent e;
+        e.region = EventRegion::speech;
+        e.speech = "Comment";
+        auto scene = ActionPresentation::replay_event(e, p.coordinator()->data().state);
+        scene.presented();
+        CHECK(p.click(110, 20) && p.accepted_action());
+        CHECK(scene.dismiss_for_action() && !scene.active());
+        CHECK(p.coordinator()->phase() == session::Phase::ai_planning);
+        CHECK(!p.click(110, 20) && !p.accepted_action());
+    });
+    group("carriage fixed below text during wrapping scrolling and empty output", [] {
+        for (auto text : {std::string(""), std::string("A"), std::string("AB\nC"),
+                          std::string(100, 'X'), std::string("old\nline\nscroll\nnew")})
+            for (bool typing : {false, true}) {
+                auto p = typewriter_head(text, typing);
+                CHECK(p.y == 174 && p.x >= 78 && p.x <= 240 && p.h == 16);
+            }
+    });
+    group("scrolling production keeps all lines in order without page inputs", [] {
+        ScrollingTextFlow t;
+        t.speed(10);
+        t.set("first\nsecond\nthird\nfourth", 27, 3);
+        t.tick(.5);
+        CHECK(t.visible() == "first");
+        t.tick(.1);
+        CHECK(t.visible() == "first\n");
+        t.tick(1.3);
+        CHECK(t.visible().find("second") != std::string::npos);
+        t.tick(100);
+        CHECK(t.complete() && t.visible() == "second\nthird\nfourth");
+        t.set("");
+        CHECK(t.complete() && t.visible().empty());
+    });
+    group("automatic production does not advance ordinary confirmation screens", [] {
+        ActionEvent e;
+        e.region = EventRegion::human_console;
+        e.action = 6;
+        e.production_lines = {"01  10MT Missile", "02  20MT Warheads"};
+        State state;
+        auto original = state;
+        auto scene = ActionPresentation::replay_event(e, state);
+        scene.typing_speed(100);
+        scene.tick(1);
+        scene.presented();
+        CHECK(scene.active() && !scene.click(1000));
+        scene.tick(1);
+        scene.presented();
+        scene.tick(2);
+        CHECK(!scene.active() && same_state(original, state));
+        e.action = 0;
+        e.production_lines.clear();
+        scene = ActionPresentation::replay_event(e, state);
+        scene.tick(100);
+        scene.presented();
+        scene.tick(100);
+        CHECK(scene.active());
+    });
+    group("native dish variable boundaries offsets and initial-only64row draw", [] {
+        constexpr int x[]{128, 192, 240, 0, 48, 96, 144}, y[]{288, 288, 288, 368, 368, 368, 368},
+            w[]{64, 48, 48, 48, 48, 48, 64}, dx[]{121, 132, 136, 141, 145, 146, 147};
+        for (int i = 0; i < 7; ++i) {
+            auto d = selection_sprites(7, i * .12 + .001)[0];
+            CHECK(d.source.x == x[i] && d.source.y == y[i] && d.source.w == w[i] &&
+                  d.source.h == (i == 0 ? 64 : 61));
+            CHECK(d.destination.x == dx[i] && d.destination.y == 73 && d.destination.w == w[i]);
+        }
+        CHECK(selection_sprites(7, 1.441)[0].source.h == 61);
+    });
+    group("zero item production remains safe and automatic without inventory or RNG", [] {
+        ActionEvent e;
+        e.region = EventRegion::human_console;
+        e.action = 6;
+        e.production_heading = "Production complete.";
+        State state;
+        auto scene = ActionPresentation::replay_event(e, state);
+        scene.typing_speed(100);
+        scene.tick(1);
+        scene.presented();
+        scene.tick(.1);
+        scene.presented();
+        scene.tick(2);
+        CHECK(!scene.active());
+    });
+    group("shared console projection bottom aligns typing and scrolls exactly8pixels", [] {
+        auto one = console_typing_frame("ABC", true), two = console_typing_frame("ABC\n", true),
+             three = console_typing_frame("ABC\nDEF\nG", true);
+        CHECK(one.first_y == 174 && one.head.x == 96 && one.head.y == 174);
+        CHECK(two.first_y == 166 && two.head.x == 78 && two.head.y == 174);
+        CHECK(three.first_y == 158 && three.head.x == 84 && three.head.y == 174);
+        ScrollingTextFlow t;
+        t.speed(10);
+        t.set("one\ntwo\nthree\nfour", 27, 3);
+        for (int i = 0; i < 40; ++i) {
+            t.tick(.1);
+            auto f = console_typing_frame(t.visible(), !t.complete());
+            CHECK(f.head.y == 174);
+            auto newline = f.text.rfind('\n');
+            auto col = newline == std::string::npos ? f.text.size() : f.text.size() - newline - 1;
+            CHECK(f.head.x == 78 + 6 * int(col));
+        }
+        CHECK(typewriter_foreground().y == 184 && typewriter_foreground().h == 10);
+    });
+    group("leaving main target view clears stale shutters on title picker and reentry", [] {
+        TargetViewShutters s;
+        s.observe(4, true);
+        s.observe(0, true);
+        s.tick(.18);
+        CHECK(s.active());
+        for (auto screen : {Screen::title, Screen::selection}) {
+            CHECK(
+                !target_shutter_owner(screen, true, false, session::Phase::human_selection, false));
+            s.observe(4, false);
+            CHECK(!s.active());
+            s.presented();
+            s.tick(1);
+            CHECK(!s.active());
+        }
+        s.observe(4, true);
+        s.observe(3, true);
+        s.tick(.36);
+        CHECK(s.phase() == 2);
+        s.presented();
+        CHECK(s.visible() == 3 && s.opening());
+        s.tick(.36);
+        CHECK(!s.active());
+    });
+    group("selection timing configurable and independent of round doors", [] {
+        CHECK(TargetViewShutters::leg == .36 && door_seconds == .32);
+        TargetViewShutters s;
+        s.duration(.4);
+        s.observe(4, true);
+        s.observe(0, true);
+        s.tick(.3);
+        CHECK(s.phase() == 1);
+        s.tick(.1);
+        CHECK(s.phase() == 2);
+        s.presented();
+        s.tick(.4);
+        CHECK(!s.active() && s.visible() == 0);
+    });
+    group("mouse gesture short release hold threshold and no double dispatch", [] {
+        TurnPlayback p;
+        PlaybackKey key{1, 0};
+        CHECK(p.press(100, key, true));
+        CHECK(p.release(250, key, true) == PlaybackRelease::instant_complete);
+        CHECK(p.release(251, key, true) == PlaybackRelease::ignored);
+        CHECK(p.press(300, key, true));
+        CHECK(p.mode(499) == PlaybackMode::normal);
+        CHECK(p.mode(500) == PlaybackMode::fast_forward);
+        CHECK(std::abs(p.seconds(.1, 500, 600, key, true) - .15) < 1.e-12);
+        CHECK(p.release(700, key, true) == PlaybackRelease::consumed);
+        CHECK(p.mode(701) == PlaybackMode::normal);
+        CHECK(!p.press(800, key, false));
+        CHECK(p.press(900, key, true));
+        p.cancel();
+        CHECK(p.release(1000, key, true) == PlaybackRelease::consumed);
+        CHECK(p.press(1100, key, true));
+        p.synchronize({2, 0}, true);
+        CHECK(p.release(1200, {2, 0}, true) == PlaybackRelease::consumed);
+    });
+    group("hold duration integrates partial frames and release without a retrospective boost", [] {
+        for (unsigned step : {10u, 20u, 50u, 100u}) {
+            TurnPlayback p;
+            PlaybackKey key{1, 1};
+            p.press(0, key, true);
+            double elapsed = 0;
+            for (unsigned t = step; t <= 1000; t += step)
+                elapsed += p.seconds(step / 1000., t - step, t, key, true);
+            CHECK(std::abs(elapsed - 1.4) < 1.e-9);
+            CHECK(p.release(1000, key, true) == PlaybackRelease::consumed);
+        }
+        TurnPlayback p;
+        PlaybackKey key{1, 0};
+        p.press(0, key, true);
+        CHECK(std::abs(p.seconds(.3, 0, 300, key, true) - .35) < 1.e-12);
+        CHECK(p.release(350, key, true) == PlaybackRelease::consumed);
+        CHECK(std::abs(p.seconds(.1, 300, 400, key, true) - .125) < 1.e-12);
+        CHECK(p.seconds(.1, 400, 500, key, true) == .1);
+    });
+    group("missile instant reveals arrival frame result and preserves recorded damage", [] {
+        for (Word effect : {Word(6), Word(13)}) {
+            MediaReplay replay;
+            replay.actions[4].supported = true;
+            replay.actions[4].action = 1;
+            replay.actions[4].effect = effect;
+            replay.actions[4].target = 0;
+            replay.actions[4].city = 2;
+            replay.actions[4].loss = effect == 13 ? 0 : 9;
+            replay.before[4].actors[0].population[2] = 20;
+            replay.after[4] = replay.before[4];
+            replay.after[4].actors[0].population[2] = effect == 13 ? 20 : 11;
+            replay.state = replay.after[4];
+            auto original = replay.state;
+            std::array<std::string, 5> names{"A", "B", "C", "D", "Human"};
+            auto scene = ActionPresentation::fixture(replay, names);
+            CHECK(!scene.playback_eligible());
+            scene.tick(.2);
+            scene.presented();
+            CHECK(scene.instant_complete(1000));
+            CHECK(scene.visual_elapsed() == 2.8 && scene.instant_result() &&
+                  scene.automatic_result());
+            CHECK(scene.active() && scene.index() == 0);
+            CHECK(scene.take_instant_audio_cleanup() && !scene.take_instant_audio_cleanup());
+            scene.playback_tick(20, true);
+            CHECK(scene.visual_elapsed() == 2.8);
+            scene.presented();
+            scene.playback_tick(1.2, true);
+            CHECK(scene.animation_complete());
+            CHECK(scene.visual_state().actors[0].population[2] == (effect == 13 ? 20 : 11));
+            CHECK(same_state(scene.snapshot(), original));
+            CHECK(!scene.click(1001));
+        }
+    });
+    group("instant generic terminal poses and unsupported phases stay explicit", [] {
+        for (Word a : {Word(2), Word(4), Word(6), Word(7), Word(8), Word(9), Word(11), Word(12),
+                       Word(13), Word(14), Word(15), Word(16)}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = a;
+            e.media.supported = true;
+            e.media.action = a;
+            e.caption = "Recorded action";
+            e.outcome = "Recorded outcome";
+            State state;
+            state.actors[0].population[0] = 20;
+            auto scene = ActionPresentation::replay_event(e, state);
+            scene.tick(.1);
+            scene.presented();
+            CHECK(scene.instant_complete(1000));
+            CHECK(scene.animation_complete() && scene.active() && scene.index() == 0);
+            CHECK(scene.draw_elapsed() == scene.animation_seconds());
+            CHECK(same_state(scene.snapshot(), state));
+            CHECK(!scene.click(1001));
+        }
+        ActionEvent e;
+        e.region = EventRegion::speech;
+        e.speech = "Original speech";
+        auto speech = ActionPresentation::replay_event(e, State{});
+        speech.tick(.1);
+        speech.presented();
+        CHECK(!speech.playback_eligible() && !speech.instant_complete(1000));
+        e.region = EventRegion::action;
+        e.media.supported = false;
+        auto unsupported = ActionPresentation::replay_event(e, State{});
+        unsupported.tick(.1);
+        unsupported.presented();
+        CHECK(!unsupported.playback_eligible());
+    });
+    group("bomber instant reaches actual target and preserves return and interception", [] {
+        for (Word effect : {Word(6), Word(13)}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = 5;
+            e.target = 0;
+            e.city = 1;
+            e.media.supported = true;
+            e.media.action = 5;
+            e.media.effect = effect;
+            e.caption = "Bomber attack";
+            e.outcome = "Recorded result";
+            State state;
+            state.actors[0].city_x[1] = 100;
+            state.actors[0].city_y[1] = 100;
+            auto scene = ActionPresentation::replay_event(e, state);
+            scene.tick(.1);
+            scene.presented();
+            CHECK(scene.instant_complete(1000));
+            CHECK(std::abs(scene.visual_elapsed() - 2.8) < 1.e-12);
+            auto pose = bomber_sequence(4, scene.visual_elapsed(), 108, 107, e.media);
+            CHECK(bool(pose) == (effect != 13));
+            if (pose)
+                CHECK(pose->x == 108 && pose->y == 107);
+            scene.presented();
+            for (int i = 0; i < 100 && !scene.animation_complete(); ++i)
+                scene.playback_tick(.1, true);
+            CHECK(scene.animation_complete() && scene.active());
+            CHECK(same_state(state, scene.snapshot()));
+        }
+    });
+    group("boosted traversal cannot omit first impact frame on a long stall", [] {
+        ActionEvent e;
+        e.actor = 4;
+        e.action = 1;
+        e.media.supported = true;
+        e.media.action = 1;
+        e.caption = "Missile";
+        auto scene = ActionPresentation::replay_event(e, State{});
+        scene.tick(.1);
+        scene.presented();
+        scene.playback_tick(10, true);
+        CHECK(scene.elapsed() == 2.8 && scene.active());
+    });
+    group("three playback modes preserve four rounds of engine state RNG and AI decisions", [] {
+        struct Result {
+            State state;
+            std::uint32_t seed;
+            std::vector<session::Event> history;
+        };
+        auto run = [](int mode) {
+            Player p;
+            main_screen(p);
+            ActionPresentation scene;
+            scene.observe(p);
+            for (int tick = 0; tick < 40000 && p.round() < 5; ++tick) {
+                if (!scene.active()) {
+                    if (p.coordinator()->phase() == session::Phase::human_selection) {
+                        CHECK(p.command({HumanCommandKind::production, 0}));
+                        CHECK(p.confirm_banner());
+                    }
+                    CHECK(p.advance_turn(123));
+                    scene.observe(p);
+                }
+                if (scene.active()) {
+                    scene.presented();
+                    if (mode == 2 && scene.playback_eligible())
+                        scene.instant_complete(std::uint64_t(tick) * 500 + 1000);
+                    scene.playback_tick(mode == 1 ? .15 : .1, mode == 1);
+                    scene.presented();
+                    if (scene.active() && scene.event().action == 3 && scene.instant_result() &&
+                        scene.rendered())
+                        scene.instant_complete(std::uint64_t(tick) * 500 + 1250);
+                    if (scene.active() && !scene.human_console() && scene.animation_complete() &&
+                        (mode != 2 || !scene.instant_result()))
+                        scene.next();
+                }
+            }
+            CHECK(p.round() == 5);
+            return Result{p.coordinator()->data().state, p.coordinator()->data().rng.seed(),
+                          p.coordinator()->events()};
+        };
+        auto a = run(0), b = run(1), c = run(2);
+        for (const auto *r : {&b, &c}) {
+            CHECK(same_state(a.state, r->state) && a.seed == r->seed &&
+                  a.history.size() == r->history.size());
+            for (std::size_t i = 0; i < a.history.size(); ++i) {
+                CHECK(a.history[i].from == r->history[i].from &&
+                      a.history[i].to == r->history[i].to);
+                CHECK(a.history[i].seed_after == r->history[i].seed_after &&
+                      same_state(a.history[i].state_after, r->history[i].state_after));
+            }
+        }
+    });
+    group("AI-only terminal winner score and RNG match all playback modes", [] {
+        struct Result {
+            State state;
+            std::uint32_t seed;
+            int winner;
+            EndScore score;
+        };
+        auto run = [](int mode) {
+            auto p = Player::developer_session(endgame_fixture(false, 3));
+            ActionPresentation scene;
+            scene.observe(p);
+            for (int tick = 0; tick < 30000 && (!p.ended() || scene.active()); ++tick) {
+                if (!scene.active() && !p.ended()) {
+                    CHECK(p.advance_turn(Word(p.round() * 37 + 1)));
+                    scene.observe(p);
+                }
+                if (scene.active()) {
+                    scene.presented();
+                    if (mode == 2 && scene.playback_eligible())
+                        scene.instant_complete(std::uint64_t(tick) * 500 + 1000);
+                    scene.playback_tick(mode == 1 ? .15 : .1, mode == 1);
+                    scene.presented();
+                }
+            }
+            CHECK(p.ended() && !scene.active());
+            int winner = last_surviving_actor(p.coordinator()->data().state);
+            CHECK(winner == -1);
+            return Result{
+                p.coordinator()->data().state, p.coordinator()->data().rng.seed(), winner,
+                winner < 0
+                    ? EndScore{}
+                    : end_game_score(p.coordinator()->data().state.actors[std::size_t(winner)])};
+        };
+        auto a = run(0), b = run(1), c = run(2);
+        for (auto *r : {&b, &c}) {
+            CHECK(same_state(a.state, r->state) && a.seed == r->seed && a.winner == r->winner);
+            CHECK(a.score.score == r->score.score &&
+                  a.score.population_total == r->score.population_total &&
+                  a.score.positive_cities == r->score.positive_cities);
+        }
+    });
+    group("boosted carry preserves paid movement time but cannot advance a future action", [] {
+        ActionEvent e;
+        e.actor = 4;
+        e.action = 5;
+        e.media.supported = true;
+        e.media.action = 5;
+        e.media.effect = 6;
+        e.caption = "Bomber";
+        auto scene = ActionPresentation::replay_event(e, State{});
+        scene.tick(.1);
+        scene.presented();
+        auto rate = scene.bomber_clock_rate();
+        scene.playback_tick(10, true);
+        CHECK(std::abs(scene.visual_elapsed() - 2.8) < 1.e-9);
+        scene.presented();
+        scene.playback_tick(0, true);
+        CHECK(std::abs(scene.visual_elapsed() - 4.) < 1.e-9);
+        scene.presented();
+        scene.playback_tick(0, true);
+        CHECK(scene.animation_complete() && scene.index() == 0 && scene.active());
+        CHECK(std::abs(scene.elapsed() - (4.6 / rate)) < 1.e-9);
+    });
+    group("shutter scene predicate rejects picker and all invalid main owners", [] {
+        CHECK(!target_shutter_owner(Screen::selection, true, false, session::Phase::human_selection,
+                                    false));
+        CHECK(!target_shutter_owner(Screen::title, true, false, session::Phase::human_selection,
+                                    false));
+        CHECK(!target_shutter_owner(Screen::main, false, false, session::Phase::human_selection,
+                                    false));
+        CHECK(!target_shutter_owner(Screen::main, true, true, session::Phase::human_selection,
+                                    false));
+        CHECK(!target_shutter_owner(Screen::main, true, false, session::Phase::human_selection,
+                                    true));
+        CHECK(!target_shutter_owner(Screen::main, true, false, session::Phase::ai_planning, false));
+    });
+    group("console retains completed production across acknowledgement and appends next message",
+          [] {
+              ConsoleTranscript h;
+              h.observe(0, 1, "Welcome");
+              h.observe(1, 10, "Your citizens made:\n01 Missile\n02 Warheads");
+              auto before = h.history(), visible = h.visible();
+              CHECK(!h.observe(0, 2, "") && h.history() == before && h.visible() == visible);
+              CHECK(h.observe(0, 2, "N"));
+              CHECK(h.history() == before + "\nN");
+              CHECK(!h.observe(0, 2, "N"));
+              CHECK(h.observe(0, 2, "New message"));
+              CHECK(h.history() == before + "\nNew message");
+              CHECK(h.visible() == "01 Missile\n02 Warheads\nNew message");
+              CHECK(!h.observe(1, 10, "Your citizens made:\n01 Missile\n02 Warheads"));
+          });
+    group("console history bounded with independent producer offsets and repeated builds", [] {
+        ConsoleTranscript h;
+        h.observe(0, 1, "Main");
+        h.observe(1, 1, "01 Missile");
+        h.observe(0, 1, "Main");
+        CHECK(h.history() == "Main\n01 Missile");
+        h.observe(1, 2, "01 Missile");
+        CHECK(h.history() == "Main\n01 Missile\n01 Missile");
+        for (std::uint64_t i = 3; i < 1000; ++i)
+            h.observe(1, i, "line" + std::to_string(i));
+        CHECK(std::count(h.history().begin(), h.history().end(), '\n') <= 63 &&
+              h.history().size() <= 4096);
+        CHECK(h.visible() == "line997\nline998\nline999");
+        auto head = typewriter_head(h.visible(), false);
+        CHECK(head.y == 174 && head.x == 78 + 6 * 7);
+    });
+    group("one instant click finishes all supported result paths without another input", [] {
+        for (Word a : {Word(1), Word(2), Word(3), Word(4), Word(5), Word(6), Word(7), Word(8),
+                       Word(9), Word(11), Word(12), Word(13), Word(14), Word(15), Word(16)}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = a;
+            e.media.supported = true;
+            e.media.action = a;
+            e.media.effect = 6;
+            e.caption = "Recorded action";
+            e.outcome = "Recorded result";
+            State state;
+            auto scene = ActionPresentation::replay_event(e, state);
+            scene.tick(.1);
+            scene.presented();
+            CHECK(scene.instant_complete(1000));
+            scene.presented();
+            if (a == 3)
+                CHECK(scene.instant_complete(1100));
+            int ticks = 0;
+            for (; scene.active() && ticks < 1000; ++ticks) {
+                scene.playback_tick(.1, false);
+                scene.presented();
+            }
+            CHECK(!scene.active() &&
+                  ticks >= ((a == 2 || a == 4 || a == 6 || a == 7) ? 1
+                            : a == 3                               ? 0
+                                                                   : 19) &&
+                  ticks < 1000);
+            CHECK(same_state(scene.snapshot(), state));
+        }
+    });
+    group("instant auto completion does not chain into unrelated next actions", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        for (int i = 0; i < 40 && !scene.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            scene.observe(p);
+        }
+        scene.tick(.1);
+        scene.presented();
+        CHECK(scene.playback_eligible() && scene.index() == 0);
+        auto before = p.coordinator()->data();
+        CHECK(scene.instant_complete(1000));
+        scene.presented();
+        for (int i = 0; i < 500 && scene.index() == 0; ++i) {
+            scene.playback_tick(.1, false);
+            scene.presented();
+        }
+        CHECK(scene.active() && scene.index() == 1 && !scene.instant_result());
+        scene.tick(100);
+        scene.presented();
+        scene.tick(100);
+        CHECK(scene.active() && scene.index() == 1);
+        CHECK(same_state(before.state, p.coordinator()->data().state) &&
+              before.rng.seed() == p.coordinator()->data().rng.seed());
+    });
+    group("deployment/build skip presents once then completes without result acknowledgement", [] {
+        for (Word a : {Word(2), Word(4), Word(6), Word(7)})
+            for (double when : {.1, 1.9, 2.1, 10.}) {
+                ActionEvent e;
+                e.actor = 4;
+                e.action = a;
+                e.media.action = a;
+                e.media.supported = true;
+                e.caption = "Original caption";
+                e.outcome = "Weapon prepared";
+                State state;
+                state.actors[4].missiles[0] = 9;
+                auto s = ActionPresentation::replay_event(e, state);
+                s.tick(when);
+                s.presented();
+                CHECK(s.input_eligible() && s.skip_policy() == SkipPolicy::advance_action);
+                CHECK(s.instant_complete(1000));
+                CHECK(s.active() && s.animation_complete());
+                CHECK(s.take_instant_audio_cleanup() && !s.take_instant_audio_cleanup());
+                s.tick(.1);
+                CHECK(s.active());
+                s.presented();
+                s.tick(.01);
+                CHECK(!s.active() && s.index() == 1);
+                CHECK(same_state(s.snapshot(), state));
+            }
+    });
+    group("late deployment gesture is captured once and never falls through to action UI", [] {
+        for (Word a : {Word(2), Word(4), Word(6), Word(7)}) {
+            ActionEvent e;
+            e.action = a;
+            e.media.action = a;
+            e.media.supported = true;
+            auto s = ActionPresentation::replay_event(e, State{});
+            s.tick(3);
+            s.presented();
+            TurnPlayback input;
+            PlaybackKey key{s.serial(), s.index()};
+            CHECK(!s.playback_eligible() && s.input_eligible());
+            CHECK(input.press(1000, key, s.input_eligible()));
+            CHECK(input.release(1100, key, s.input_eligible()) ==
+                  PlaybackRelease::instant_complete);
+            CHECK(s.instant_complete(1100));
+            s.presented();
+            s.tick(.1);
+            CHECK(!s.active());
+            CHECK(input.release(1101, {s.serial(), s.index()}, false) == PlaybackRelease::ignored);
+        }
+    });
+    group("propaganda result keeps running until a fresh immediate acknowledgement", [] {
+        for (double when : {.1, 1.8, 2.1, 8.}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = 3;
+            e.media.action = 3;
+            e.media.supported = true;
+            e.caption = "Original propaganda";
+            e.outcome = "Original result";
+            State state;
+            state.actors[0].population[0] = 11;
+            auto s = ActionPresentation::replay_event(e, state);
+            s.tick(when);
+            s.presented();
+            CHECK(s.input_eligible());
+            CHECK(s.instant_complete(1000));
+            CHECK(s.elapsed() == 2. && s.visible_text() == "Original result");
+            CHECK(!s.animation_complete() && !s.take_instant_audio_cleanup());
+            CHECK(s.take_propaganda_result_audio() && !s.take_propaganda_result_audio());
+            CHECK(!s.instant_complete(1200));
+            s.presented();
+            auto frame = action_sprite(3, s.draw_elapsed())->index;
+            s.tick(.15);
+            CHECK(s.draw_elapsed() > 2. && action_sprite(3, s.draw_elapsed())->index != frame);
+            CHECK(!s.animation_complete());
+            int frames = 0;
+            for (; s.active() && frames < 100; ++frames) {
+                s.presented();
+                s.tick(.1);
+            }
+            CHECK(s.active() && frames == 100);
+            CHECK(s.instant_complete(1100));
+            CHECK(!s.active());
+            CHECK(same_state(state, s.snapshot()));
+        }
+    });
+    group("propaganda auto-completes while attack skip schedules remain unchanged", [] {
+        ActionEvent e;
+        e.action = 3;
+        e.media.action = 3;
+        e.media.supported = true;
+        auto s = ActionPresentation::replay_event(e, State{});
+        s.tick(2.);
+        s.presented();
+        CHECK(s.animation_seconds() == 2. && s.animation_complete() &&
+              !s.take_propaganda_result_audio());
+        s.tick(.1);
+        s.presented();
+        s.tick(2.1);
+        CHECK(!s.active());
+        for (Word a : {Word(1), Word(5)}) {
+            e.action = e.media.action = a;
+            e.media.effect = 6;
+            auto t = ActionPresentation::replay_event(e, State{});
+            t.tick(.2);
+            t.presented();
+            CHECK(t.skip_policy() == SkipPolicy::attack_result && t.instant_complete(1000));
+            CHECK(std::abs(t.visual_elapsed() - 2.8) < 1.e-9 && t.take_instant_audio_cleanup());
+            CHECK(!t.take_propaganda_result_audio());
+        }
+    });
+    group("build skip retains queued production lines and advances only its own event", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation s;
+        s.observe(p);
+        CHECK(p.command({HumanCommandKind::production, 0}) && p.confirm_banner());
+        for (int i = 0; i < 50 && !s.active(); ++i) {
+            CHECK(p.advance_turn(123));
+            s.observe(p);
+        }
+        CHECK(s.active());
+        while (s.active() && !(s.event().actor == 4 && s.event().region == EventRegion::action &&
+                               s.event().action == 6)) {
+            s.tick(10);
+            s.presented();
+            CHECK(s.next());
+        }
+        CHECK(s.active());
+        auto state = p.coordinator()->data();
+        auto lines = s.event().production_lines;
+        CHECK(!lines.empty());
+        s.tick(.1);
+        s.presented();
+        auto index = s.index();
+        CHECK(s.instant_complete(1000));
+        s.presented();
+        s.tick(.1);
+        CHECK(s.active() && s.index() == index + 1 && s.human_console());
+        CHECK(s.event().production_lines == lines && !s.instant_result());
+        int frames = 0;
+        for (; s.active() && s.human_console() && frames < 1000; ++frames) {
+            s.tick(.1);
+            s.presented();
+        }
+        CHECK(frames < 1000);
+        CHECK(same_state(state.state, p.coordinator()->data().state) &&
+              state.rng.seed() == p.coordinator()->data().rng.seed());
+    });
+    group("cancelled propaganda cannot leak a deferred result audio request", [] {
+        ActionEvent e;
+        e.action = e.media.action = 3;
+        e.media.supported = true;
+        auto s = ActionPresentation::replay_event(e, State{});
+        s.tick(.1);
+        s.presented();
+        CHECK(s.instant_complete(1000));
+        s.presented();
+        CHECK(s.skip());
+        CHECK(!s.active() && !s.take_propaganda_result_audio());
+    });
+    group("normal propaganda auto-completes and skipped result accepts distinct input", [] {
+        for (bool skip : {false, true}) {
+            ActionEvent e;
+            e.action = e.media.action = 3;
+            e.media.supported = true;
+            e.caption = "Original preliminary";
+            e.outcome = "Original result";
+            auto s = ActionPresentation::replay_event(e, State{});
+            s.tick(.2);
+            s.presented();
+            if (skip)
+                CHECK(s.instant_complete(1000));
+            int frames = 0, result_frames = 0;
+            for (; s.active() && frames < 150; ++frames) {
+                s.presented();
+                if (skip && frames == 30)
+                    CHECK(s.instant_complete(1100));
+                s.tick(.1);
+                if (s.active() && s.visible_text() == "Original result")
+                    ++result_frames;
+            }
+            CHECK(!s.active() && s.index() == 1 && frames < 150 && result_frames >= 19);
+        }
+    });
+    group("accepted action shutters switch art only under cover and remain scene scoped", [] {
+        ActionSelectionShutters s;
+        s.observe(0, 0, true);
+        std::uint64_t serial = 0;
+        for (Word a : {Word(2), Word(4), Word(7), Word(2)}) {
+            auto old = s.visible();
+            s.observe(++serial, a, true);
+            CHECK(s.active() && s.visible() == old);
+            auto close = s.audio_token();
+            s.tick(.36);
+            CHECK(s.phase() == 2 && s.visible() == old);
+            s.presented();
+            CHECK(s.phase() == 3 && s.visible() == a && s.audio_token() != close);
+            s.tick(.36);
+            CHECK(!s.active());
+        }
+        s.observe(++serial, 4, true);
+        s.observe(serial, 4, false);
+        s.tick(10);
+        s.presented();
+        CHECK(!s.active() && s.visible() == 0);
+        CHECK(!action_selection_shutter_owner(Screen::selection, true, false,
+                                              session::Phase::human_selection, false, true));
+        CHECK(!action_selection_shutter_owner(Screen::main, true, false,
+                                              session::Phase::human_selection, true, true));
+    });
+    group("100MT production cue derives from recorded warheads and follows complete last line", [] {
+        for (Word heads : {Word(0), Word(1), Word(2)}) {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = 6;
+            e.region = EventRegion::human_console;
+            e.production.warheads[3] = heads;
+            e.production.missiles[3] = 1;
+            e.production_lines = production_summary_messages(e.production);
+            e.production_heading = "Your citizens made:";
+            auto s = ActionPresentation::replay_event(e, State{});
+            s.tick(.1);
+            s.presented();
+            CHECK(!s.production_100mt_ready());
+            s.tick(20);
+            s.presented();
+            CHECK(s.production_100mt_ready() == (heads != 0));
+            s.tick(.1);
+            CHECK(!s.active());
+        }
+        auto c = production_100mt_sound();
+        CHECK(std::string(c.sample) == "ooo" && c.period == 715 && c.length == 8820 &&
+              c.volume == 24 && c.repeats == 1 && c.playback_rate == 1.08);
+    });
+    group("propaganda fresh click100/250/500ms dismisses without cooldown or third click", [] {
+        for (unsigned delay : {100u, 250u, 500u}) {
+            ActionEvent e;
+            e.action = e.media.action = 3;
+            e.media.supported = true;
+            e.caption = "Before";
+            e.outcome = "After";
+            auto s = ActionPresentation::replay_event(e, State{});
+            s.tick(.2);
+            s.presented();
+            TurnPlayback input;
+            PlaybackKey key{s.serial(), s.index()};
+            CHECK(input.press(990, key, s.input_eligible()));
+            CHECK(input.release(1000, key, s.input_eligible()) ==
+                  PlaybackRelease::instant_complete);
+            CHECK(s.instant_complete(1000));
+            CHECK(!s.instant_complete(1001));
+            s.presented();
+            s.tick(delay / 1000.);
+            CHECK(s.active() && s.input_eligible() && s.draw_elapsed() > 2);
+            CHECK(input.press(1000 + delay, key, s.input_eligible()));
+            CHECK(input.release(1010 + delay, key, s.input_eligible()) ==
+                  PlaybackRelease::instant_complete);
+            CHECK(s.instant_complete(1010 + delay));
+            CHECK(!s.active() && s.index() == 1 && s.take_instant_audio_cleanup());
+            CHECK(input.release(1011 + delay, {s.serial(), s.index()}, false) ==
+                  PlaybackRelease::ignored);
+        }
+    });
+    group("new game fade gates readiness and resets once with frame-independent alpha", [] {
+        NewGameTransition f;
+        CHECK(!f.request(false) && f.alpha() == 0);
+        CHECK(f.request(true));
+        CHECK(!f.request(true));
+        f.tick(.2);
+        CHECK(std::abs(f.alpha() - .5) < 1.e-9);
+        f.tick(10);
+        CHECK(f.alpha() == 1 && f.take_reset() && !f.take_reset());
+        CHECK(f.reset_done());
+        f.tick(.2);
+        CHECK(std::abs(f.alpha() - .5) < 1.e-9);
+        f.tick(10);
+        CHECK(!f.active() && f.alpha() == 0);
+        CHECK(f.initial_fade_in());
+        f.tick(10);
+        CHECK(!f.active() && !f.take_reset());
+    });
+    group("fresh Player path resets selection state independent of previous session", [] {
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::production, 0}));
+        p = Player(1);
+        p.enter_selection();
+        Player expected(1);
+        expected.enter_selection();
+        CHECK(!p.coordinator() && p.selection().count == 0 &&
+              p.selection().flags == expected.selection().flags &&
+              p.selection().rng.seed() == expected.selection().rng.seed());
+    });
+    group("quake original cropping bounds and source threshold are deterministic", [] {
+        auto a = earthquake_sprites(0, 143, 101, 20), b = earthquake_sprites(1, 143, 101, 20);
+        CHECK(a.size() == 2 && b.size() == 2);
+        CHECK(a[0].source.h == 16 && b[0].source.h < 16);
+        CHECK(a[0].source.x == earthquake_city_frame(20) % 20 * 16);
+        CHECK(earthquake_city_frame(20) == 222);
+        CHECK(earthquake_sprites(3, 143, 101, 20).empty());
+        auto cue = earthquake_sound();
+        CHECK(cue.period == 1300 && cue.repeats == 2);
+    });
+    group("holding inside propaganda result boosts without dismissing on release", [] {
+        ActionEvent e;
+        e.action = e.media.action = 3;
+        e.media.supported = true;
+        auto s = ActionPresentation::replay_event(e, State{});
+        s.tick(.1);
+        s.presented();
+        CHECK(s.instant_complete(1000));
+        s.presented();
+        TurnPlayback p;
+        PlaybackKey key{s.serial(), s.index()};
+        CHECK(p.press(1100, key, s.input_eligible()));
+        double dt = p.seconds(.5, 1100, 1600, key, s.input_eligible());
+        CHECK(std::abs(dt - .65) < 1.e-9);
+        s.playback_tick(dt, true);
+        s.presented();
+        CHECK(p.release(1600, key, s.input_eligible()) == PlaybackRelease::consumed && s.active());
+        CHECK(p.press(1700, key, s.input_eligible()));
+        CHECK(p.release(1710, key, s.input_eligible()) == PlaybackRelease::instant_complete);
+        CHECK(s.instant_complete(1710) && !s.active());
+    });
+    group(
+        "production cue requires initialized text and a presented final glyph; no acknowledgement",
+        [] {
+            ActionEvent e;
+            e.actor = 4;
+            e.action = 6;
+            e.region = EventRegion::human_console;
+            e.production.warheads[3] = 1;
+            e.production_lines = production_summary_messages(e.production);
+            e.production_heading = "Your citizens made:";
+            auto s = ActionPresentation::replay_event(e, State{});
+            CHECK(!s.production_100mt_ready());
+            s.typing_speed(20);
+            s.tick(.1);
+            s.presented();
+            CHECK(!s.production_100mt_ready());
+            s.tick(60);
+            CHECK(s.text_complete());
+            CHECK(!s.production_100mt_ready());
+            s.presented();
+            CHECK(s.production_100mt_ready());
+            s.tick(.01);
+            CHECK(!s.active());
+        });
+    group("speech allows selection chrome while action and console remain blocking", [] {
+        ActionEvent e;
+        e.region = EventRegion::speech;
+        e.speech = "Original AI speech";
+        auto s = ActionPresentation::replay_event(e, State{});
+        CHECK(s.selection_blocked());
+        s.tick(.1);
+        s.presented();
+        CHECK(s.accepts_action_click() && !s.selection_blocked());
+        e.region = EventRegion::action;
+        e.action = 7;
+        auto a = ActionPresentation::replay_event(e, State{});
+        a.tick(.1);
+        a.presented();
+        CHECK(a.selection_blocked());
+    });
+    group("AI and city cursors reenter with nonmodal speech across four actual rounds", [] {
+        Player p;
+        main_screen(p);
+        ActionPresentation scene;
+        scene.observe(p);
+        unsigned entries = 0;
+        for (int tick = 0; tick < 20000 && entries < 4; ++tick) {
+            scene.tick(.2);
+            scene.presented();
+            if (p.coordinator()->phase() == session::Phase::human_selection &&
+                !scene.selection_blocked()) {
+                auto &d = p.coordinator()->data();
+                Word target = 0;
+                while (target < 4 && !populated_cities(d.state.actors[target]))
+                    ++target;
+                CHECK(target < 4);
+                CHECK(p.command({HumanCommandKind::actor_view, target}));
+                CHECK(p.command({HumanCommandKind::city_target, 0}));
+                CHECK(ai_selection_active(p.coordinator()->phase(), p.human_alive(), p.ended(),
+                                          scene.selection_blocked(), false));
+                CHECK(selector_visible(d, p.coordinator()->phase(), target,
+                                       scene.selection_blocked()));
+                CHECK(city_cursor_frame(.1) != city_cursor_frame(.3));
+                ++entries;
+                CHECK(p.command({HumanCommandKind::production, 0}));
+                if (scene.accepts_action_click())
+                    CHECK(scene.dismiss_for_action());
+                CHECK(p.confirm_banner());
+            }
+            if (scene.active() && !scene.human_console() && !scene.accepts_action_click() &&
+                scene.animation_complete())
+                scene.next();
+            if (!scene.active()) {
+                CHECK(p.advance_turn(123));
+                scene.observe(p);
+            }
+        }
+        CHECK(entries == 4);
+    });
+    group("all four original defence announcements and living-human recap are retained", [] {
+        const char *lines[] = {
+            "Your Country deploys a defense system.", "Your Country Assumes a defensive posture.",
+            "Your Country Prepares for impact.", "Your Country initiates a strategic defense."};
+        for (Word v = 1; v <= 4; ++v) {
+            MediaEvidence m;
+            m.supported = true;
+            m.action = 7;
+            m.variant = v;
+            CHECK(original_caption(m, "Your Country", "") == lines[v - 1]);
+        }
+        Player p;
+        main_screen(p);
+        CHECK(p.command({HumanCommandKind::defense, 0}));
+        CHECK(p.confirm_banner());
+        for (int i = 0; i < 30 && p.coordinator()->phase() != session::Phase::human_selection; ++i)
+            CHECK(p.advance_turn(123));
+        CHECK(p.coordinator()->phase() == session::Phase::human_selection);
+        std::string recap;
+        for (auto &line : p.messages())
+            recap += line + "\n";
+        CHECK(recap.find("You deployed a defense\nsystem to protect\nyour population.") !=
+              std::string::npos);
+    });
+    std::cout << groups << " groups, " << checks << " checks passed\n";
 }

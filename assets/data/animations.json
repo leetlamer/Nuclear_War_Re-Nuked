@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "authority": "C++ animation functions retain all timing and frame rules; this manifest documents their verified mappings.",
+  "animations": [
+    {
+      "name": "AI selection arrow",
+      "image": "images/effects/small_sprites.png",
+      "rectangle": [
+        0,
+        256,
+        16,
+        16
+      ],
+      "timing_source": "ui/target_selection.hpp",
+      "frames": [
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327
+      ],
+      "color": "fixed original red",
+      "cycle_seconds": 1.12
+    },
+    {
+      "name": "city target arrows",
+      "image": "images/effects/small_sprites.png",
+      "frames": [
+        227,
+        228,
+        229,
+        230,
+        231,
+        232
+      ],
+      "timing_source": "ui/target_selection.hpp",
+      "color_period_seconds": 0.6
+    },
+    {
+      "name": "selection shutters",
+      "image": "images/interface/main_window.png",
+      "closing_seconds": 0.36,
+      "opening_seconds": 0.36,
+      "timing_source": "ui/action_selection_shutters.hpp"
+    },
+    {
+      "name": "missile and city exhaust",
+      "image": "images/missiles/flight_and_effects.png",
+      "missile_rectangle": [
+        0,
+        192,
+        16,
+        32
+      ],
+      "exhaust_rectangle": [
+        0,
+        208,
+        16,
+        16
+      ],
+      "flight_seconds": 2.8,
+      "exhaust_cutoff_fraction": 0.46
+    },
+    {
+      "name": "defence selection dish",
+      "image": "images/effects/large_sprites.png",
+      "timing_source": "rendering/animations/selection_sprites.hpp",
+      "frame_source": "explicit source rectangles and ping-pong sequence in selection_sprites()",
+      "frame_seconds": 0.12,
+      "frames": [
+        {
+          "source": [
+            128,
+            288,
+            64,
+            61
+          ],
+          "destination": [
+            121,
+            73,
+            64,
+            61
+          ]
+        },
+        {
+          "source": [
+            192,
+            288,
+            48,
+            61
+          ],
+          "destination": [
+            132,
+            73,
+            48,
+            61
+          ]
+        },
+        {
+          "source": [
+            240,
+            288,
+            48,
+            61
+          ],
+          "destination": [
+            136,
+            73,
+            48,
+            61
+          ]
+        },
+        {
+          "source": [
+            0,
+            368,
+            48,
+            61
+          ],
+          "destination": [
+            141,
+            73,
+            48,
+            61
+          ]
+        },
+        {
+          "source": [
+            48,
+            368,
+            48,
+            61
+          ],
+          "destination": [
+            145,
+            73,
+            48,
+            61
+          ]
+        },
+        {
+          "source": [
+            96,
+            368,
+            48,
+            61
+          ],
+          "destination": [
+            146,
+            73,
+            48,
+            61
+          ]
+        },
+        {
+          "source": [
+            144,
+            368,
+            64,
+            61
+          ],
+          "destination": [
+            147,
+            73,
+            64,
+            61
+          ]
+        }
+      ],
+      "first_frame_height": 64,
+      "frame_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "victory body",
+      "image": "images/characters/victory_body.png",
+      "timing_source": "ui/endgame.hpp",
+      "jump_seconds": 1.2,
+      "sound_repetitions": 3
+    },
+    {
+      "name": "console carriage",
+      "image": "images/effects/small_sprites.png",
+      "rectangle": [
+        304,
+        176,
+        16,
+        16
+      ],
+      "timing_source": "rendering/animations/console_and_sound_cues.hpp",
+      "behind": "images/interface/main_window.png"
+    }
+  ]
+}

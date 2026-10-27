@@ -15,10 +15,10 @@ struct HighScoreNumbers {
 };
 using HighScoreTable = std::array<HighScoreNumbers, 10>;
 // 11496c..114986: strict SIGNED word comparison with last row.
-bool high_score_qualifies(Word score, const HighScoreTable&) noexcept;
+bool high_score_qualifies(Word score, const HighScoreTable &) noexcept;
 // 1141b4..1142ce, with required caller guard11496c. Equality is ranked
 // after existing equal scores. No sorting or validation of original table.
 // Rejected candidates leave all rows unchanged.
-std::optional<std::size_t> insert_high_score_numbers(
-    HighScoreTable&, HighScoreNumbers candidate) noexcept;
-}
+std::optional<std::size_t> insert_high_score_numbers(HighScoreTable &,
+                                                     HighScoreNumbers candidate) noexcept;
+} // namespace nuclear

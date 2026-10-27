@@ -18,23 +18,24 @@ struct Game {
     unsigned round{}, max_rounds;
     Outcome outcome{Outcome::ongoing};
     std::vector<std::string> log;
-    explicit Game(std::uint32_t seed, unsigned limit=200);
+    explicit Game(std::uint32_t seed, unsigned limit = 200);
     bool alive(std::size_t actor) const;
-    std::string validate(const Command&) const;
+    std::string validate(const Command &) const;
     // Rejected commands leave state, RNG, round and log unchanged.
-    bool play(const Command&, std::string& error);
+    bool play(const Command &, std::string &error);
     Command automatic_command() const;
     void finish_if_needed();
     // Prototype-only immediate resolver; also usable by headless simulations.
     // Does not plan actions, advance round, or infer an Amiga frame gate.
     void resolve_immediate(std::size_t actor);
-private:
-    void human_command(const Command&);
+
+  private:
+    void human_command(const Command &);
     void plan_ai();
     void production(std::size_t);
 };
-const char* leader(std::size_t);
-const char* outcome_name(Outcome);
+const char *leader(std::size_t);
+const char *outcome_name(Outcome);
 std::string action_name(Word);
-std::string state_digest(const Game&);
-}
+std::string state_digest(const Game &);
+} // namespace prototype
