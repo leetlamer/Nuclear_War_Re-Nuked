@@ -116,6 +116,22 @@ int main() {
             ai_turn(planned, random);
             for (Word slot = count; slot < 4; ++slot)
                 CHECK(planned.actors[slot].action == 88);
+            for (int round = 0; round < 3 && !player.ended(); ++round) {
+                CHECK(player.command({HumanCommandKind::production, 0}));
+                CHECK(player.confirm_banner());
+                for (int step = 0; step < 40 && !player.ended() &&
+                     player.coordinator()->phase() != session::Phase::human_selection; ++step)
+                    CHECK(player.advance_turn(Word(37 + round)));
+                const auto &resolved = player.coordinator()->data().state;
+                for (Word slot = count; slot < 4; ++slot) {
+                    CHECK(!resolved.participating[slot]);
+                    CHECK(!populated_cities(resolved.actors[slot]));
+                    CHECK(resolved.actors[slot].action == 88);
+                    for (auto v : resolved.actors[slot].warheads) CHECK(v == 0);
+                    for (auto v : resolved.actors[slot].missiles) CHECK(v == 0);
+                }
+                if (player.ended()) CHECK(living_actors(resolved) <= 1);
+            }
         }
     });
     group("setup copies verified profiles and human initialized resources", [] {
