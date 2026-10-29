@@ -1405,7 +1405,7 @@ int main() {
         }
         CHECK(special_sprites(11, 4, 3.1, 80, 100).empty());
         auto alien = special_sprites(16, 4, 1, 80, 100);
-        CHECK(alien.size() == 1 && alien[0].atlas == Atlas::small && alien[0].source.y == 210);
+        CHECK(alien.size() == 2 && alien[0].atlas == Atlas::small && alien[0].source.y == 210);
     });
     group("special projectile and weight arrive at recorded target without game writes", [] {
         for (Word a : {9, 12, 13, 14}) {
@@ -2284,7 +2284,64 @@ int main() {
         EndgamePresentation empty;
         CHECK(empty.begin(none, false) && empty.winner() == -1 && !empty.rank() && !empty.saved());
         empty.tick(1);
+        CHECK(!empty.restart_ready());
+        for (int i = 0; i < 12; ++i) empty.tick(extinction_duration());
         CHECK(empty.restart_ready());
+    });
+
+    group("alien yellow frames use original atlas and finish without changing city lift", [] {
+        for (int i = 0; i < 4; ++i) {
+            double seconds = 1.0 + i * .125;
+            auto sprites = special_sprites(16, 0, seconds, 80, 80);
+            CHECK(sprites.size() == 2);
+            auto craft = sprites[0], yellow = sprites[1];
+            CHECK(yellow.source.x == 256 + i * 16 && yellow.source.y == 208);
+            CHECK(yellow.destination.x == craft.destination.x + 12);
+            CHECK(yellow.destination.y == craft.destination.y + 3);
+        }
+        CHECK(special_sprites(16, 0, 0, 80, 80).size() == 1);
+        CHECK(special_sprites(16, 0, 3.01, 80, 80).empty());
+        auto exit = special_sprites(16, 0, 3, 80, 80);
+        CHECK(exit[0].destination.y + exit[0].destination.h < 0);
+        CHECK(special_sprites(11, 0, 1, 80, 80)[1].atlas == Atlas::big);
+    });
+
+    group("extinction counts participating roster and waits for pending presentation", [] {
+        for (Word opponents = 1; opponents <= 4; ++opponents) {
+            auto data = endgame_fixture(false, 0);
+            for (Word slot = opponents; slot < 4; ++slot)
+                data.state.participating[slot] = false;
+            auto p = Player::developer_session(data);
+            for (int i = 0; i < 30 && !p.ended(); ++i) CHECK(p.advance_turn(37));
+            CHECK(p.ended());
+            EndgamePresentation ending;
+            CHECK(!ending.begin(p, true));
+            CHECK(ending.begin(p, false));
+            CHECK(ending.winner() == -1 && !ending.hall());
+            for (int frame = 0; frame < 10; ++frame) {
+                ending.tick(10);
+                CHECK(extinction_stage(ending.elapsed()) == frame);
+                CHECK(!ending.hall());
+            }
+            ending.tick(extinction_duration());
+            CHECK(ending.hall() && ending.restart_ready());
+        }
+    });
+
+    group("extinction displays every recovered frame before Hall", [] {
+        CHECK(extinction_stage(0) == -1);
+        double elapsed = extinction_earth_seconds;
+        for (std::size_t i = 0; i < extinction_frames.size(); ++i) {
+            auto frame = extinction_frames[i];
+            CHECK(extinction_stage(elapsed + frame.seconds / 2) == int(i));
+            CHECK(frame.source.w == frame.destination.w);
+            CHECK(frame.source.h == frame.destination.h);
+            CHECK(frame.source.x + frame.source.w <= 320);
+            CHECK(frame.source.y + frame.source.h <= (frame.large ? 432 : 176));
+            elapsed += frame.seconds;
+        }
+        CHECK(extinction_stage(elapsed + .001) == 10);
+        CHECK(extinction_frames[5].source.w == 160);
     });
 
     group("highscore persistence roundtrip is separate from source and duplicate guarded", [] {

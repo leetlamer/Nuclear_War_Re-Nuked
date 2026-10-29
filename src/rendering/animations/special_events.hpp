@@ -71,8 +71,17 @@ inline std::vector<DrawSprite> special_sprites(Word action, std::size_t actor, d
         out.push_back(small_sprite(286 + 2 * std::min(6, int(seconds / timing.duration * 7)), 32,
                                    32, base.x, base.y));
     if (action == 16) {
-        int y = int(-10 + (std::max(0, ty - 24) + 10) * std::min(1., seconds / timing.arrival));
-        out.push_back(small_sprite(260 + 2 * (frame % 8), 32, 10, tx - 8, y, 2));
+        // Verified UFO260..274 and yellow secondary276..279. Original effect69
+        // is immigration, not damage. Host seconds/descent/exit remain presentation policy.
+        double approach = std::clamp(seconds / timing.release, 0., 1.);
+        double depart = std::clamp((seconds - timing.arrival) /
+                                  (timing.duration - timing.arrival), 0., 1.);
+        int hover = std::max(0, ty - 24);
+        int y = int(-12 + (hover + 12) * approach - (hover + 28) * depart);
+        int x = tx - 8;
+        out.push_back(small_sprite(260 + 2 * (frame % 8), 32, 10, x, y, 2));
+        if (seconds >= timing.release && seconds < timing.arrival)
+            out.push_back(small_sprite(276 + frame % 4, 16, 16, x + 12, y + 3));
     }
     // Original action11 lifts the city; it is not an alien laser attack.
     if (action == 11) {

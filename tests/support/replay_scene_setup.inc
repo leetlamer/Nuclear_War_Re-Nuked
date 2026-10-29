@@ -3,6 +3,10 @@ if (!options.fixture.empty()) {
     if (options.smoke.empty())
         throw std::runtime_error("media fixture requires smoke-test output");
     player.enter_selection();
+    for (Word id : {Word(0), Word(4), Word(2), Word(7)}) {
+        auto r = portrait_rect(id);
+        player.click(r.x + 20, r.y + 15);
+    }
     player.click(110, 20);
     State state = player.coordinator()->data().state;
     for (auto &a : state.actors)
