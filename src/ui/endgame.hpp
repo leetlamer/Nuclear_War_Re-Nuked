@@ -1,5 +1,6 @@
 #pragma once
 #include "nuclear/ending.hpp"
+#include "rendering/animations/extinction.hpp"
 #include "ui/player_controller.hpp"
 #include <filesystem>
 #include <fstream>
@@ -39,7 +40,7 @@ class EndgamePresentation {
     bool active() const { return active_; }
     bool editing() const { return editing_; }
     bool hall() const {
-        return elapsed_ >= .8 + (winner_ >= 0 && winner_ < 4 ? 3 * jump_seconds_ : 0) &&
+        return elapsed_ >= (winner_ < 0 ? extinction_duration() : .8) + (winner_ >= 0 && winner_ < 4 ? 3 * jump_seconds_ : 0) &&
                !audio_wait_;
     }
     bool ai_victory() const { return active_ && winner_ >= 0 && winner_ < 4 && !hall(); }
@@ -112,8 +113,21 @@ class EndgamePresentation {
         return true;
     }
     void tick(double dt) {
-        if (active_)
-            elapsed_ += std::max(0., dt);
+        if (!active_)
+            return;
+        double next = elapsed_ + std::max(0., dt);
+        if (winner_ < 0) {
+            int current = extinction_stage(elapsed_);
+            // Never drop a recovered stage on a slow host frame. Simulation is
+            // already resolved; only this ending presentation can take longer.
+            if (current < 9 && extinction_stage(next) > current + 1) {
+                next = extinction_earth_seconds;
+                for (int i = 0; i <= current; ++i)
+                    next += extinction_frames[std::size_t(i)].seconds;
+                next += 1e-8;
+            }
+        }
+        elapsed_ = next;
     }
     void input(const std::string &input) {
         if (!editing_ || !hall())

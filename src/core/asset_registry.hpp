@@ -3,7 +3,7 @@
 #include <string_view>
 namespace nuclear::assets {
 struct ImageSpec{std::string_view key,mask,file;unsigned width,height;};
-inline constexpr std::array<ImageSpec,13> images{{
+inline constexpr std::array<ImageSpec,16> images{{
     {"character_selection","","images/backgrounds/character_selection.png",320,200},
     {"main_window","","images/interface/main_window.png",320,200},
     {"leader_portraits","","images/characters/leader_portraits.png",320,160},
@@ -17,6 +17,9 @@ inline constexpr std::array<ImageSpec,13> images{{
     {"space_ending","","images/backgrounds/space_ending.png",320,200},
     {"desolate_ending","","images/backgrounds/desolate_ending.png",320,200},
     {"bitmap_font","","fonts/original_bitmap.png",576,8},
+    {"expmap","","images/effects/expmap.png",320,200},
+    {"smallexp","","images/effects/smallexp.png",320,176},
+    {"bigexp","","images/effects/bigexp.png",320,432},
 }};
 struct AudioSpec{std::string_view key,file;unsigned samples,rate;};
 inline constexpr std::array<AudioSpec,13> audio{{

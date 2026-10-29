@@ -52,7 +52,7 @@ class Renderer {
     bool preview_speaking_{};
     std::optional<State> inspection_;
     std::size_t inspection_actor_{};
-    SDL_Texture *winner_art_{}, *space_{}, *ending_{}, *start_{}, *dip_{}, *heads_{}, *world_{},
+    SDL_Texture *earth_{}, *earth_small_{}, *earth_large_{}, *winner_art_{}, *space_{}, *ending_{}, *start_{}, *dip_{}, *heads_{}, *world_{},
         *tiles_{}, *font_{}, *missiles_{}, *controls_{}, *large_{}, *large_opaque_{};
     ScrollingTextFlow main_text_;
     ConsoleTranscript console_;
@@ -160,6 +160,9 @@ class Renderer {
         SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
         winner_art_ = image_texture("victory_body", "masked");
         space_ = image_texture("space_ending");
+        earth_ = image_texture("expmap");
+        earth_small_ = image_texture("smallexp");
+        earth_large_ = image_texture("bigexp");
         ending_ = image_texture("desolate_ending");
         large_ = image_texture("large_sprites", "masked");
         large_opaque_ = image_texture("large_sprites");
@@ -255,6 +258,19 @@ class Renderer {
         }
         if (endgame && endgame->active()) {
             SDL_RenderCopy(renderer, endgame->winner() < 0 ? space_ : ending_, nullptr, nullptr);
+            if (endgame->winner() < 0 && !endgame->hall()) {
+                int stage = extinction_stage(endgame->elapsed());
+                if (stage < int(extinction_frames.size()))
+                    SDL_RenderCopy(renderer, earth_, nullptr, nullptr);
+                // Original copies accumulate on each screen buffer. Reconstruct that
+                // deterministic composition each frame rather than retaining GPU contents.
+                for (int i = 0; stage < int(extinction_frames.size()) && i <= stage; ++i) {
+                    auto frame = extinction_frames[std::size_t(i)];
+                    auto r = frame.source, d = frame.destination;
+                    copy(frame.large ? earth_large_ : earth_small_,
+                         {r.x,r.y,r.w,r.h}, {d.x,d.y,d.w,d.h});
+                }
+            }
             if (endgame->ai_victory()) {
                 auto pose = victory_pose(
                     player.coordinator()->data().state.identity[std::size_t(endgame->winner())],

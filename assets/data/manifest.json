@@ -188,6 +188,48 @@
       "source_mask": "",
       "mask": "",
       "frame_catalog": "data/animations.json"
+    },
+    {
+      "key": "expmap",
+      "mask": "",
+      "file": "images/effects/expmap.png",
+      "width": 320,
+      "height": 200,
+      "rgba_sha256": "5fc22ee428e3060c5170a997377542aa7f0497728f1a97959ecc61139f4f7dad",
+      "transparency": "opaque native rectangle copy",
+      "source_key": "expmap",
+      "source_mask": "",
+      "source_mapping": "expmap: indexed pixels + palette_ending_all_dead",
+      "frame_catalog": "data/animations.json",
+      "frame_count": 1
+    },
+    {
+      "key": "smallexp",
+      "mask": "",
+      "file": "images/effects/smallexp.png",
+      "width": 320,
+      "height": 176,
+      "rgba_sha256": "97d5b961e02f8bd4054e0764165c3ef4bfacb83e735a542ec59f2d64b0bbaf07",
+      "transparency": "opaque native rectangle copy",
+      "source_key": "smallexp",
+      "source_mask": "",
+      "source_mapping": "smallexp: indexed pixels + palette_ending_all_dead",
+      "frame_catalog": "data/animations.json",
+      "frame_count": 5
+    },
+    {
+      "key": "bigexp",
+      "mask": "",
+      "file": "images/effects/bigexp.png",
+      "width": 320,
+      "height": 432,
+      "rgba_sha256": "a9b4b415bac97f2409f164336ef51d1345bc68ad5b9f6d5da0901b905958d93a",
+      "transparency": "opaque native rectangle copy",
+      "source_key": "bigexp",
+      "source_mask": "",
+      "source_mapping": "bigexp: indexed pixels + palette_ending_all_dead",
+      "frame_catalog": "data/animations.json",
+      "frame_count": 5
     }
   ],
   "audio": [

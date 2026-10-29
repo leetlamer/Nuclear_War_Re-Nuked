@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
         EndgamePresentation ending(score_path);
         ending.jump_seconds(options.victory_jump_seconds);
         VictorySoundSequence victory_sound;
+        bool extinction_sound_played = false;
         display.endgame = &ending;
         SDL_StartTextInput();
         SoundManager sound(options.audio_clock, options.rates);
@@ -321,6 +322,7 @@ int main(int argc, char **argv) {
                 ending = EndgamePresentation(score_path);
                 ending.jump_seconds(options.victory_jump_seconds);
                 victory_sound = VictorySoundSequence{};
+                extinction_sound_played = false;
                 had_action_audio = had_target_audio = had_selection_audio = false;
                 bleep_seen = player.bleep_serial();
                 show_log = false;
@@ -497,6 +499,11 @@ int main(int argc, char **argv) {
                     trace << "before=" << before << " after=" << sound.queued_bytes()
                           << " restarted=" << started << " cleanup=0\n";
                 }
+            }
+            if (ending.active() && ending.winner() < 0 &&
+                extinction_stage(ending.elapsed()) >= 3 && !extinction_sound_played) {
+                extinction_sound_played = true;
+                sound.play(0xe000000000000000ull, SoundCue{"exp", 620, 4998, 64});
             }
             if (ending.ai_victory()) {
                 unsigned previous_queue = sound.queued_bytes();
