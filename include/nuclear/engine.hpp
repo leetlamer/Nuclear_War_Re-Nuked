@@ -40,6 +40,8 @@ using ActorImage = std::array<std::uint8_t, actor_bytes>;
 Actor decode_actor(const ActorImage &);
 ActorImage encode_actor(const Actor &);
 struct State {
+    // Modern roster occupancy; absent slots are neither living nor eliminated players.
+    std::array<bool, actor_count> participating{{true, true, true, true, true}};
     std::array<Actor, actor_count> actors{};
     std::array<Word, actor_count> prepared_capacity{}; // 132600
     std::array<Word, actor_count> selected_opponent{}; // 13263a

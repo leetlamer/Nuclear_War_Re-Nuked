@@ -174,6 +174,12 @@ void initialize_state(State &s, Word mode, Rng &rng) {
                             {82, 107, 125, 109, 130}};
     for (std::size_t i = 0; i < 5; ++i) {
         auto &a = s.actors[i];
+        if (!s.participating[i]) {
+            a = Actor{};
+            a.action = 88;
+            s.pass_processed[i] = s.remaining_total[i] = s.prepared_capacity[i] = 0;
+            continue;
+        }
         a.target_actor = 0;
         a.target_city = 0;
         a.magnitude = 0;

@@ -58,15 +58,12 @@ Completion complete_selection(std::array<Word, 10> &flags, Rng &rng) {
     auto f = flags;
     auto random = rng;
     Completion result;
-    while (count < 4) {
-        auto id = random.next() % 10;
-        ++result.fill_draws;
-        if (!f[id]) {
-            f[id] = 1;
-            ++count;
-        }
-    }
-    for (auto &id : result.identity) {
+    if (!count)
+        throw Unsupported("select at least one opponent before confirming");
+    result.count = count;
+    result.identity.fill(0xffff);
+    for (unsigned slot = 0; slot < count; ++slot) {
+        auto &id = result.identity[slot];
         Word index = Word(random.next() % 10);
         ++result.assignment_draws;
         while (!f[index])
@@ -110,11 +107,16 @@ Word city_frame(Word p) {
     return signed_word(p) >= 1 ? 220 : 150;
 }
 bool Player::complete_selection_screen() {
+    if (!selection_.count)
+        return false;
     auto next = selection_;
     auto result = complete_selection(next.flags, next.rng);
-    next.count = 4;
+    next.count = Word(result.count);
     session::Data data(next.rng.seed(), true);
     for (std::size_t i = 0; i < 4; ++i) {
+        data.state.participating[i] = i < result.count;
+        if (!data.state.participating[i])
+            continue;
         auto id = result.identity[i];
         data.state.identity[i] = id;
         data.state.actors[i].profile = Word(player_assets::profiles[id]);
@@ -162,6 +164,9 @@ Player Player::developer_session(session::Data initial) {
 bool Player::command(HumanCommand cmd) {
     accepted_action_ = false;
     if (!coordinator_ || coordinator_->phase() != session::Phase::human_selection)
+        return false;
+    if (cmd.kind == HumanCommandKind::actor_view &&
+        (cmd.argument >= 5 || !coordinator_->data().state.participating[cmd.argument]))
         return false;
     session::Adapters a{resolver_, schedule_};
     bool delivery_accepted = false;
@@ -412,7 +417,7 @@ bool Player::click(int x, int y) {
     }
     const Rect portraits[]{{0, 0, 68, 42}, {0, 149, 68, 42}, {251, 0, 69, 42}, {251, 149, 69, 42}};
     for (Word actor = 0; actor < 4; ++actor)
-        if (portraits[actor].contains(x, y))
+        if (coordinator_->data().state.participating[actor] && portraits[actor].contains(x, y))
             return command({HumanCommandKind::actor_view, actor});
     auto view = coordinator_->data().human.logical_view;
     if (Rect{100, 58, 124, 80}.contains(x, y))

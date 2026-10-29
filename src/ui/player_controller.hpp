@@ -12,7 +12,7 @@ Rect portrait_rect(std::size_t identity);
 bool selection_header(int x, int y);
 struct Completion {
     std::array<Word, 4> identity{};
-    unsigned fill_draws{}, assignment_draws{};
+    unsigned count{}, fill_draws{}, assignment_draws{};
 };
 Completion complete_selection(std::array<Word, 10> &, Rng &);
 struct Selection {

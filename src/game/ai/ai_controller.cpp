@@ -5,6 +5,8 @@ void ai_turn(State &state, Rng &random) {
     auto planned_state = state;
     auto planned_random = random;
     for (std::size_t actor_index = 0; actor_index < 4; ++actor_index) {
+        if (!planned_state.participating[actor_index])
+            continue;
         Word decision_row =
             add_word(select_opponent(planned_state, actor_index, planned_random), 2);
         auto &actor = planned_state.actors[actor_index];

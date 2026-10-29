@@ -245,7 +245,7 @@ class Renderer {
                         auto r = portrait_rect(id);
                         tile(233, {r.x + 45, r.y + 5, 16, 16});
                     }
-                auto title = "Nuclear War - select four opponents (" +
+                auto title = "Nuclear War - select 1–4 opponents (" +
                              std::to_string(player.selection().count) + "/4); click title to begin";
                 SDL_SetWindowTitle(window, title.c_str());
             } else
@@ -321,6 +321,8 @@ class Renderer {
                                                 scene && scene->selection_blocked(),
                                                 data.human.display_actor == 0xffff);
         for (std::size_t i = 0; i < 4; ++i) {
+            if (!face_state.participating[i])
+                continue;
             auto identity = face_state.identity[i];
             auto r = portrait_rect(identity);
             int x = i < 2 ? 13 : 264, y = (i % 2) ? 154 : 5;
@@ -509,6 +511,7 @@ class Renderer {
         if (!player.human_alive() || player.ended()) {
             SDL_RenderCopy(renderer, world_, nullptr, nullptr);
             for (auto &a : display_state.actors)
+                if (display_state.participating[std::size_t(&a - display_state.actors.data())])
                 for (int city = 0; city < 5; ++city)
                     tile(city_frame(a.population[city]),
                          {int(a.city_x[city]), int(a.city_y[city]) - 1, 16, 16});
@@ -531,6 +534,7 @@ class Renderer {
             const auto state = scene->population_state();
             const auto &event = scene->event();
             for (std::size_t i = 0; i < 5; ++i)
+                if (state.participating[i])
                 for (std::size_t city = 0; city < 5; ++city) {
                     const auto &a = state.actors[i];
                     tile(event.action == 86 && i == event.target && city == event.city

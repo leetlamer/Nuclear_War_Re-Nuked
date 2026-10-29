@@ -91,12 +91,32 @@ int main() {
         for (auto f : flags)
             CHECK(f == 0);
     });
-    group("vacancy fill retains duplicate draws; never substitute shuffle", [] {
-        std::array<Word, 10> flags{};
-        Rng rng(1);
-        auto c = complete_selection(flags, rng);
-        CHECK((c.identity == std::array<Word, 4>{8, 1, 3, 5}));
-        CHECK(c.fill_draws == 5 && c.assignment_draws == 4 && rng.seed() == 0xbf54bc7e);
+    group("explicit roster supports one through four opponents without filling", [] {
+        for (Word count = 1; count <= 4; ++count) {
+            Player player;
+            player.enter_selection();
+            CHECK(!player.click(110, 20));
+            for (Word id = 0; id < count; ++id) {
+                auto r = portrait_rect(id);
+                CHECK(player.click(r.x + 20, r.y + 15));
+            }
+            CHECK(player.click(110, 20));
+            const auto &state = player.coordinator()->data().state;
+            CHECK(living_actors(state) == count + 1);
+            for (Word slot = 0; slot < 4; ++slot) {
+                CHECK(state.participating[slot] == (slot < count));
+                if (slot >= count) {
+                    CHECK(!populated_cities(state.actors[slot]));
+                    CHECK(state.actors[slot].action == 88);
+                    CHECK(!player.click(slot < 2 ? 20 : 270, slot % 2 ? 160 : 10));
+                }
+            }
+            auto planned = state;
+            Rng random(123);
+            ai_turn(planned, random);
+            for (Word slot = count; slot < 4; ++slot)
+                CHECK(planned.actors[slot].action == 88);
+        }
     });
     group("setup copies verified profiles and human initialized resources", [] {
         Player p;
