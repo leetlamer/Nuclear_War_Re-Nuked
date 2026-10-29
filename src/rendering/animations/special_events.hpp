@@ -74,8 +74,10 @@ inline std::vector<DrawSprite> special_sprites(Word action, std::size_t actor, d
         // Verified UFO260..274 and yellow secondary276..279. Original effect69
         // is immigration, not damage. Host seconds/descent/exit remain presentation policy.
         double approach = std::clamp(seconds / timing.release, 0., 1.);
-        double depart = std::clamp((seconds - timing.arrival) /
-                                  (timing.duration - timing.arrival), 0., 1.);
+        double depart = timing.duration > timing.arrival
+                            ? std::clamp((seconds - timing.arrival) /
+                                         (timing.duration - timing.arrival), 0., 1.)
+                            : 0.;
         int hover = std::max(0, ty - 24);
         int y = int(-12 + (hover + 12) * approach - (hover + 28) * depart);
         int x = tx - 8;

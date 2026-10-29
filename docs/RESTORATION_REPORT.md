@@ -41,7 +41,7 @@ Recovered announcement is **`Space Aliens land on %s.`**. Effect69 doubles the f
 ## Desktop validation actually executed
 
 - Baseline optimized:16/16 CTest suites passed before edits.
-- Final optimized:16/16 passed; player176groups/178643checks, revenge20groups/790checks.
+- Final optimized:16/16 passed; player176groups/178644checks, revenge20groups/790checks.
 - Final UBSan:16/16 passed (`-fsanitize=undefined -fno-sanitize-recover=all`).
 - Asset validation:16 exact RGBA images,13 reversible original WAVs,743 texts/315 references.
 - Native SDL replays: all-dead, human-death/AI-only, alien-delivery, revenge-human passed; revenge4attacks, no acknowledgement, seed3008955749.

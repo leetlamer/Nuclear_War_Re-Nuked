@@ -2315,6 +2315,7 @@ int main() {
             CHECK(yellow.destination.x == craft.destination.x + 12);
             CHECK(yellow.destination.y == craft.destination.y + 3);
         }
+        CHECK(special_sprites(16, 0, 2, 80, 80, 1, {.7, 2., 2.}).size() == 1);
         CHECK(special_sprites(16, 0, 0, 80, 80).size() == 1);
         CHECK(special_sprites(16, 0, 3.01, 80, 80).empty());
         auto exit = special_sprites(16, 0, 3, 80, 80);
