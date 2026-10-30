@@ -85,6 +85,7 @@ if(BUILD_TESTING)
   game_test(audio_tests tests/frontend/audio_tests.cpp)
   game_test(render_tests tests/frontend/render_tests.cpp)
   game_test(emoji_renderer_tests tests/frontend/emoji_renderer_tests.cpp)
+  game_test(city_refresh_tests tests/frontend/city_refresh_tests.cpp)
   game_test(legacy_prototype_tests tests/support/legacy_prototype/tests.cpp
             tests/support/legacy_prototype/game.cpp)
   game_test(missile_demo_tests tests/support/missile_demo/tests.cpp

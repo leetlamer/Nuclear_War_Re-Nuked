@@ -1,0 +1,39 @@
+Test project /Users/zellcorp/NuclearWar-ReNuked/build-ubsan
+      Start  1: engine_tests
+ 1/17 Test  #1: engine_tests .....................   Passed    0.02 sec
+      Start  2: ending_tests
+ 2/17 Test  #2: ending_tests .....................   Passed    0.02 sec
+      Start  3: resolver_marker_tests
+ 3/17 Test  #3: resolver_marker_tests ............   Passed    0.01 sec
+      Start  4: round_plan_tests
+ 4/17 Test  #4: round_plan_tests .................   Passed    0.01 sec
+      Start  5: session_tests
+ 5/17 Test  #5: session_tests ....................   Passed    0.01 sec
+      Start  6: resolver_tests
+ 6/17 Test  #6: resolver_tests ...................   Passed    0.01 sec
+      Start  7: missile_tests
+ 7/17 Test  #7: missile_tests ....................   Passed    0.01 sec
+      Start  8: text_tests
+ 8/17 Test  #8: text_tests .......................   Passed    0.01 sec
+      Start  9: player_tests
+ 9/17 Test  #9: player_tests .....................   Passed    0.05 sec
+      Start 10: revenge_tests
+10/17 Test #10: revenge_tests ....................   Passed    0.01 sec
+      Start 11: audio_tests
+11/17 Test #11: audio_tests ......................   Passed    0.71 sec
+      Start 12: render_tests
+12/17 Test #12: render_tests .....................   Passed    0.07 sec
+      Start 13: emoji_renderer_tests
+13/17 Test #13: emoji_renderer_tests .............   Passed    2.22 sec
+      Start 14: city_refresh_tests
+14/17 Test #14: city_refresh_tests ...............   Passed    0.32 sec
+      Start 15: legacy_prototype_tests
+15/17 Test #15: legacy_prototype_tests ...........   Passed    0.38 sec
+      Start 16: missile_demo_tests
+16/17 Test #16: missile_demo_tests ...............   Passed    0.01 sec
+      Start 17: asset_validation
+17/17 Test #17: asset_validation .................   Passed    0.03 sec
+
+100% tests passed out of 17
+
+Total Test time (real) =   3.88 sec

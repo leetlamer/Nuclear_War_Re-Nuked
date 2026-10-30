@@ -1,0 +1,15 @@
+{
+  "src/rendering/animations/extinction.hpp": "55cfe769a92611e4139caa48e30f97b9d85d93c977e5b0ad23e17552cc9a68c8",
+  "src/ui/endgame.hpp": "07c45af488c60143fc056e5fac9eb11ccb29eb4c640beb1deeb80acd72c860d5",
+  "src/platform/application.cpp": "32cdad39b2f0cbcb23c650216812e7caba59fad7b88b9a5fc3abf4b19672c051",
+  "src/ui/player_controller.cpp": "11d7052e868b966cd2c19ec2897ed538e0d872520a87948d7adf00e635447daa",
+  "src/ui/player_controller.hpp": "2b8f7772336148c47691cb86dd9284af37c8a316075c8226b9346be98bd9371d",
+  "include/nuclear/engine.hpp": "a6e9a8d507c6f4c0b69fdc39d4798c0ecc0eea59c2178852c879adb7462901e6",
+  "src/game/ai/ai_controller.cpp": "b11e9775f944e890d4d2f8a38eb9e422cad9c547d803089dca7c15910646137f",
+  "src/game/game_rules.cpp": "9f4886bf23ab817a2c3bf52308c2375218a9c920aeeac05d1a861cf446e7d449",
+  "assets/images/effects/expmap.png": "45d1a8a479a901da3229b2baeb7bfbcfff0dc39ae9766e4c9cab825f8ae205b2",
+  "assets/images/effects/smallexp.png": "148f6ec8f19a31bd1bb199028685e2b75cec13fbced23d7a7ccc415cea035808",
+  "assets/images/effects/bigexp.png": "b21cc49fa527c5b32c8904e94544554bac9309dc70780e51e1cbbfb6efa64dc2",
+  "assets/audio/effects/explosion.wav": "21af4cb3b1b7cb10f26d2df3b7765a5908b4957a39f002d397896bf696546c9e",
+  "renderer protected ending block": "63c6587cb021284eeef5a18d56b76e9751aa8cabccb7a92f7dc5afa6bcf55966"
+}

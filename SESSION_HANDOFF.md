@@ -1,3 +1,7 @@
+# Selective special-event rollback — 2026-10-30
+
+See docs/SELECTIVE_SPECIAL_EVENT_ROLLBACK.md. Alien16 single-UFO landing restored without lasers. City11 stationary redraw and exact-end exhaust cleanup corrected; actual SDL negative control16524differences→0. Roster1–4 and entire Earth extinction ending are byte-identical to pre-rollback safety checkpoint. Release/UBSan17/17 pass; native immigration/city/extinction replays and capture parity pass. Safety tag+verified bundle exist; no push/deploy/shutdown; GameReverse read-only.
+
 # Current handoff — 2026-10-29
 
 See docs/RESTORATION_REPORT.md, EXTINCTION_EVIDENCE.md and ALIEN_ATTACK_EVIDENCE.md.

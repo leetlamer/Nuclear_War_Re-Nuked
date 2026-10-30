@@ -2,7 +2,7 @@
 nwr_verify_file("assets/data/manifest.json" "88a3d7aaf23ba1bde1e175901c4a4a5dd6d86312167d005c3998bf94100292c6")
 nwr_verify_file("assets/data/interface_layout.json" "bd5aee6fabb19441b8080626885e4d45b0e974317b23ff88565cf6ca4cab882f")
 nwr_verify_file("assets/data/dialogue.json" "c46be38fbb1e1e8cc23c8dbb434a2670eca9263ddaad1a46c6d2bf60a59c88fc")
-nwr_verify_file("assets/data/animations.json" "40fa2520299f9fcd5fa73f4140736ab7ef44617cfdca862777abdd546909edf9")
+nwr_verify_file("assets/data/animations.json" "2fe004a1447eb38152b3321dd72d7258a71ae1f109a9fd81f3721be53dd89bce")
 nwr_verify_file("assets/images/backgrounds/character_selection.png" "c743efee9fd2816c4cd661802c276259b01ae7c32c512ec56b67f4e76d788821")
 nwr_verify_file("assets/images/interface/main_window.png" "47fbdb7b44dfdefe9bfa4531c27b353bb019055b9ca9859498b6b83ddd0421e7")
 nwr_verify_file("assets/images/characters/leader_portraits.png" "7499b2889f7aac4f6a7d399a9720c7925151f6a9ed8f0188a164c52a6c8e9311")

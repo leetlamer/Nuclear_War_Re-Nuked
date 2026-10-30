@@ -482,45 +482,6 @@
           "seconds": 0.04
         }
       ]
-    },
-    {
-      "name": "alien yellow secondary",
-      "image": "images/effects/small_sprites.png",
-      "frames": [
-        {
-          "source": [
-            256,
-            208,
-            16,
-            16
-          ]
-        },
-        {
-          "source": [
-            272,
-            208,
-            16,
-            16
-          ]
-        },
-        {
-          "source": [
-            288,
-            208,
-            16,
-            16
-          ]
-        },
-        {
-          "source": [
-            304,
-            208,
-            16,
-            16
-          ]
-        }
-      ],
-      "evidence": "104EE4..104EFC; original action16 immigration, not hostile damage"
     }
   ]
 }

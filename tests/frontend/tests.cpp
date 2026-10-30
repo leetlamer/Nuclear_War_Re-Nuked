@@ -1288,7 +1288,7 @@ int main() {
         for (Word action : {9, 11, 12, 13, 14, 15, 16})
             for (int frame = 0; frame < 31; ++frame) {
                 auto sprites = special_sprites(action, 4, frame * .1, 90, 100, 30);
-                CHECK(!sprites.empty());
+                CHECK(action == 11 && frame == 30 ? sprites.empty() : !sprites.empty());
                 for (auto sprite : sprites) {
                     CHECK(sprite.atlas == Atlas::small || sprite.atlas == Atlas::big);
                     CHECK(sprite.source.x >= 0 && sprite.source.y >= 0 &&
@@ -1421,7 +1421,7 @@ int main() {
         }
         CHECK(special_sprites(11, 4, 3.1, 80, 100).empty());
         auto alien = special_sprites(16, 4, 1, 80, 100);
-        CHECK(alien.size() == 2 && alien[0].atlas == Atlas::small && alien[0].source.y == 210);
+        CHECK(alien.size() == 1 && alien[0].atlas == Atlas::small && alien[0].source.y == 210);
     });
     group("special projectile and weight arrive at recorded target without game writes", [] {
         for (Word a : {9, 12, 13, 14}) {
@@ -2305,22 +2305,36 @@ int main() {
         CHECK(empty.restart_ready());
     });
 
-    group("alien yellow frames use original atlas and finish without changing city lift", [] {
-        for (int i = 0; i < 4; ++i) {
-            double seconds = 1.0 + i * .125;
-            auto sprites = special_sprites(16, 0, seconds, 80, 80);
-            CHECK(sprites.size() == 2);
-            auto craft = sprites[0], yellow = sprites[1];
-            CHECK(yellow.source.x == 256 + i * 16 && yellow.source.y == 208);
-            CHECK(yellow.destination.x == craft.destination.x + 12);
-            CHECK(yellow.destination.y == craft.destination.y + 3);
+    group("alien immigration restores single UFO without secondary laser sprites", [] {
+        for (double t : {0., .125, .7, 1., 1.5, 2., 2.8, 3.}) {
+            auto sprites = special_sprites(16, 0, t, 80, 80);
+            CHECK(sprites.size() == 1);
+            CHECK(sprites[0].source.y == 210);
+            CHECK(sprites[0].destination.y == int(-10 + 66 * std::min(1., t / 2.)));
         }
-        CHECK(special_sprites(16, 0, 2, 80, 80, 1, {.7, 2., 2.}).size() == 1);
-        CHECK(special_sprites(16, 0, 0, 80, 80).size() == 1);
         CHECK(special_sprites(16, 0, 3.01, 80, 80).empty());
-        auto exit = special_sprites(16, 0, 3, 80, 80);
-        CHECK(exit[0].destination.y + exit[0].destination.h < 0);
-        CHECK(special_sprites(11, 0, 1, 80, 80)[1].atlas == Atlas::big);
+    });
+    group("city launch clears flight art and publishes resolved city at completion", [] {
+        State before, after;
+        before.actors[0].population[0] = 30;
+        after = before;
+        after.actors[0].population[0] = 0;
+        ActionEvent event;
+        event.actor = event.target = event.city = 0;
+        event.action = 11;
+        event.region = EventRegion::action;
+        event.before = before;
+        event.after = after;
+        auto scene = ActionPresentation::replay_event(event, before);
+        scene.tick(2.9);
+        CHECK(!scene.effect_complete());
+        CHECK(scene.population_state().actors[0].population[0] == 30);
+        CHECK(special_sprites(11, 0, 2.9, 80, 80, 30).size() == 2);
+        scene.tick(.1);
+        CHECK(scene.effect_complete());
+        CHECK(scene.population_state().actors[0].population[0] == 0);
+        CHECK(special_sprites(11, 0, 3., 80, 80, 30).empty());
+        CHECK(special_sprites(11, 0, 3.1, 80, 80, 30).empty());
     });
 
     group("extinction counts participating roster and waits for pending presentation", [] {

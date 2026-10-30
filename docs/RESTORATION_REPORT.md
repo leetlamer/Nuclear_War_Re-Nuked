@@ -1,3 +1,5 @@
+> Historical 2026-10-29 report. The later selective UFO rollback is documented in SELECTIVE_SPECIAL_EVENT_ROLLBACK.md; roster and extinction remain intact.
+
 # Roster, extinction and UFO restoration — 2026-10-29
 
 ## Status

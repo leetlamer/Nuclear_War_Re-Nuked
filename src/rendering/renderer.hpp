@@ -553,7 +553,9 @@ class Renderer {
                 if (state.participating[i])
                 for (std::size_t city = 0; city < 5; ++city) {
                     const auto &a = state.actors[i];
-                    tile(event.action == 86 && i == event.target && city == event.city
+                    tile((event.action == 86 ||
+                          (event.action == 11 && !scene->effect_complete())) &&
+                                 i == event.target && city == event.city
                              ? Word(150)
                              : city_frame(a.population[city]),
                          {int(a.city_x[city]), int(a.city_y[city]) - 1, 16, 16});

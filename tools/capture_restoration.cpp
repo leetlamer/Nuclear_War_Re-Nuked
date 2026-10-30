@@ -39,4 +39,20 @@ int main(int argc, char **argv) {
         display.render(roster,false,&scene);
         display.capture(std::string(argv[1])+"/alien-"+std::to_string(time)+".bmp");
     }
+    auto before = roster.coordinator()->data().state;
+    auto after = before;
+    after.actors[4].population[0] = 0;
+    for (double time : {1., 2.9, 3., 3.2}) {
+        ActionEvent event;
+        event.region = EventRegion::action;
+        event.actor = event.target = 4; event.city = 0; event.action = 11;
+        event.media.supported = true;
+        event.media.population_before = before.actors[4].population[0];
+        event.before = before; event.after = after;
+        auto scene = ActionPresentation::replay_event(event,before);
+        scene.tick(time);
+        display.render(roster,false,&scene);
+        display.capture(std::string(argv[1])+"/city-lift-"+std::to_string(time)+".bmp");
+    }
+
 }
